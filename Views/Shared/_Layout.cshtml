@@ -1,0 +1,166 @@
+@{
+    var cart = Session["Cart"] as List<PandoraWeb.ViewModels.CartItemVM>;
+    int cartCount = cart != null ? cart.Sum(c => c.Quantity) : 0;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Pandora</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="~/assets/css/global.css">
+    <link rel="stylesheet" href="~/assets/css/components/buttons.css">
+    <link rel="stylesheet" href="~/assets/css/components/navbar.css">
+    <link rel="stylesheet" href="~/assets/css/components/product-card.css">
+    <link rel="stylesheet" href="~/assets/css/components/footer.css">
+    <link rel="stylesheet" href="~/assets/css/components/forms.css">
+    <link rel="stylesheet" href="~/assets/css/components/quantity-input.css">
+    <link rel="stylesheet" href="~/assets/css/components/section-title.css">
+    <link rel="stylesheet" href="~/assets/css/components/breadcrumb.css">
+    <link rel="stylesheet" href="~/assets/css/index.css">
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+
+    <!-- Header / Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container-fluid px-4 px-lg-5">
+            <a class="navbar-brand" href="@Url.Action("Index", "Home")">PANDORA</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewBag.ActiveMenu == "Home" ? "active" : "")" href="@Url.Action("Index", "Home")">Trang Chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewBag.ActiveMenu == "Category" ? "active" : "")" href="@Url.Action("Category", "Product")">Bộ Sưu Tập</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewBag.ActiveMenu == "Stores" ? "active" : "")" href="@Url.Action("Stores", "Home")">Cửa Hàng</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewBag.ActiveMenu == "Contact" ? "active" : "")" href="@Url.Action("Contact", "Home")">Liên Hệ</a>
+                    </li>
+
+                </ul>
+                <div class="d-flex align-items-center mt-3 mt-lg-0">
+                    <a href="#" class="nav-icon"><i class="fas fa-search"></i></a>
+                    
+                    @if (Session["FullName"] != null)
+                    {
+                        <div class="dropdown d-inline-block">
+                            <a href="#" class="nav-icon dropdown-toggle" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle text-primary-gold"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2" aria-labelledby="profileDropdown">
+                                <li>
+                                    <div class="px-3 py-2 border-bottom mb-1">
+                                        <div class="fw-bold">@Session["FullName"]</div>
+                                        <small class="text-muted">@Session["Role"]</small>
+                                    </div>
+                                </li>
+                                @if (Session["Role"]?.ToString() == "Admin" || Session["Role"]?.ToString() == "Manager")
+                                {
+                                    <li><a class="dropdown-item" href="@Url.Action("Index", "Admin")"><i class="fas fa-crown text-warning me-2"></i>Bảng điều khiển Quản trị</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                }
+                                <li><a class="dropdown-item" href="@Url.Action("Profile", "Account")"><i class="far fa-id-badge me-2"></i>Hồ sơ cá nhân</a></li>
+                                <li><a class="dropdown-item" href="@Url.Action("Orders", "Order")"><i class="fas fa-box me-2"></i>Đơn hàng của tôi</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="@Url.Action("Logout", "Account")"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <a href="@Url.Action("Login", "Account")" class="nav-icon"><i class="far fa-user"></i></a>
+                    }
+                    <a href="@Url.Action("Cart", "Order")" class="nav-icon position-relative">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cart-badge" style="font-size: 0.6rem;">@cartCount</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    @RenderBody()
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container-fluid px-4 px-lg-5">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
+                    <a href="@Url.Action("Index", "Home")" class="navbar-brand text-white mb-3 d-inline-block">PANDORA</a>
+                    <p class="mb-4">Mang đến vẻ đẹp hoàn mỹ và sự tự tin cho phái đẹp thông qua những thiết kế trang sức tinh tế, hiện đại và sang trọng.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-pinterest-p"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
+                    <h5 class="footer-heading">Liên Kết Nhỏ</h5>
+                    <a href="@Url.Action("Index", "Home")" class="footer-link">Trang Chủ</a>
+                    <a href="@Url.Action("Category", "Product")" class="footer-link">Sản Phẩm</a>
+                    <a href="@Url.Action("About", "Home")" class="footer-link">Về Chúng Tôi</a>
+                    <a href="@Url.Action("Stores", "Home")" class="footer-link">Hệ Thống Cửa Hàng</a>
+                    <a href="@Url.Action("Contact", "Home")" class="footer-link">Liên Hệ</a>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
+                    <h5 class="footer-heading">Hỗ Trợ</h5>
+                    <a href="#" class="footer-link">Chính sách bảo hành</a>
+                    <a href="#" class="footer-link">Chính sách đổi trả</a>
+                    <a href="#" class="footer-link">Hướng dẫn đo size</a>
+                    <a href="@Url.Action("Faq", "Home")" class="footer-link">Câu hỏi thường gặp</a>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <h5 class="footer-heading">Đăng Ký Nhận Tin</h5>
+                    <p>Nhận ngay thông tin về các bộ sưu tập mới và ưu đãi đặc biệt.</p>
+                    <form class="d-flex">
+                        <input type="email" class="form-control me-2" placeholder="Email của bạn">
+                        <button type="submit" class="btn btn-gold text-nowrap">Đăng Ký</button>
+                    </form>
+                </div>
+            </div>
+            <hr class="border-secondary mt-5 mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                    &copy; 2026 Pandora. All rights reserved.
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <img src="~/assets/images/payment-methods.png" alt="Payment Methods" height="30" onerror="this.style.display='none'">
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100;">
+        <div id="cartToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-check-circle me-2"></i> Đã thêm sản phẩm vào giỏ hàng!
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/assets/js/main.js?v=@DateTime.Now.Ticks"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
+
+
+

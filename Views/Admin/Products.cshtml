@@ -1,0 +1,211 @@
+@model IEnumerable<PandoraWeb.Models.Product>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="page-title">
+    Quản lý Sản Phẩm
+    <button class="btn btn-admin" onclick="openProductModal()">
+        <i class="fas fa-plus"></i> Thêm Sản Phẩm
+    </button>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="admin-card">
+    <div class="table-responsive table-wrapper">
+        <table class="table admin-table" id="productTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên Sản Phẩm</th>
+                    <th>Danh Mục</th>
+                    <th>Giá</th>
+                    <th>Tồn Kho</th>
+                    <th>Trạng Thái</th>
+                    <th>Thao Tác</th>
+                </tr>
+            </thead>
+            <tbody id="productTbody">
+                @foreach (var p in Model)
+                {
+                    var statusClass = p.Status == "active" ? "status-active" : "status-inactive";
+                    var statusText = p.Status == "active" ? "Đang Bán" : "Ngừng KD";
+                    var stock = p.ProductVariants?.FirstOrDefault()?.Stock ?? 0;
+                    
+                    <tr data-id="@p.ProductId" data-name="@p.ProductName" data-cat="@p.CategoryId" data-price="@p.BasePrice" data-stock="@stock" data-status="@p.Status">
+                        <td>#@p.ProductId</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                @if (!string.IsNullOrEmpty(p.ImageUrl))
+                                {
+                                    <img src="~/@p.ImageUrl" alt="@p.ProductName" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 10px;">
+                                }
+                                <strong>@p.ProductName</strong>
+                            </div>
+                        </td>
+                        <td>@(p.Category?.CategoryName)</td>
+                        <td>@p.BasePrice.ToString("N0") ₫</td>
+                        <td>@stock</td>
+                        <td><span class="status-badge @statusClass">@statusText</span></td>
+                        <td>
+                            <button class="btn-icon btn-edit" onclick="editProduct(this)"><i class="fas fa-edit"></i></button>
+                            <button class="btn-icon btn-delete" onclick="deleteProduct(@p.ProductId)"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Product Modal -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content admin-form">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Thêm Sản Phẩm Mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="productForm" method="post" action="@Url.Action("SaveProduct", "Admin")" enctype="multipart/form-data">
+                    <input type="hidden" name="productId" id="productId">
+                    <div class="mb-3">
+                        <label class="form-label">Tên Sản Phẩm</label>
+                        <input type="text" class="form-control" name="productName" id="productName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Danh Mục</label>
+                        <select class="form-select" name="categoryId" id="productCategory" required>
+                            @foreach (var cat in ViewBag.Categories as IEnumerable<PandoraWeb.Models.Category>)
+                            {
+                                <option value="@cat.CategoryId">@cat.CategoryName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Giá (VNĐ)</label>
+                        <input type="number" class="form-control" name="price" id="productPrice" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Hình Ảnh</label>
+                        <input type="file" class="form-control" name="imageFile" id="productImage" accept="image/*">
+                        <div class="mt-2 text-center d-none" id="imagePreviewContainer">
+                            <img src="" id="imagePreview" alt="Preview" style="max-height: 120px; border-radius: 8px; border: 1px solid var(--admin-border);">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tồn Kho</label>
+                        <input type="number" class="form-control" name="stock" id="productStock" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Trạng Thái</label>
+                        <select class="form-select" name="status" id="productStatus">
+                            <option value="active">Đang Bán</option>
+                            <option value="inactive">Ngừng Kinh Doanh</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-admin">Lưu Thay Đổi</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+@section Scripts {
+    <script>
+        let productModal;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            productModal = new bootstrap.Modal(document.getElementById('productModal'));
+            
+            // Handle image preview
+            document.getElementById('productImage').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                const previewContainer = document.getElementById('imagePreviewContainer');
+                const previewImg = document.getElementById('imagePreview');
+                
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImg.src = e.target.result;
+                        previewContainer.classList.remove('d-none');
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    previewImg.src = '';
+                    previewContainer.classList.add('d-none');
+                }
+            });
+        });
+
+        function openProductModal() {
+            const form = document.getElementById('productForm');
+            form.reset();
+            document.getElementById('productId').value = '';
+            document.getElementById('productImage').value = '';
+            document.getElementById('imagePreviewContainer').classList.add('d-none');
+            document.getElementById('imagePreview').src = '';
+            document.getElementById('modalTitle').textContent = 'Thêm Sản Phẩm Mới';
+            productModal.show();
+        }
+
+        function editProduct(btn) {
+            const tr = btn.closest('tr');
+            document.getElementById('productId').value = tr.dataset.id;
+            document.getElementById('productName').value = tr.dataset.name;
+            document.getElementById('productCategory').value = tr.dataset.cat;
+            document.getElementById('productPrice').value = tr.dataset.price;
+            document.getElementById('productStock').value = tr.dataset.stock;
+            document.getElementById('productStatus').value = tr.dataset.status;
+            
+            document.getElementById('productImage').value = '';
+            document.getElementById('imagePreviewContainer').classList.add('d-none');
+            document.getElementById('imagePreview').src = '';
+            
+            document.getElementById('modalTitle').textContent = 'Sửa Sản Phẩm';
+            productModal.show();
+        }
+
+        function deleteProduct(id) {
+            if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này? Hệ thống sẽ xóa nó vĩnh viễn khỏi cơ sở dữ liệu!')) {
+                fetch('/Admin/DeleteProduct', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: 'id=' + id
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success) {
+                        window.location.reload();
+                    } else {
+                        alert('Lỗi: ' + data.message);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Lỗi khi xóa!');
+                });
+            }
+        }
+    </script>
+}
+

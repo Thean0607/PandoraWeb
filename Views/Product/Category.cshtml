@@ -1,0 +1,168 @@
+@model IEnumerable<PandoraWeb.Models.Product>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Category";
+}
+
+<!-- Breadcrumb & Title -->
+    <div class="breadcrumb-wrap mt-5 pt-5">
+        <div class="container-fluid px-4 px-lg-5 mt-4">
+            <h1 class="breadcrumb-title font-serif">Tất Cả Sản Phẩm</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Trang Chủ</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Sản Phẩm</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Category Content -->
+    <section class="py-5">
+        <div class="container-fluid px-4 px-lg-5">
+            <div class="row">
+                <!-- Filter Toggle Button (Mobile Only) -->
+                <div class="d-lg-none mb-3">
+                    <button class="btn btn-outline-gold w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterSidebar" aria-controls="filterSidebar">
+                        <i class="fas fa-filter me-2"></i> Hiển thị bộ lọc
+                    </button>
+                </div>
+
+                <!-- Sidebar Filter -->
+                <div class="col-lg-3 mb-5 mb-lg-0">
+                    <div class="offcanvas-lg offcanvas-start position-sticky" style="top: 140px; z-index: 10;" tabindex="-1" id="filterSidebar" aria-labelledby="filterSidebarLabel">
+                        <div class="offcanvas-header border-bottom">
+                            <h5 class="offcanvas-title font-serif" id="filterSidebarLabel">Lọc Sản Phẩm</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#filterSidebar" aria-label="Close"></button>
+                        </div>
+                        <div class="offcanvas-body p-3 p-lg-0">
+                            <div class="card border-0 shadow-sm p-lg-4 p-0 bg-transparent w-100">
+                                <h4 class="font-serif mb-4 d-none d-lg-block">Lọc Sản Phẩm</h4>
+                        
+                        <!-- Filter by Category -->
+                        <div class="mb-4">
+                            <h5 class="fs-6 fw-bold mb-3">Danh Mục</h5>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" value="" id="cat1">
+                                <label class="form-check-label text-muted" for="cat1">Nhẫn (15)</label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" value="" id="cat2">
+                                <label class="form-check-label text-muted" for="cat2">Dây Chuyền (20)</label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" value="" id="cat3">
+                                <label class="form-check-label text-muted" for="cat3">Hoa Tai (12)</label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" value="" id="cat4">
+                                <label class="form-check-label text-muted" for="cat4">Lắc Tay (8)</label>
+                            </div>
+                        </div>
+
+                        <!-- Filter by Material -->
+                        <div class="mb-4">
+                            <h5 class="fs-6 fw-bold mb-3">Chất Liệu</h5>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" value="" id="mat1">
+                                <label class="form-check-label text-muted" for="mat1">Vàng 18K</label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" value="" id="mat2">
+                                <label class="form-check-label text-muted" for="mat2">Vàng Hồng</label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" value="" id="mat3">
+                                <label class="form-check-label text-muted" for="mat3">Bạc Ý 925</label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" value="" id="mat4">
+                                <label class="form-check-label text-muted" for="mat4">Bạch Kim</label>
+                            </div>
+                        </div>
+
+                        <!-- Filter by Price -->
+                        <div class="mb-4">
+                            <h5 class="fs-6 fw-bold mb-3">Mức Giá</h5>
+                            <input type="range" class="form-range" min="0" max="50000000" step="1000000" id="priceRange">
+                            <div class="d-flex justify-content-between text-muted fs-7">
+                                <span>0 ₫</span>
+                                <span>50,000,000 ₫</span>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-gold w-100">Áp Dụng Tùy Chọn</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Grid -->
+                <div class="col-lg-9">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <p class="mb-0 text-muted">Hiển thị 1-9 trong số 55 sản phẩm</p>
+                        <select class="form-select w-auto border-0 bg-light">
+                            <option>Mới nhất</option>
+                            <option>Giá: Thấp đến Cao</option>
+                            <option>Giá: Cao xuống Thấp</option>
+                            <option>Phổ biến nhất</option>
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        @if(Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <!-- Product Item -->
+                                <div class="col-md-4 col-sm-6">
+                                    <div class="product-card">
+                                        <div class="product-img-wrapper">
+                                            <a href="@Url.Action("ProductDetail", "Product", new { id = item.ProductId })">
+                                                <img src="~/@item.ImageUrl" onerror="this.src='https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=600'" alt="@item.ProductName">
+                                            </a>
+                                            <div class="product-action">
+                                                <a href="javascript:void(0);" class="action-btn btn-add-cart" data-pid="@item.ProductId" title="Thêm vào giỏ hàng"><i class="fas fa-shopping-cart"></i></a>
+                                                <a href="@Url.Action("ProductDetail", "Product", new { id = item.ProductId })" class="action-btn" title="Xem chi tiết"><i class="fas fa-eye"></i></a>
+                                                <a href="javascript:void(0);" class="action-btn btn-wishlist" data-pid="@item.ProductId" title="Yêu thích"><i class="far fa-heart"></i></a>
+                                            </div>
+                                        </div>
+                                        <div class="product-info">
+                                            <div class="product-category">@item.Category.CategoryName</div>
+                                            <h3 class="product-title"><a href="@Url.Action("ProductDetail", "Product", new { id = item.ProductId })">@item.ProductName</a></h3>
+                                            <div class="product-price">@item.BasePrice.ToString("N0") ₫</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="col-12 text-center py-5">
+                                <p class="text-muted">Không tìm thấy sản phẩm nào.</p>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav aria-label="Page navigation" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true"><i class="fas fa-chevron-left"></i></a>
+                            </li>
+                            <li class="page-item active"><a class="page-link bg-primary-gold border-0" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link text-dark" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link text-dark" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link text-dark" href="#"><i class="fas fa-chevron-right"></i></a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+
+

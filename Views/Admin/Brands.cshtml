@@ -1,0 +1,121 @@
+@model IEnumerable<PandoraWeb.Models.Collection>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-white">@ViewBag.Title</h1>
+    <button class="btn btn-admin" onclick="openBrandModal()">
+        <i class="fas fa-plus"></i> Thêm Nhãn Hiệu
+    </button>
+</div>
+
+<div class="table-wrapper">
+    <table class="table admin-table table-hover">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Hình Ảnh</th>
+                <th>Tên Nhãn Hiệu</th>
+                <th>Mô Tả</th>
+                <th class="text-end">Thao Tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>#@item.CollectionId</td>
+                        <td>
+                            <img src="~/@(string.IsNullOrEmpty(item.ImageUrl) ? "assets/img/collections/default.jpg" : item.ImageUrl)" alt="@item.CollectionName" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;" />
+                        </td>
+                        <td>@item.CollectionName</td>
+                        <td><small class="text-muted">@(item.Description != null && item.Description.Length > 50 ? item.Description.Substring(0, 50) + "..." : item.Description)</small></td>
+                        <td class="text-end">
+                            <button class="btn btn-icon btn-edit" onclick="openBrandModal(@item.CollectionId, '@item.CollectionName', '@item.Description')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-icon btn-delete" onclick="deleteBrand(@item.CollectionId)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="5" class="text-center py-4 text-muted">Chưa có nhãn hiệu nào.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal Thêm/Sửa -->
+<div class="modal fade" id="brandModal" tabindex="-1" aria-labelledby="brandModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="brandModalLabel">Thêm Nhãn Hiệu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="@Url.Action("SaveBrand", "Admin")" method="post" enctype="multipart/form-data">
+                <div class="modal-body admin-form">
+                    <input type="hidden" id="brandId" name="id" value="" />
+                    <div class="mb-3">
+                        <label for="brandName" class="form-label">Tên nhãn hiệu <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="brandName" name="name" required placeholder="Nhập tên nhãn hiệu...">
+                    </div>
+                    <div class="mb-3">
+                        <label for="brandDesc" class="form-label">Mô tả</label>
+                        <textarea class="form-control" id="brandDesc" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="brandImg" class="form-label">Hình ảnh</label>
+                        <input type="file" class="form-control" id="brandImg" name="imageFile" accept="image/*">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-admin">Lưu lại</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const brandModal = new bootstrap.Modal(document.getElementById('brandModal'));
+        
+        function openBrandModal(id = '', name = '', desc = '') {
+            document.getElementById('brandId').value = id;
+            document.getElementById('brandName').value = name;
+            document.getElementById('brandDesc').value = desc;
+            document.getElementById('brandModalLabel').innerText = id ? 'Cập nhật Nhãn Hiệu' : 'Thêm Nhãn Hiệu';
+            brandModal.show();
+        }
+
+        function deleteBrand(id) {
+            if (confirm('Bạn có chắc chắn muốn xóa nhãn hiệu này?')) {
+                fetch('@Url.Action("DeleteBrand", "Admin")', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ id: id })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success) {
+                        location.reload();
+                    } else {
+                        alert(data.message || 'Không thể xóa nhãn hiệu này!');
+                    }
+                })
+                .catch(err => console.error(err));
+            }
+        }
+    </script>
+}

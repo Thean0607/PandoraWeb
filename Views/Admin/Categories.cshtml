@@ -1,0 +1,131 @@
+@model IEnumerable<PandoraWeb.Models.Category>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-white">@ViewBag.Title</h1>
+    <button class="btn btn-admin" onclick="openCategoryModal()">
+        <i class="fas fa-plus"></i> Thêm Danh Mục
+    </button>
+</div>
+
+<div class="table-wrapper">
+    <table class="table admin-table table-hover">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tên Danh Mục</th>
+                <th class="text-end">Thao Tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>#@item.CategoryId</td>
+                        <td>@item.CategoryName</td>
+                        <td class="text-end">
+                            <button class="btn btn-icon btn-edit" onclick="openCategoryModal(@item.CategoryId, '@item.CategoryName')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-icon btn-delete" onclick="deleteCategory(@item.CategoryId)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3" class="text-center py-4 text-muted">Chưa có danh mục nào.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal Thêm/Sửa -->
+<div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="categoryModalLabel">Thêm Danh Mục</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body admin-form">
+                <form id="categoryForm">
+                    <input type="hidden" id="categoryId" name="id" value="" />
+                    <div class="mb-3">
+                        <label for="categoryName" class="form-label">Tên danh mục <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="categoryName" name="name" required placeholder="Nhập tên danh mục...">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-admin" onclick="saveCategory()">Lưu lại</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const categoryModal = new bootstrap.Modal(document.getElementById('categoryModal'));
+        
+        function openCategoryModal(id = '', name = '') {
+            document.getElementById('categoryId').value = id;
+            document.getElementById('categoryName').value = name;
+            document.getElementById('categoryModalLabel').innerText = id ? 'Cập nhật Danh Mục' : 'Thêm Danh Mục';
+            categoryModal.show();
+        }
+
+        function saveCategory() {
+            const id = document.getElementById('categoryId').value;
+            const name = document.getElementById('categoryName').value.trim();
+            
+            if (!name) {
+                alert('Vui lòng nhập tên danh mục.');
+                return;
+            }
+
+            fetch('@Url.Action("SaveCategory", "Admin")', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ id: id, name: name })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    location.reload();
+                } else {
+                    alert(data.message || 'Có lỗi xảy ra!');
+                }
+            })
+            .catch(err => console.error(err));
+        }
+
+        function deleteCategory(id) {
+            if (confirm('Bạn có chắc chắn muốn xóa danh mục này?')) {
+                fetch('@Url.Action("DeleteCategory", "Admin")', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ id: id })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success) {
+                        location.reload();
+                    } else {
+                        alert(data.message || 'Không thể xóa danh mục này!');
+                    }
+                })
+                .catch(err => console.error(err));
+            }
+        }
+    </script>
+}

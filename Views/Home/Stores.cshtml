@@ -1,0 +1,130 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Stores";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/assets/css/components/stores.css">
+}
+
+<!-- Page Header -->
+    <div class="container-fluid px-4 px-lg-5 stores-header text-center">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb justify-content-center">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")" class="text-decoration-none text-muted">Trang Chủ</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Hệ thống cửa hàng</li>
+            </ol>
+        </nav>
+        <h1 class="font-serif mb-3">Hệ Thống Cửa Hàng</h1>
+        <p class="text-muted">Tìm cửa hàng Pandora gần bạn nhất để trải nghiệm và mua sắm trực tiếp.</p>
+    </div>
+
+    <!-- Stores Content -->
+    <div class="container-fluid px-4 px-lg-5 mb-5 pb-5">
+        <div class="row g-0 stores-container">
+            <!-- Store List Panel -->
+            <div class="col-lg-4 store-list-panel">
+                <div class="store-search-box">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Nhập tỉnh/thành phố hoặc quận/huyện..." aria-label="Tìm kiếm cửa hàng">
+                        <button class="btn btn-gold" type="button"><i class="fas fa-search"></i></button>
+                    </div>
+                </div>
+                
+                <div class="store-list">
+                    <!-- Store Item 1 -->
+                    <div class="store-item active" data-map-src="https://www.google.com/maps?q=Pandora+Vincom+Center+Đồng+Khởi&output=embed">
+                        <h3 class="store-name">Pandora Vincom Center Đồng Khởi</h3>
+                        <p class="store-address">Tầng trệt, 72 Lê Thánh Tôn, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh</p>
+                        <div class="store-info-row">
+                            <i class="fas fa-phone-alt"></i> 1900 1234 (Ext: 101)
+                        </div>
+                        <div class="store-info-row">
+                            <i class="far fa-clock"></i> 09:30 - 22:00 (Thứ 2 - Chủ Nhật)
+                        </div>
+                        <div class="store-info-row mt-2">
+                            <a href="#" class="text-primary-gold text-decoration-none fs-7 fw-bold"><i class="fas fa-directions"></i> Chỉ đường</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Store Item 2 -->
+                    <div class="store-item" data-map-src="https://www.google.com/maps?q=Pandora+Saigon+Centre&output=embed">
+                        <h3 class="store-name">Pandora Saigon Centre</h3>
+                        <p class="store-address">Tầng 1, 65 Lê Lợi, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh</p>
+                        <div class="store-info-row">
+                            <i class="fas fa-phone-alt"></i> 1900 1234 (Ext: 102)
+                        </div>
+                        <div class="store-info-row">
+                            <i class="far fa-clock"></i> 09:30 - 22:00 (Thứ 2 - Chủ Nhật)
+                        </div>
+                        <div class="store-info-row mt-2">
+                            <a href="#" class="text-primary-gold text-decoration-none fs-7 fw-bold"><i class="fas fa-directions"></i> Chỉ đường</a>
+                        </div>
+                    </div>
+
+                    <!-- Store Item 3 -->
+                    <div class="store-item" data-map-src="https://www.google.com/maps?q=Pandora+Crescent+Mall&output=embed">
+                        <h3 class="store-name">Pandora Crescent Mall</h3>
+                        <p class="store-address">Tầng trệt, 101 Tôn Dật Tiên, Phường Tân Phú, Quận 7, TP. Hồ Chí Minh</p>
+                        <div class="store-info-row">
+                            <i class="fas fa-phone-alt"></i> 1900 1234 (Ext: 103)
+                        </div>
+                        <div class="store-info-row">
+                            <i class="far fa-clock"></i> 10:00 - 22:00 (Thứ 2 - Chủ Nhật)
+                        </div>
+                        <div class="store-info-row mt-2">
+                            <a href="#" class="text-primary-gold text-decoration-none fs-7 fw-bold"><i class="fas fa-directions"></i> Chỉ đường</a>
+                        </div>
+                    </div>
+
+                    <!-- Store Item 4 -->
+                    <div class="store-item" data-map-src="https://www.google.com/maps?q=Pandora+Vincom+Bà+Triệu&output=embed">
+                        <h3 class="store-name">Pandora Vincom Bà Triệu</h3>
+                        <p class="store-address">Tầng 1, 191 Bà Triệu, Phường Lê Đại Hành, Quận Hai Bà Trưng, Hà Nội</p>
+                        <div class="store-info-row">
+                            <i class="fas fa-phone-alt"></i> 1900 1234 (Ext: 201)
+                        </div>
+                        <div class="store-info-row">
+                            <i class="far fa-clock"></i> 09:30 - 22:00 (Thứ 2 - Chủ Nhật)
+                        </div>
+                        <div class="store-info-row mt-2">
+                            <a href="#" class="text-primary-gold text-decoration-none fs-7 fw-bold"><i class="fas fa-directions"></i> Chỉ đường</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Store Map Panel -->
+            <div class="col-lg-8 store-map-panel">
+                <!-- Google Maps Embedded iFrame Placeholder -->
+                <!-- Use an actual coordinates for Vincom Dong Khoi -->
+                <iframe src="https://www.google.com/maps?q=Pandora+Vincom+Center+Đồng+Khởi&output=embed" class="store-map-iframe" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Minimal -->
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const storeItems = document.querySelectorAll('.store-item');
+            const mapIframe = document.querySelector('.store-map-iframe');
+
+            storeItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Remove active from all
+                    storeItems.forEach(si => si.classList.remove('active'));
+                    // Add active to clicked
+                    this.classList.add('active');
+                    // Change map src
+                    const mapSrc = this.getAttribute('data-map-src');
+                    if(mapSrc && mapIframe) {
+                        mapIframe.src = mapSrc;
+                    }
+                });
+            });
+        });
+    </script>
+}
+

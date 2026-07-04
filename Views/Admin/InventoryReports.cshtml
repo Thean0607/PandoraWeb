@@ -1,0 +1,65 @@
+@model IEnumerable<PandoraWeb.Models.ProductVariant>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-white">@ViewBag.Title</h1>
+    <button class="btn btn-admin">
+        <i class="fas fa-box"></i> Nhập Kho
+    </button>
+</div>
+
+<div class="admin-card">
+    <div class="table-responsive">
+        <table class="table admin-table table-hover">
+            <thead>
+                <tr>
+                    <th>Sản Phẩm</th>
+                    <th>Mã SKU</th>
+                    <th>Phân Loại</th>
+                    <th>Tồn Kho</th>
+                    <th>Cảnh Báo</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold">@(item.Product != null ? item.Product.ProductName : "-")</td>
+                            <td>@item.SKU</td>
+                            <td>
+                                <span class="badge bg-secondary">@(item.Size != null ? item.Size.SizeValue : "N/A")</span>
+                                <span class="badge bg-secondary">@(item.Material != null ? item.Material.MaterialName : "N/A")</span>
+                            </td>
+                            <td>
+                                @if(item.Stock == 0) {
+                                    <span class="text-danger fw-bold fs-5">0</span>
+                                } else if (item.Stock < 10) {
+                                    <span class="text-warning fw-bold fs-5">@item.Stock</span>
+                                } else {
+                                    <span class="text-success fw-bold fs-5">@item.Stock</span>
+                                }
+                            </td>
+                            <td>
+                                @if(item.Stock == 0) {
+                                    <span class="badge bg-danger"><i class="fas fa-exclamation-triangle me-1"></i>Hết Hàng</span>
+                                } else if (item.Stock < 10) {
+                                    <span class="badge bg-warning text-dark"><i class="fas fa-exclamation-circle me-1"></i>Sắp hết</span>
+                                } else {
+                                    <span class="badge bg-success">Ổn định</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="5" class="text-center py-4 text-muted">Chưa có dữ liệu tồn kho.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

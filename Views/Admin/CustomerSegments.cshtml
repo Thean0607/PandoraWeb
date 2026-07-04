@@ -1,0 +1,59 @@
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    // Using dynamic since we passed anonymous type
+    var segments = ViewBag.Segments as IEnumerable<dynamic>;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-white">@ViewBag.Title</h1>
+</div>
+
+<div class="table-wrapper">
+    <table class="table admin-table table-hover">
+        <thead>
+            <tr>
+                <th>Xếp Hạng</th>
+                <th>Khách Hàng</th>
+                <th>Email</th>
+                <th>Tổng Chi Tiêu</th>
+                <th>Phân Loại VIP</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (segments != null && segments.Any())
+            {
+                int rank = 1;
+                foreach (var item in segments)
+                {
+                    decimal spent = item.TotalSpent;
+                    string vipClass = "bg-secondary";
+                    string vipName = "Thành viên";
+                    if (spent > 10000000) { vipClass = "bg-warning text-dark"; vipName = "VIP Kim Cương"; }
+                    else if (spent > 5000000) { vipClass = "bg-primary"; vipName = "VIP Vàng"; }
+                    else if (spent > 2000000) { vipClass = "bg-info text-dark"; vipName = "Bạc"; }
+
+                    <tr>
+                        <td>
+                            @if(rank <= 3) {
+                                <i class="fas fa-trophy text-warning"></i> <strong>#@rank</strong>
+                            } else {
+                                <span>#@rank</span>
+                            }
+                        </td>
+                        <td class="fw-bold">@item.Customer.FullName</td>
+                        <td>@item.Customer.Email</td>
+                        <td class="text-warning fw-bold">@spent.ToString("N0") ₫</td>
+                        <td>
+                            <span class="badge @vipClass">@vipName</span>
+                        </td>
+                    </tr>
+                    rank++;
+                }
+            }
+            else
+            {
+                <tr><td colspan="5" class="text-center py-4 text-muted">Không có dữ liệu phân nhóm.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>

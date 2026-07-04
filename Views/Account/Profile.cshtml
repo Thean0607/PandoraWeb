@@ -1,0 +1,175 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Profile";
+}
+
+<!-- Breadcrumb -->
+    <div class="breadcrumb-wrap mt-5 pt-5 mb-4">
+        <div class="container-fluid px-4 px-lg-5 mt-4">
+            <h1 class="breadcrumb-title font-serif">Tài Khoản</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Trang Chủ</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Hồ Sơ Của Tôi</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Profile Section -->
+    <section class="pb-5">
+        <div class="container-fluid px-4 px-lg-5">
+            <div class="row">
+                <!-- Filter Toggle Button (Mobile Only) -->
+                <div class="d-lg-none mb-4">
+                    <button class="btn btn-outline-gold w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#profileSidebar" aria-controls="profileSidebar">
+                        <i class="fas fa-bars me-2"></i> Menu Tài Khoản
+                    </button>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="col-lg-3 mb-4 mb-lg-0">
+                    <div class="offcanvas-lg offcanvas-start" tabindex="-1" id="profileSidebar" aria-labelledby="profileSidebarLabel">
+                        <div class="offcanvas-header border-bottom">
+                            <h5 class="offcanvas-title font-serif" id="profileSidebarLabel">Menu Tài Khoản</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#profileSidebar" aria-label="Close"></button>
+                        </div>
+                        <div class="offcanvas-body p-3 p-lg-0 flex-column">
+                            <div class="card border-0 shadow-sm p-3 w-100">
+                                <div class="text-center mb-4 mt-3 d-none d-lg-block">
+                                    <h5 class="font-serif fw-bold mb-1">Nguyễn Văn A</h5>
+                                    <p class="text-muted fs-7 mb-0">Thành viên Bạc</p>
+                                </div>
+                                <hr class="mt-0 mb-3 text-muted d-none d-lg-block">
+                        <nav class="nav flex-column profile-sidebar">
+                            <a class="nav-link active" href="@Url.Action("Profile", "Account")"><i class="far fa-user me-2"></i> Thông tin tài khoản</a>
+                            <a class="nav-link" href="@Url.Action("Orders", "Order")"><i class="fas fa-shopping-basket me-2"></i> Quản lý đơn hàng</a>
+                            <a class="nav-link" href="@Url.Action("Wishlist", "Order")"><i class="far fa-heart me-2"></i> Sản phẩm yêu thích</a>
+                            <a class="nav-link" href="@Url.Action("Address", "Account")"><i class="far fa-address-book me-2"></i> Sổ địa chỉ</a>
+                            <a class="nav-link" href="@Url.Action("ChangePassword", "Account")"><i class="fas fa-lock me-2"></i> Đổi mật khẩu</a>
+                            <a class="nav-link text-danger mt-3" href="@Url.Action("Login", "Account")"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a>
+                        </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="col-lg-9">
+                    <div class="card border-0 shadow-sm p-4 p-md-5">
+                        <h4 class="font-serif mb-4 pb-2 border-bottom">Hồ Sơ Của Tôi</h4>
+                        <p class="text-muted mb-4">Quản lý thông tin hồ sơ để bảo mật tài khoản</p>
+
+                        <div class="row">
+                            <div class="col-md-8 order-2 order-md-1">
+                                <form>
+                                    <div class="row mb-3">
+                                        <div class="col-sm-3 d-flex align-items-center">
+                                            <label class="form-label mb-0 fw-bold">Họ và Tên</label>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" value="Nguyễn Văn A">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-sm-3 d-flex align-items-center">
+                                            <label class="form-label mb-0 fw-bold">Email</label>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <div class="d-flex align-items-center">
+                                                <input type="email" class="form-control" value="nguyenvana@gmail.com" readonly style="background-color: #f8f9fa;">
+                                                <a href="#" class="ms-3 text-decoration-none fs-7 text-primary-gold flex-shrink-0">Thay đổi</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-sm-3 d-flex align-items-center">
+                                            <label class="form-label mb-0 fw-bold">Số điện thoại</label>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <div class="d-flex align-items-center">
+                                                <input type="tel" class="form-control" value="*********89">
+                                                <a href="#" class="ms-3 text-decoration-none fs-7 text-primary-gold flex-shrink-0">Thay đổi</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-sm-3 d-flex align-items-center">
+                                            <label class="form-label mb-0 fw-bold">Giới tính</label>
+                                        </div>
+                                        <div class="col-sm-9 d-flex align-items-center">
+                                            <div class="form-check form-check-inline me-4">
+                                                <input class="form-check-input" type="radio" name="gender" id="male" value="male" checked>
+                                                <label class="form-check-label" for="male">Nam</label>
+                                            </div>
+                                            <div class="form-check form-check-inline me-4">
+                                                <input class="form-check-input" type="radio" name="gender" id="female" value="female">
+                                                <label class="form-check-label" for="female">Nữ</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="gender" id="other" value="other">
+                                                <label class="form-check-label" for="other">Khác</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-4">
+                                        <div class="col-sm-3 d-flex align-items-center">
+                                            <label class="form-label mb-0 fw-bold">Ngày sinh</label>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <div class="row g-2">
+                                                <div class="col-4">
+                                                    <select class="form-select">
+                                                        <option>15</option>
+                                                        <!-- more options -->
+                                                    </select>
+                                                </div>
+                                                <div class="col-4">
+                                                    <select class="form-select">
+                                                        <option>Tháng 8</option>
+                                                        <!-- more options -->
+                                                    </select>
+                                                </div>
+                                                <div class="col-4">
+                                                    <select class="form-select">
+                                                        <option>1995</option>
+                                                        <!-- more options -->
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-sm-3"></div>
+                                        <div class="col-sm-9">
+                                            <button type="submit" class="btn btn-gold px-4 py-2">Lưu Thay Đổi</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            
+                            <!-- Avatar Column -->
+                            <div class="col-md-4 order-1 order-md-2 mb-4 mb-md-0 d-flex flex-column align-items-center justify-content-start border-start-md">
+                                <div class="avatar-wrapper mb-3">
+                                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop" alt="Avatar">
+                                    <label class="avatar-edit-btn" for="uploadAvatar" title="Đổi ảnh đại diện">
+                                        <i class="fas fa-camera"></i>
+                                    </label>
+                                    <input type="file" id="uploadAvatar" class="d-none" accept=".jpg, .jpeg, .png">
+                                </div>
+                                <div class="text-center text-muted fs-7">
+                                    <p class="mb-1">Dung lượng file tối đa 1 MB</p>
+                                    <p class="mb-0">Định dạng: .JPEG, .PNG</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Minimal -->
+

@@ -1,0 +1,118 @@
+@model List<PandoraWeb.ViewModels.CartItemVM>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Checkout";
+    decimal subTotal = Model != null ? Model.Sum(x => x.Total) : 0;
+    
+    var customer = ViewBag.Customer as PandoraWeb.Models.Customer;
+    var address = ViewBag.Address as PandoraWeb.Models.Address;
+    
+    string nameVal = customer != null ? customer.FullName : "";
+    string phoneVal = customer != null ? customer.PhoneNumber : "";
+    string emailVal = customer != null ? customer.Email : "";
+    string addrVal = address != null ? $"{address.StreetAddress}, {address.Ward}, {address.District}, {address.City}".Trim(new char[] { ',', ' ' }) : "";
+}
+
+<div class="container-fluid px-4 px-lg-5 mt-4 pb-5">
+    <div class="row">
+        <!-- Checkout Form -->
+        <div class="col-lg-8 mb-4">
+            <div class="card border-0 shadow-sm p-4 mb-4">
+                <h4 class="font-serif mb-4">1. Thông tin giao hàng</h4>
+                <form class="checkout-form" id="form-checkout" action="@Url.Action("Checkout", "Order")" method="post" novalidate>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Họ và tên</label>
+                            <input type="text" class="form-control" name="fullName" value="@nameVal" placeholder="Nhập họ tên" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Số điện thoại</label>
+                            <input type="tel" class="form-control" name="phone" value="@phoneVal" placeholder="Nhập số điện thoại" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Địa chỉ email</label>
+                            <input type="email" class="form-control" name="email" value="@emailVal" placeholder="Nhập email" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Địa chỉ giao hàng</label>
+                            <input type="text" class="form-control" name="address" value="@addrVal" placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Ghi chú đơn hàng (Tùy chọn)</label>
+                            <textarea class="form-control" name="notes" rows="3" placeholder="Ghi chú về thời gian giao hàng hoặc lời nhắn"></textarea>
+                        </div>
+                    </div>
+
+                    <h4 class="font-serif mb-4 mt-5">2. Phương thức thanh toán</h4>
+                    <div class="form-check mb-3 p-3 border rounded">
+                        <input class="form-check-input ms-1" type="radio" name="paymentMethod" value="COD" id="cod" checked>
+                        <label class="form-check-label ms-2 d-flex align-items-center" for="cod">
+                            <i class="fas fa-money-bill-wave text-success fs-4 me-3"></i>
+                            <div>
+                                <h6 class="mb-0">Thanh toán khi nhận hàng (COD)</h6>
+                                <small class="text-muted">Thanh toán bằng tiền mặt khi giao hàng.</small>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="form-check mb-3 p-3 border rounded">
+                        <input class="form-check-input ms-1" type="radio" name="paymentMethod" value="BANK" id="bank">
+                        <label class="form-check-label ms-2 d-flex align-items-center" for="bank">
+                            <i class="fas fa-university text-primary fs-4 me-3"></i>
+                            <div>
+                                <h6 class="mb-0">Chuyển khoản ngân hàng</h6>
+                                <small class="text-muted">Chuyển khoản an toàn qua hệ thống NAPAS 247.</small>
+                            </div>
+                        </label>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Order Summary Sidebar -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm p-4 sticky-top" style="top: 100px;">
+                <h5 class="font-serif mb-4">Đơn Hàng Của Bạn (@Model.Count sản phẩm)</h5>
+                
+                <!-- Order Items Mini -->
+                <div class="mb-4">
+                    @foreach (var item in Model)
+                    {
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="@(!string.IsNullOrEmpty(item.ImageUrl) ? Url.Content("~/" + item.ImageUrl) : "https://images.unsplash.com/photo-1605100804763-247f67b2548e?q=80&w=80")" class="rounded" style="width: 60px;" alt="@item.ProductName">
+                            <div class="ms-3 flex-grow-1">
+                                <h6 class="mb-0 fs-7 text-truncate" style="max-width: 150px;">@item.ProductName</h6>
+                                <span class="text-muted fs-8">SL: @item.Quantity</span>
+                            </div>
+                            <div class="text-end">
+                                <strong class="fs-7">@item.Total.ToString("N0") ₫</strong>
+                            </div>
+                        </div>
+                    }
+                </div>
+                
+                <hr>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Tạm tính</span>
+                    <span>@subTotal.ToString("N0") ₫</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Phí vận chuyển</span>
+                    <span class="text-success">Miễn phí</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Giảm giá</span>
+                    <span class="text-danger">-0 ₫</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between mb-4">
+                    <strong class="fs-5">Tổng cộng</strong>
+                    <strong class="fs-5 text-primary-gold">@subTotal.ToString("N0") ₫</strong>
+                </div>
+
+                <button type="submit" form="form-checkout" class="btn btn-gold w-100 py-3 mb-3">ĐẶT HÀNG</button>
+                <p class="text-center text-muted fs-8 mb-0">Bằng việc đặt hàng, bạn đồng ý với <a href="#" class="text-dark">Điều khoản & Điều kiện</a> của Pandora.</p>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Pandora Admin</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Admin CSS -->
+    <link rel="stylesheet" href="~/assets/css/admin-layout.css?v=1.1">
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="@Url.Action("Index", "Admin")" class="sidebar-brand">
+                <i class="fas fa-gem sidebar-brand-icon d-none text-center"></i>
+                <span class="sidebar-brand-text">PANDORA ADMIN</span>
+            </a>
+        </div>
+        <div class="sidebar-nav">
+            <!-- 1. Dashboard -->
+            <div class="sidebar-nav-item">
+                <a href="@Url.Action("Index", "Admin")" class="sidebar-nav-link @(ViewBag.ActiveMenu == "Dashboard" ? "active" : "")">
+                    <span class="sidebar-nav-link-content">
+                        <i class="fas fa-chart-line sidebar-nav-icon"></i>
+                        <span class="sidebar-nav-text">Tổng Quan</span>
+                    </span>
+                </a>
+            </div>
+
+            <!-- 2. Catalog Management -->
+            <div class="sidebar-nav-item">
+                <a href="#menuCatalog" data-bs-toggle="collapse" class="sidebar-nav-link @(ViewBag.ActiveMenu == "Catalog" ? "active" : "")" aria-expanded="@(ViewBag.ActiveMenu == "Catalog" ? "true" : "false")">
+                    <span class="sidebar-nav-link-content">
+                        <i class="fas fa-box-open sidebar-nav-icon"></i>
+                        <span class="sidebar-nav-text">Sản Phẩm</span>
+                    </span>
+                    <i class="fas fa-chevron-down sidebar-nav-arrow"></i>
+                </a>
+                <ul class="collapse sidebar-submenu @(ViewBag.ActiveMenu == "Catalog" ? "show" : "")" id="menuCatalog">
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("Products", "Admin")" class="sidebar-submenu-link @(ViewBag.ActiveSubMenu == "Products" ? "active" : "")">Danh sách Sản Phẩm</a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("Categories", "Admin")" class="sidebar-submenu-link @(ViewBag.ActiveSubMenu == "Categories" ? "active" : "")">Danh Mục</a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("Brands", "Admin")" class="sidebar-submenu-link @(ViewBag.ActiveSubMenu == "Brands" ? "active" : "")">Nhãn Hiệu</a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("Attributes", "Admin")" class="sidebar-submenu-link @(ViewBag.ActiveSubMenu == "Attributes" ? "active" : "")">Thuộc Tính</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 3. Order Management -->
+            <div class="sidebar-nav-item">
+                <a href="#menuOrders" data-bs-toggle="collapse" class="sidebar-nav-link @(ViewBag.ActiveMenu == "Orders" ? "active" : "")" aria-expanded="@(ViewBag.ActiveMenu == "Orders" ? "true" : "false")">
+                    <span class="sidebar-nav-link-content">
+                        <i class="fas fa-shopping-cart sidebar-nav-icon"></i>
+                        <span class="sidebar-nav-text">Đơn Hàng</span>
+                    </span>
+                    <i class="fas fa-chevron-down sidebar-nav-arrow"></i>
+                </a>
+                <ul class="collapse sidebar-submenu @(ViewBag.ActiveMenu == "Orders" ? "show" : "")" id="menuOrders">
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("Orders", "Admin")" class="sidebar-submenu-link @(ViewBag.ActiveSubMenu == "OrdersList" ? "active" : "")">Danh sách Đơn Hàng</a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("Refunds", "Admin")" class="sidebar-submenu-link @(ViewBag.ActiveSubMenu == "Refunds" ? "active" : "")">Hoàn Trả / Hủy</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 4. Customer Management -->
+            <div class="sidebar-nav-item">
+                <a href="#menuCustomers" data-bs-toggle="collapse" class="sidebar-nav-link @(ViewBag.ActiveMenu == "Customers" ? "active" : "")" aria-expanded="@(ViewBag.ActiveMenu == "Customers" ? "true" : "false")">
+                    <span class="sidebar-nav-link-content">
+                        <i class="fas fa-users sidebar-nav-icon"></i>
+                        <span class="sidebar-nav-text">Khách Hàng</span>
+                    </span>
+                    <i class="fas fa-chevron-down sidebar-nav-arrow"></i>
+                </a>
+                <ul class="collapse sidebar-submenu @(ViewBag.ActiveMenu == "Customers" ? "show" : "")" id="menuCustomers">
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("Customers", "Admin")" class="sidebar-submenu-link @(ViewBag.ActiveSubMenu == "CustomersList" ? "active" : "")">Danh Sách Khách Hàng</a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("CustomerSegments", "Admin")" class="sidebar-submenu-link @(ViewBag.ActiveSubMenu == "CustomerSegments" ? "active" : "")">Phân Nhóm</a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("Reviews", "Admin")" class="sidebar-submenu-link @(ViewBag.ActiveSubMenu == "Reviews" ? "active" : "")">Đánh Giá Sản Phẩm</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 5. Marketing & Promotions -->
+            <div class="sidebar-nav-item">
+                <a href="#menuMarketing" data-bs-toggle="collapse" class="sidebar-nav-link @(ViewBag.ActiveMenu == "Marketing" ? "active" : "")" aria-expanded="@(ViewBag.ActiveMenu == "Marketing" ? "true" : "false")">
+                    <span class="sidebar-nav-link-content">
+                        <i class="fas fa-bullhorn sidebar-nav-icon"></i>
+                        <span class="sidebar-nav-text">Marketing</span>
+                    </span>
+                    <i class="fas fa-chevron-down sidebar-nav-arrow"></i>
+                </a>
+                <ul class="collapse sidebar-submenu @(ViewBag.ActiveMenu == "Marketing" ? "show" : "")" id="menuMarketing">
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("Coupons", "Admin")" class="sidebar-submenu-link @(ViewBag.ActiveSubMenu == "Coupons" ? "active" : "")">Mã Giảm Giá</a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("FlashSales", "Admin")" class="sidebar-submenu-link @(ViewBag.ActiveSubMenu == "FlashSales" ? "active" : "")">Flash Sales</a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("Banners", "Admin")" class="sidebar-submenu-link @(ViewBag.ActiveSubMenu == "Banners" ? "active" : "")">Quản lý Banners</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 6. CMS -->
+            <div class="sidebar-nav-item">
+                <a href="#menuCMS" data-bs-toggle="collapse" class="sidebar-nav-link @(ViewBag.ActiveMenu == "CMS" ? "active" : "")" aria-expanded="@(ViewBag.ActiveMenu == "CMS" ? "true" : "false")">
+                    <span class="sidebar-nav-link-content">
+                        <i class="fas fa-file-alt sidebar-nav-icon"></i>
+                        <span class="sidebar-nav-text">Nội Dung</span>
+                    </span>
+                    <i class="fas fa-chevron-down sidebar-nav-arrow"></i>
+                </a>
+                <ul class="collapse sidebar-submenu @(ViewBag.ActiveMenu == "CMS" ? "show" : "")" id="menuCMS">
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("Pages", "Admin")" class="sidebar-submenu-link @(ViewBag.ActiveSubMenu == "Pages" ? "active" : "")">Trang Tĩnh</a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("Blog", "Admin")" class="sidebar-submenu-link @(ViewBag.ActiveSubMenu == "Blog" ? "active" : "")">Bài Viết (Blog)</a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("FAQ", "Admin")" class="sidebar-submenu-link @(ViewBag.ActiveSubMenu == "FAQ" ? "active" : "")">FAQ</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 7. Reports -->
+            <div class="sidebar-nav-item">
+                <a href="#menuReports" data-bs-toggle="collapse" class="sidebar-nav-link @(ViewBag.ActiveMenu == "Reports" ? "active" : "")" aria-expanded="@(ViewBag.ActiveMenu == "Reports" ? "true" : "false")">
+                    <span class="sidebar-nav-link-content">
+                        <i class="fas fa-chart-pie sidebar-nav-icon"></i>
+                        <span class="sidebar-nav-text">Báo Cáo</span>
+                    </span>
+                    <i class="fas fa-chevron-down sidebar-nav-arrow"></i>
+                </a>
+                <ul class="collapse sidebar-submenu @(ViewBag.ActiveMenu == "Reports" ? "show" : "")" id="menuReports">
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("SalesReports", "Admin")" class="sidebar-submenu-link @(ViewBag.ActiveSubMenu == "SalesReports" ? "active" : "")">Doanh Thu</a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("InventoryReports", "Admin")" class="sidebar-submenu-link @(ViewBag.ActiveSubMenu == "InventoryReports" ? "active" : "")">Tồn Kho</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 8. Settings -->
+            <div class="sidebar-nav-item">
+                <a href="#menuSettings" data-bs-toggle="collapse" class="sidebar-nav-link @(ViewBag.ActiveMenu == "Settings" ? "active" : "")" aria-expanded="@(ViewBag.ActiveMenu == "Settings" ? "true" : "false")">
+                    <span class="sidebar-nav-link-content">
+                        <i class="fas fa-cog sidebar-nav-icon"></i>
+                        <span class="sidebar-nav-text">Cài Đặt</span>
+                    </span>
+                    <i class="fas fa-chevron-down sidebar-nav-arrow"></i>
+                </a>
+                <ul class="collapse sidebar-submenu @(ViewBag.ActiveMenu == "Settings" ? "show" : "")" id="menuSettings">
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("Settings", "Admin")" class="sidebar-submenu-link @(ViewBag.ActiveSubMenu == "General" ? "active" : "")">Cài Đặt Chung</a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("Payments", "Admin")" class="sidebar-submenu-link @(ViewBag.ActiveSubMenu == "Payments" ? "active" : "")">Thanh Toán</a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("Shipping", "Admin")" class="sidebar-submenu-link @(ViewBag.ActiveSubMenu == "Shipping" ? "active" : "")">Vận Chuyển</a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("Employees", "Admin")" class="sidebar-submenu-link @(ViewBag.ActiveSubMenu == "Employees" ? "active" : "")">Nhân Viên</a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("Roles", "Admin")" class="sidebar-submenu-link @(ViewBag.ActiveSubMenu == "Roles" ? "active" : "")">Phân Quyền</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-nav-item mt-4">
+                <a href="@Url.Action("Index", "Home")" class="sidebar-nav-link">
+                    <span class="sidebar-nav-link-content">
+                        <i class="fas fa-store sidebar-nav-icon"></i>
+                        <span class="sidebar-nav-text">Về Cửa Hàng</span>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main" id="mainContent">
+        <!-- Header -->
+        <header class="admin-header">
+            <button class="toggle-sidebar-btn" id="toggleSidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="header-user">
+                <div class="user-info text-end">
+                    <span class="user-name">Phạm Admin</span>
+                    <span class="user-role">Quản trị viên</span>
+                </div>
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="admin-content">
+            @RenderBody()
+        </div>
+    </main>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Admin Main JS -->
+    <script src="~/assets/js/admin-main.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
+

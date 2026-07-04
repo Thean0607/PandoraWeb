@@ -1,0 +1,199 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="page-title">
+    Quản lý Nhân Viên
+    <button class="btn btn-admin" onclick="openEmployeeModal()">
+        <i class="fas fa-plus"></i> Thêm Nhân Viên
+    </button>
+</div>
+
+<div class="admin-card">
+    <div class="table-responsive table-wrapper">
+        <table class="table admin-table" id="employeeTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Họ Tên</th>
+                    <th>Email</th>
+                    <th>Vai Trò (Role)</th>
+                    <th>Trạng Thái</th>
+                    <th>Thao Tác</th>
+                </tr>
+            </thead>
+            <tbody id="employeeTbody">
+                <!-- Data will be loaded here -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Employee Modal -->
+<div class="modal fade" id="employeeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content admin-form">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Thêm Nhân Viên Mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="employeeForm">
+                    <input type="hidden" id="employeeId">
+                    <div class="mb-3">
+                        <label class="form-label">Họ Tên</label>
+                        <input type="text" class="form-control" id="employeeName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="employeeEmail" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Vai Trò (Role)</label>
+                        <select class="form-select" id="employeeRole" required>
+                            <!-- Roles will be loaded dynamically -->
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Trạng Thái</label>
+                        <select class="form-select" id="employeeStatus">
+                            <option value="active">Đang Làm Việc</option>
+                            <option value="inactive">Đã Nghỉ Việc</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-admin" onclick="saveEmployee()">Lưu Thay Đổi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let employeeModal;
+        let roleMap = {};
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            employeeModal = new bootstrap.Modal(document.getElementById('employeeModal'));
+            loadRoles();
+            renderEmployees();
+        });
+
+        function loadRoles() {
+            const roles = getStorage('admin_roles');
+            const roleSelect = document.getElementById('employeeRole');
+            roleSelect.innerHTML = '';
+            
+            roles.forEach(r => {
+                roleMap[r.id] = r.name;
+                const option = document.createElement('option');
+                option.value = r.id;
+                option.textContent = r.name;
+                roleSelect.appendChild(option);
+            });
+        }
+
+        function renderEmployees() {
+            const employees = getStorage('admin_employees');
+            const tbody = document.getElementById('employeeTbody');
+            tbody.innerHTML = '';
+
+            employees.forEach(e => {
+                const statusBadge = e.status === 'active' 
+                    ? '<span class="status-badge status-active">Đang Làm Việc</span>' 
+                    : '<span class="status-badge status-inactive">Đã Nghỉ Việc</span>';
+                
+                const roleName = roleMap[e.roleId] || 'Chưa phân quyền';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>#${e.id}</td>
+                    <td><strong>${e.name}</strong></td>
+                    <td>${e.email}</td>
+                    <td><span class="status-badge status-warning">${roleName}</span></td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        <button class="btn-icon btn-edit" onclick="editEmployee(${e.id})"><i class="fas fa-edit"></i></button>
+                        <button class="btn-icon btn-delete" onclick="deleteEmployee(${e.id})"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function openEmployeeModal(id = null) {
+            const form = document.getElementById('employeeForm');
+            form.reset();
+            document.getElementById('employeeId').value = '';
+            document.getElementById('modalTitle').textContent = 'Thêm Nhân Viên Mới';
+
+            if (id) {
+                const employees = getStorage('admin_employees');
+                const employee = employees.find(e => e.id === id);
+                if (employee) {
+                    document.getElementById('modalTitle').textContent = 'Sửa Nhân Viên';
+                    document.getElementById('employeeId').value = employee.id;
+                    document.getElementById('employeeName').value = employee.name;
+                    document.getElementById('employeeEmail').value = employee.email;
+                    document.getElementById('employeeRole').value = employee.roleId;
+                    document.getElementById('employeeStatus').value = employee.status;
+                }
+            }
+            employeeModal.show();
+        }
+
+        function editEmployee(id) {
+            openEmployeeModal(id);
+        }
+
+        function deleteEmployee(id) {
+            if (confirm('Bạn có chắc chắn muốn xóa nhân viên này?')) {
+                let employees = getStorage('admin_employees');
+                employees = employees.filter(e => e.id !== id);
+                setStorage('admin_employees', employees);
+                renderEmployees();
+            }
+        }
+
+        function saveEmployee() {
+            const id = document.getElementById('employeeId').value;
+            const name = document.getElementById('employeeName').value;
+            const email = document.getElementById('employeeEmail').value;
+            const roleId = parseInt(document.getElementById('employeeRole').value);
+            const status = document.getElementById('employeeStatus').value;
+
+            if (!name || !email || isNaN(roleId)) {
+                alert('Vui lòng điền đầy đủ thông tin hợp lệ.');
+                return;
+            }
+
+            let employees = getStorage('admin_employees');
+
+            if (id) {
+                // Update
+                const index = employees.findIndex(e => e.id == id);
+                if (index !== -1) {
+                    employees[index] = { ...employees[index], name, email, roleId, status };
+                }
+            } else {
+                // Add
+                const newEmployee = {
+                    id: generateId(employees),
+                    name,
+                    email,
+                    roleId,
+                    status
+                };
+                employees.push(newEmployee);
+            }
+
+            setStorage('admin_employees', employees);
+            employeeModal.hide();
+            renderEmployees();
+        }
+    </script>
+}
+

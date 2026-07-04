@@ -1,0 +1,146 @@
+@model IEnumerable<PandoraWeb.Models.Promotion>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-white">@ViewBag.Title</h1>
+    <button class="btn btn-admin" onclick="openPromoModal()">
+        <i class="fas fa-plus"></i> Tạo Mã Giảm Giá
+    </button>
+</div>
+
+<div class="table-wrapper">
+    <table class="table admin-table table-hover">
+        <thead>
+            <tr>
+                <th>Mã (Code)</th>
+                <th>Giảm %</th>
+                <th>Giảm Tiền</th>
+                <th>Thời Gian Áp Dụng</th>
+                <th>Trạng Thái</th>
+                <th class="text-end">Thao Tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="fw-bold text-warning">@item.Code</td>
+                        <td>@(item.DiscountPercentage.HasValue ? item.DiscountPercentage + "%" : "-")</td>
+                        <td>@(item.DiscountAmount.HasValue ? item.DiscountAmount.Value.ToString("N0") + " ₫" : "-")</td>
+                        <td>
+                            <small class="text-muted">
+                                Từ: @item.StartDate.ToString("dd/MM/yyyy")<br/>
+                                Đến: @item.EndDate.ToString("dd/MM/yyyy")
+                            </small>
+                        </td>
+                        <td>
+                            @if(item.IsActive && item.EndDate >= DateTime.Now) {
+                                <span class="badge bg-success">Đang hiệu lực</span>
+                            } else {
+                                <span class="badge bg-secondary">Hết hạn / Khóa</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <button class="btn btn-icon btn-edit" onclick="openPromoModal(@item.PromotionId, '@item.Code', @(item.DiscountPercentage ?? 0), @(item.DiscountAmount ?? 0), '@item.StartDate.ToString("yyyy-MM-dd")', '@item.EndDate.ToString("yyyy-MM-dd")', @item.IsActive.ToString().ToLower())">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-icon btn-delete" onclick="deletePromo(@item.PromotionId)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td colspan="6" class="text-center py-4 text-muted">Chưa có mã giảm giá nào.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="promoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="promoModalLabel">Tạo Mã Giảm Giá</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="@Url.Action("SaveCoupon", "Admin")" method="post">
+                <div class="modal-body admin-form">
+                    <input type="hidden" id="promoId" name="id" value="" />
+                    <div class="mb-3">
+                        <label class="form-label">Mã Code <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="promoCode" name="code" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Giảm phần trăm (%)</label>
+                            <input type="number" class="form-control" id="promoPercent" name="percent" min="0" max="100">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Hoặc giảm số tiền (₫)</label>
+                            <input type="number" class="form-control" id="promoAmount" name="amount" min="0">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Ngày bắt đầu</label>
+                            <input type="date" class="form-control" id="promoStart" name="start" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Ngày kết thúc</label>
+                            <input type="date" class="form-control" id="promoEnd" name="end" required>
+                        </div>
+                    </div>
+                    <div class="form-check form-switch mt-2">
+                        <input class="form-check-input" type="checkbox" id="promoActive" name="active" value="true" checked>
+                        <label class="form-check-label" for="promoActive">Kích hoạt</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-admin">Lưu lại</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const promoModal = new bootstrap.Modal(document.getElementById('promoModal'));
+        
+        function openPromoModal(id = '', code = '', percent = 0, amount = 0, start = '', end = '', active = true) {
+            document.getElementById('promoId').value = id;
+            document.getElementById('promoCode').value = code;
+            document.getElementById('promoPercent').value = percent > 0 ? percent : '';
+            document.getElementById('promoAmount').value = amount > 0 ? amount : '';
+            document.getElementById('promoStart').value = start || new Date().toISOString().split('T')[0];
+            document.getElementById('promoEnd').value = end;
+            document.getElementById('promoActive').checked = active;
+            document.getElementById('promoModalLabel').innerText = id ? 'Cập nhật Mã Giảm Giá' : 'Tạo Mã Giảm Giá';
+            promoModal.show();
+        }
+
+        function deletePromo(id) {
+            if (confirm('Bạn có chắc muốn xóa mã giảm giá này?')) {
+                fetch('@Url.Action("DeleteCoupon", "Admin")', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ id: id })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success) location.reload();
+                    else alert('Không thể xóa!');
+                });
+            }
+        }
+    </script>
+}

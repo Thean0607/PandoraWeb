@@ -1,0 +1,171 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Faq";
+}
+
+<!-- Page Header -->
+    <div class="container-fluid px-4 px-lg-5 faq-header">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb justify-content-center">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")" class="text-decoration-none text-muted">Trang Chủ</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Câu Hỏi Thường Gặp</li>
+            </ol>
+        </nav>
+        <h1 class="faq-title">Câu Hỏi Thường Gặp (FAQ)</h1>
+        <p class="text-muted max-w-600 mx-auto">Tìm kiếm câu trả lời nhanh cho các vấn đề về mua sắm, giao hàng, bảo hành và dịch vụ hậu mãi của Pandora.</p>
+    </div>
+
+    <!-- FAQ Content -->
+    <div class="container-fluid px-4 px-lg-5 mb-5 pb-5">
+        <div class="row">
+            <!-- Sidebar Navigation -->
+            <div class="col-lg-3">
+                <div class="faq-sidebar">
+                    <h5 class="font-serif mb-4">Chủ Đề</h5>
+                    <a href="#orders" class="faq-nav-link active">Đặt Hàng & Thanh Toán</a>
+                    <a href="#shipping" class="faq-nav-link">Giao Hàng & Vận Chuyển</a>
+                    <a href="#returns" class="faq-nav-link">Đổi Trả & Hoàn Tiền</a>
+                    <a href="#warranty" class="faq-nav-link">Bảo Hành & Sửa Chữa</a>
+                    <a href="#products" class="faq-nav-link">Sản Phẩm & Kích Cỡ</a>
+                </div>
+            </div>
+
+            <!-- FAQ Accordions -->
+            <div class="col-lg-9 mt-4 mt-lg-0">
+                
+                <!-- Section: Orders & Payment -->
+                <div id="orders" class="mb-5 pt-4">
+                    <h2 class="faq-section-title">Đặt Hàng & Thanh Toán</h2>
+                    <div class="accordion faq-accordion" id="accordionOrders">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#order1">
+                                    Tôi có thể hủy hoặc thay đổi đơn hàng sau khi đã đặt không?
+                                </button>
+                            </h2>
+                            <div id="order1" class="accordion-collapse collapse show" data-bs-parent="#accordionOrders">
+                                <div class="accordion-body">
+                                    <p>Trong trường hợp đơn hàng của bạn chưa được xử lý và bàn giao cho đơn vị vận chuyển (thường trong vòng 2 giờ sau khi đặt), bạn có thể liên hệ với Tổng đài CSKH của chúng tôi để yêu cầu hủy hoặc thay đổi thông tin. Tuy nhiên, một khi đơn hàng đã chuyển sang trạng thái "Đang giao", chúng tôi không thể thực hiện bất kỳ thay đổi nào.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#order2">
+                                    Pandora chấp nhận những hình thức thanh toán nào?
+                                </button>
+                            </h2>
+                            <div id="order2" class="accordion-collapse collapse" data-bs-parent="#accordionOrders">
+                                <div class="accordion-body">
+                                    <p>Chúng tôi cung cấp nhiều phương thức thanh toán an toàn và tiện lợi bao gồm:</p>
+                                    <ul>
+                                        <li>Thanh toán khi nhận hàng (COD).</li>
+                                        <li>Thẻ tín dụng / Ghi nợ quốc tế (Visa, Mastercard, JCB).</li>
+                                        <li>Chuyển khoản qua tài khoản ngân hàng (Napas 247).</li>
+                                        <li>Ví điện tử (MoMo, ZaloPay, VNPay).</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: Shipping -->
+                <div id="shipping" class="mb-5 pt-4">
+                    <h2 class="faq-section-title">Giao Hàng & Vận Chuyển</h2>
+                    <div class="accordion faq-accordion" id="accordionShipping">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ship1">
+                                    Thời gian giao hàng mất bao lâu?
+                                </button>
+                            </h2>
+                            <div id="ship1" class="accordion-collapse collapse" data-bs-parent="#accordionShipping">
+                                <div class="accordion-body">
+                                    <p>Thời gian giao hàng phụ thuộc vào khu vực của bạn:</p>
+                                    <ul>
+                                        <li><strong>Khu vực nội thành (TP.HCM, Hà Nội):</strong> 1 - 2 ngày làm việc.</li>
+                                        <li><strong>Khu vực ngoại thành và các tỉnh khác:</strong> 3 - 5 ngày làm việc.</li>
+                                    </ul>
+                                    <p>Lưu ý: Thời gian này có thể kéo dài hơn trong các dịp lễ, Tết hoặc điều kiện thời tiết khắc nghiệt.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ship2">
+                                    Phí vận chuyển được tính như thế nào?
+                                </button>
+                            </h2>
+                            <div id="ship2" class="accordion-collapse collapse" data-bs-parent="#accordionShipping">
+                                <div class="accordion-body">
+                                    <p>Pandora <strong>MIỄN PHÍ VẬN CHUYỂN TOÀN QUỐC</strong> cho tất cả các đơn hàng tiêu chuẩn từ 2,000,000 VNĐ. Với đơn hàng dưới 2,000,000 VNĐ, phí giao hàng đồng giá là 30,000 VNĐ trên toàn quốc.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: Returns -->
+                <div id="returns" class="mb-5 pt-4">
+                    <h2 class="faq-section-title">Đổi Trả & Hoàn Tiền</h2>
+                    <div class="accordion faq-accordion" id="accordionReturns">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#return1">
+                                    Chính sách đổi trả của Pandora là gì?
+                                </button>
+                            </h2>
+                            <div id="return1" class="accordion-collapse collapse" data-bs-parent="#accordionReturns">
+                                <div class="accordion-body">
+                                    <p>Bạn có thể đổi sản phẩm mới trong vòng <strong>15 ngày</strong> kể từ ngày nhận hàng với điều kiện sản phẩm còn nguyên vẹn, chưa qua sử dụng, còn đầy đủ hóa đơn, hộp đựng và tem nhãn mác. Lưu ý: Chính sách này không áp dụng cho hoa tai (vì lý do vệ sinh an toàn) và các sản phẩm đã khắc chữ, làm theo yêu cầu cá nhân.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: Warranty -->
+                <div id="warranty" class="mb-5 pt-4">
+                    <h2 class="faq-section-title">Bảo Hành & Sửa Chữa</h2>
+                    <div class="accordion faq-accordion" id="accordionWarranty">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#warrant1">
+                                    Thời gian bảo hành cho trang sức Pandora là bao lâu?
+                                </button>
+                            </h2>
+                            <div id="warrant1" class="accordion-collapse collapse" data-bs-parent="#accordionWarranty">
+                                <div class="accordion-body">
+                                    <p>Pandora cung cấp chính sách bảo hành <strong>12 tháng</strong> kể từ ngày mua cho tất cả các sản phẩm bằng bạc 925, vàng 14k và mạ vàng. Bảo hành áp dụng cho các lỗi kỹ thuật từ nhà sản xuất (như đứt dây, rơi đá nhỏ). Không bảo hành cho các trường hợp hao mòn tự nhiên, bảo quản sai cách hoặc tự ý can thiệp sửa chữa tại bên thứ ba.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#warrant2">
+                                    Pandora có dịch vụ làm sáng trang sức không?
+                                </button>
+                            </h2>
+                            <div id="warrant2" class="accordion-collapse collapse" data-bs-parent="#accordionWarranty">
+                                <div class="accordion-body">
+                                    <p>Có. Khách hàng của Pandora được hưởng dịch vụ <strong>làm sạch và đánh bóng miễn phí trọn đời</strong> tại bất kỳ cửa hàng chính hãng nào trên toàn quốc. Bạn chỉ cần mang theo sản phẩm đến cửa hàng gần nhất để được hỗ trợ.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Support Box -->
+                <div class="contact-support-box">
+                    <h3 class="font-serif mb-3">Bạn Vẫn Còn Thắc Mắc?</h3>
+                    <p class="text-muted mb-4">Đội ngũ chăm sóc khách hàng của chúng tôi luôn sẵn sàng hỗ trợ bạn giải đáp mọi vấn đề nhanh chóng nhất.</p>
+                    <a href="@Url.Action("Contact", "Home")" class="btn btn-gold px-5 py-3">Liên Hệ Ngay</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+

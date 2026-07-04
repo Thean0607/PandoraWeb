@@ -1,0 +1,113 @@
+.success-page-container {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 100px 0 60px;
+}
+
+.success-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    padding: 50px 40px;
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+}
+
+.success-icon-wrapper {
+    width: 100px;
+    height: 100px;
+    background-color: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 30px;
+    animation: scaleIn 0.5s ease-out;
+}
+
+.success-icon {
+    font-size: 3rem;
+}
+
+.success-title {
+    font-family: var(--font-serif);
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.success-message {
+    color: var(--text-color);
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.order-details-box {
+    background-color: var(--light-color);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 20px;
+    margin-bottom: 30px;
+    text-align: left;
+}
+
+.order-detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed var(--border-color);
+}
+
+.order-detail-row:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.detail-label {
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.detail-value {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.next-steps {
+    text-align: left;
+    margin-bottom: 40px;
+}
+
+.step-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.step-icon {
+    color: var(--accent-color);
+    margin-right: 15px;
+    margin-top: 4px;
+}
+
+@keyframes scaleIn {
+    0% { transform: scale(0); opacity: 0; }
+    80% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@media (max-width: 575.98px) {
+    .success-card {
+        padding: 40px 20px;
+    }
+    .success-title {
+        font-size: 2rem;
+    }
+}

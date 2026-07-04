@@ -1,0 +1,131 @@
+@model PandoraWeb.Models.Product
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = Model != null ? Model.ProductName : "Chi Tiết Sản Phẩm";
+}
+
+<!-- Breadcrumb -->
+    <div class="container-fluid px-4 px-lg-5 mt-5 pt-5 pb-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mt-4">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Trang Chủ</a></li>
+                <li class="breadcrumb-item"><a href="@Url.Action("Category", "Product")">Sản Phẩm</a></li>
+                <li class="breadcrumb-item"><a href="#">@Model.Category.CategoryName</a></li>
+                <li class="breadcrumb-item active" aria-current="page">@Model.ProductName</li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- Product Details -->
+    <section class="py-4">
+        <div class="container-fluid px-4 px-lg-5">
+            <div class="row">
+                <!-- Product Images -->
+                <div class="col-md-6 mb-4 mb-md-0">
+                    <div class="card border-0">
+                        <img src="~/@Model.ImageUrl" onerror="this.src='https://images.unsplash.com/photo-1605100804763-247f67b2548e?q=80&w=600'" class="w-100 img-fluid rounded" alt="@Model.ProductName" id="mainImage">
+                    </div>
+                    <div class="row mt-3 g-2">
+                        <div class="col-3">
+                            <img src="~/@Model.ImageUrl" onerror="this.src='https://images.unsplash.com/photo-1605100804763-247f67b2548e?q=80&w=600'" class="w-100 rounded border border-1 p-1 cursor-pointer" alt="Thumb" onclick="document.getElementById('mainImage').src=this.src">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Info -->
+                <div class="col-md-6 ps-md-5">
+                    <div class="text-uppercase text-muted fs-7 mb-2 tracking-wide">@Model.Category.CategoryName</div>
+                    <h1 class="font-serif display-5 mb-3">@Model.ProductName</h1>
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="text-warning me-2">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <span class="text-muted fs-7">(24 đánh giá)</span>
+                    </div>
+                    <h2 class="text-primary-gold fw-bold mb-4">@Model.BasePrice.ToString("N0") ₫</h2>
+                    
+                    @{
+                        var totalStock = Model.ProductVariants != null ? Model.ProductVariants.Sum(v => v.Stock) : 0;
+                    }
+                    <p class="text-muted mb-4">Tình trạng: 
+                        @if(totalStock > 0){
+                            <span class="text-success fw-bold">Còn hàng (@totalStock)</span>
+                        } else {
+                            <span class="text-danger fw-bold">Hết hàng</span>
+                        }
+                    </p>
+                    
+                    <hr>
+
+                    <!-- Size Selection -->
+                    <div class="mb-4">
+                        <h6 class="mb-3 fw-bold">Chọn Kích Cỡ:</h6>
+                        <div class="d-flex gap-2">
+                            <input type="radio" class="btn-check" name="options" id="size1" autocomplete="off" checked>
+                            <label class="btn btn-outline-dark rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;" for="size1">48</label>
+                            
+                            <input type="radio" class="btn-check" name="options" id="size2" autocomplete="off">
+                            <label class="btn btn-outline-dark rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;" for="size2">50</label>
+
+                            <input type="radio" class="btn-check" name="options" id="size3" autocomplete="off">
+                            <label class="btn btn-outline-dark rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;" for="size3">52</label>
+
+                            <input type="radio" class="btn-check" name="options" id="size4" autocomplete="off">
+                            <label class="btn btn-outline-dark rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;" for="size4">54</label>
+                        </div>
+                        <a href="#" class="text-decoration-underline text-muted fs-7 d-inline-block mt-2">Hướng dẫn chọn size</a>
+                    </div>
+
+                    <!-- Quantity & Add to Cart -->
+                    <div class="d-flex align-items-center mb-4 gap-3">
+                        <div class="quantity-input input-group" style="width: 130px;">
+                            <button class="btn btn-minus" type="button"><i class="fas fa-minus"></i></button>
+                            <input type="text" class="form-control" value="1">
+                            <button class="btn btn-plus" type="button"><i class="fas fa-plus"></i></button>
+                        </div>
+                        <button class="btn btn-gold flex-grow-1 py-3 btn-add-cart" data-pid="@Model.ProductId"><i class="fas fa-shopping-bag me-2"></i>Thêm Vào Giỏ Hàng</button>
+                        <button class="btn btn-outline-dark py-3 px-4 btn-wishlist" data-pid="@Model.ProductId"><i class="far fa-heart"></i></button>
+                    </div>
+
+                    <!-- Extra Info -->
+                    <ul class="list-unstyled text-muted fs-7 mt-4">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Miễn phí vận chuyển toàn quốc</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Bảo hành trọn đời</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Đổi trả trong 15 ngày</li>
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Detailed Tabs -->
+    <section class="py-5 border-top">
+        <div class="container-fluid px-4 px-lg-5">
+            <ul class="nav nav-tabs justify-content-center mb-4" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active text-dark fw-bold" id="desc-tab" data-bs-toggle="tab" data-bs-target="#desc" type="button" role="tab">Mô Tả Sản Phẩm</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link text-dark fw-bold" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">Thông Tin Chi Tiết</button>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active text-center w-75 mx-auto text-muted" id="desc" role="tabpanel">
+                    <p>Mỗi chi tiết trên chiếc nhẫn đều được chế tác thủ công bởi những nghệ nhân lành nghề nhất. Viên kim cương chủ được tuyển chọn kỹ lưỡng với độ sáng trong suốt, được nâng đỡ bởi những chấu vàng tinh tế, cho phép ánh sáng xuyên qua và phản chiếu rực rỡ từ mọi góc nhìn.</p>
+                </div>
+                <div class="tab-pane fade text-center w-50 mx-auto text-muted" id="info" role="tabpanel">
+                    <ul class="list-group list-group-flush text-start">
+                        <li class="list-group-item d-flex justify-content-between"><span>Chất liệu:</span> <strong>Vàng trắng 18K</strong></li>
+                        <li class="list-group-item d-flex justify-content-between"><span>Đá chính:</span> <strong>Kim cương tự nhiên (0.5ct)</strong></li>
+                        <li class="list-group-item d-flex justify-content-between"><span>Trọng lượng:</span> <strong>2.5 chỉ</strong></li>
+                        <li class="list-group-item d-flex justify-content-between"><span>SKU:</span> <strong>PAN-R-10023</strong></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+
+

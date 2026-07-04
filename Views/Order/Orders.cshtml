@@ -1,0 +1,101 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Orders";
+}
+
+<!-- Breadcrumb -->
+    <div class="breadcrumb-wrap mt-5 pt-5 mb-4">
+        <div class="container-fluid px-4 px-lg-5 mt-4">
+            <h1 class="breadcrumb-title font-serif">Tài Khoản</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Trang Chủ</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Hồ Sơ Của Tôi</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Profile Section -->
+    <section class="pb-5">
+        <div class="container-fluid px-4 px-lg-5">
+            <div class="row">
+                <!-- Filter Toggle Button (Mobile Only) -->
+                <div class="d-lg-none mb-4">
+                    <button class="btn btn-outline-gold w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#profileSidebar" aria-controls="profileSidebar">
+                        <i class="fas fa-bars me-2"></i> Menu Tài Khoản
+                    </button>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="col-lg-3 mb-4 mb-lg-0">
+                    <div class="offcanvas-lg offcanvas-start" tabindex="-1" id="profileSidebar" aria-labelledby="profileSidebarLabel">
+                        <div class="offcanvas-header border-bottom">
+                            <h5 class="offcanvas-title font-serif" id="profileSidebarLabel">Menu Tài Khoản</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#profileSidebar" aria-label="Close"></button>
+                        </div>
+                        <div class="offcanvas-body p-3 p-lg-0 flex-column">
+                            <div class="card border-0 shadow-sm p-3 w-100">
+                                <div class="text-center mb-4 mt-3 d-none d-lg-block">
+                                    <h5 class="font-serif fw-bold mb-1">Nguyễn Văn A</h5>
+                                    <p class="text-muted fs-7 mb-0">Thành viên Bạc</p>
+                                </div>
+                                <hr class="mt-0 mb-3 text-muted d-none d-lg-block">
+                        <nav class="nav flex-column profile-sidebar">
+                            <a class="nav-link" href="@Url.Action("Profile", "Account")"><i class="far fa-user me-2"></i> Thông tin tài khoản</a>
+                            <a class="nav-link active" href="@Url.Action("Orders", "Order")"><i class="fas fa-shopping-basket me-2"></i> Quản lý đơn hàng</a>
+                            <a class="nav-link" href="@Url.Action("Wishlist", "Order")"><i class="far fa-heart me-2"></i> Sản phẩm yêu thích</a>
+                            <a class="nav-link" href="@Url.Action("Address", "Account")"><i class="far fa-address-book me-2"></i> Sổ địa chỉ</a>
+                            <a class="nav-link" href="@Url.Action("ChangePassword", "Account")"><i class="fas fa-lock me-2"></i> Đổi mật khẩu</a>
+                            <a class="nav-link text-danger mt-3" href="@Url.Action("Login", "Account")"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a>
+                        </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="col-lg-9">
+                    <div class="card border-0 shadow-sm p-4 p-md-5">
+                        <h4 class="font-serif mb-4 pb-2 border-bottom">Quản Lý Đơn Hàng</h4>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Mã ĐH</th>
+                                        <th>Ngày mua</th>
+                                        <th>Sản phẩm</th>
+                                        <th>Tổng tiền</th>
+                                        <th>Trạng thái</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>#PD00123</td>
+                                        <td>15/06/2026</td>
+                                        <td>Nhẫn Đính Kim Cương x 1</td>
+                                        <td class="text-primary-gold fw-bold">12,500,000 ₫</td>
+                                        <td><span class="badge bg-success">Đã giao</span></td>
+                                        <td><a href="#" class="btn btn-sm btn-outline-dark">Chi tiết</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>#PD00085</td>
+                                        <td>02/05/2026</td>
+                                        <td>Dây Chuyền Vàng Mặt Tròn x 1</td>
+                                        <td class="text-primary-gold fw-bold">8,200,000 ₫</td>
+                                        <td><span class="badge bg-success">Đã giao</span></td>
+                                        <td><a href="#" class="btn btn-sm btn-outline-dark">Chi tiết</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Minimal -->
+

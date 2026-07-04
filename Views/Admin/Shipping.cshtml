@@ -1,0 +1,49 @@
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-white">@ViewBag.Title</h1>
+    <button class="btn btn-admin">
+        <i class="fas fa-save"></i> Lưu Thay Đổi
+    </button>
+</div>
+
+<div class="admin-card">
+    <h5 class="text-white mb-4">Phí Giao Hàng & Đơn Vị Vận Chuyển</h5>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-4">
+                <label class="form-label text-muted">Phí Giao Hàng Tiêu Chuẩn (₫)</label>
+                <input type="number" class="form-control bg-dark text-white border-secondary" value="30000" />
+            </div>
+            <div class="mb-4">
+                <label class="form-label text-muted">Miễn phí giao hàng cho đơn từ (₫)</label>
+                <input type="number" class="form-control bg-dark text-white border-secondary" value="500000" />
+                <small class="text-info mt-1 d-block"><i class="fas fa-info-circle me-1"></i> Để 0 nếu không áp dụng freeship.</small>
+            </div>
+        </div>
+        <div class="col-md-6">
+             <label class="form-label text-muted mb-3">Đối tác vận chuyển mặc định</label>
+             <div class="form-check mb-2">
+                <input class="form-check-input" type="radio" name="shippingPartner" id="ghn" checked>
+                <label class="form-check-label text-white" for="ghn">
+                    Giao Hàng Nhanh (GHN)
+                </label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="radio" name="shippingPartner" id="ghtk">
+                <label class="form-check-label text-white" for="ghtk">
+                    Giao Hàng Tiết Kiệm (GHTK)
+                </label>
+            </div>
+             <div class="form-check mb-2">
+                <input class="form-check-input" type="radio" name="shippingPartner" id="viettel">
+                <label class="form-check-label text-white" for="viettel">
+                    Viettel Post
+                </label>
+            </div>
+        </div>
+    </div>
+</div>

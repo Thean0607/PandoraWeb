@@ -1,0 +1,125 @@
+@model IEnumerable<PandoraWeb.Models.Product>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Index";
+}
+
+<!-- Hero Section -->
+    <section class="hero-section">
+        <!-- Placeholder image -->
+        <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=2000&auto=format&fit=crop" alt="Hero Banner" class="hero-img">
+        <div class="container-fluid px-4 px-lg-5">
+            <div class="hero-content">
+                <h1 class="hero-title">Elegance in Every Detail</h1>
+                <p class="hero-subtitle">Khám phá bộ sưu tập mùa xuân mới nhất với các thiết kế tinh xảo, tôn vinh vẻ đẹp vĩnh cửu.</p>
+                <a href="@Url.Action("Category", "Product")" class="btn btn-gold">Mua Ngay</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Categories -->
+    <section class="py-5 mt-5">
+        <div class="container-fluid px-4 px-lg-5">
+            <div class="section-title">
+                <h2>Danh Mục Nổi Bật</h2>
+                <div class="title-separator"></div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="position-relative overflow-hidden group-hover" style="height: 400px;">
+                        <img src="https://images.unsplash.com/photo-1599643478514-4a4e02632616?q=80&w=600&auto=format&fit=crop" class="w-100 h-100 object-fit-cover transition" alt="Nhẫn">
+                        <div class="position-absolute bottom-0 start-0 w-100 p-4 bg-gradient-dark">
+                            <h3 class="text-white mb-0 font-serif">Nhẫn</h3>
+                            <a href="@Url.Action("Category", "Product")" class="text-white text-decoration-none">Khám phá <i class="fas fa-arrow-right ms-2"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="position-relative overflow-hidden group-hover" style="height: 400px;">
+                        <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=600&auto=format&fit=crop" class="w-100 h-100 object-fit-cover transition" alt="Dây Chuyền">
+                        <div class="position-absolute bottom-0 start-0 w-100 p-4 bg-gradient-dark">
+                            <h3 class="text-white mb-0 font-serif">Dây Chuyền</h3>
+                            <a href="@Url.Action("Category", "Product")" class="text-white text-decoration-none">Khám phá <i class="fas fa-arrow-right ms-2"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="position-relative overflow-hidden group-hover" style="height: 400px;">
+                        <img src="https://images.unsplash.com/photo-1535632787350-4e68ef0ac584?q=80&w=600&auto=format&fit=crop" class="w-100 h-100 object-fit-cover transition" alt="Hoa Tai">
+                        <div class="position-absolute bottom-0 start-0 w-100 p-4 bg-gradient-dark">
+                            <h3 class="text-white mb-0 font-serif">Hoa Tai</h3>
+                            <a href="@Url.Action("Category", "Product")" class="text-white text-decoration-none">Khám phá <i class="fas fa-arrow-right ms-2"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trending Products -->
+    <section class="py-5 bg-secondary-soft">
+        <div class="container-fluid px-4 px-lg-5">
+            <div class="section-title">
+                <h2>Sản Phẩm Bán Chạy</h2>
+                <div class="title-separator"></div>
+            </div>
+            <div class="row">
+            @if(Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <div class="product-card">
+                            <div class="product-img-wrapper">
+                                <!-- If image is missing, use a placeholder -->
+                                <img src="~/@item.ImageUrl" onerror="this.src='https://images.unsplash.com/photo-1605100804763-247f67b2548e?q=80&w=600'" alt="@item.ProductName">
+                                <div class="product-action">
+                                    <a href="javascript:void(0);" class="action-btn btn-add-cart" data-pid="@item.ProductId" data-bs-toggle="tooltip" title="Thêm vào giỏ hàng"><i class="fas fa-shopping-cart"></i></a>
+                                    <a href="@Url.Action("ProductDetail", "Product", new { id = item.ProductId })" class="action-btn" data-bs-toggle="tooltip" title="Xem chi tiết"><i class="fas fa-eye"></i></a>
+                                    <a href="javascript:void(0);" class="action-btn btn-wishlist" data-pid="@item.ProductId" data-bs-toggle="tooltip" title="Yêu thích"><i class="far fa-heart"></i></a>
+                                </div>
+                            </div>
+                            <div class="product-info">
+                                <div class="product-category">@item.Category.CategoryName</div>
+                                <h3 class="product-title"><a href="@Url.Action("ProductDetail", "Product", new { id = item.ProductId })">@item.ProductName</a></h3>
+                                <div class="product-price">@item.BasePrice.ToString("N0") ₫</div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center py-5">
+                    <p class="text-muted">Chưa có sản phẩm nào được hiển thị.</p>
+                </div>
+            }
+            </div>
+            <div class="text-center mt-4">
+                <a href="@Url.Action("Category", "Product")" class="btn btn-outline-gold">Xem Tất Cả Sản Phẩm</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feature Highlights -->
+    <section class="py-5">
+        <div class="container-fluid px-4 px-lg-5">
+            <div class="row text-center">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <i class="fas fa-shipping-fast text-primary-gold fs-1 mb-3"></i>
+                    <h4 class="font-serif">Miễn Phí Vận Chuyển</h4>
+                    <p class="text-muted">Cho mọi đơn hàng trên 2,000,000 ₫</p>
+                </div>
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <i class="fas fa-sync-alt text-primary-gold fs-1 mb-3"></i>
+                    <h4 class="font-serif">Đổi Trả Dễ Dàng</h4>
+                    <p class="text-muted">Trong vòng 15 ngày kể từ ngày mua</p>
+                </div>
+                <div class="col-md-4">
+                    <i class="fas fa-gem text-primary-gold fs-1 mb-3"></i>
+                    <h4 class="font-serif">Bảo Hành Trọn Đời</h4>
+                    <p class="text-muted">Dịch vụ làm sạch và đánh bóng miễn phí</p>
+                </div>
+            </div>
+        </div>
+    </section>

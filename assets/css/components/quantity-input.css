@@ -1,0 +1,18 @@
+/* Quantity Input */
+.quantity-input {
+  display: flex;
+  align-items: center;
+  max-width: 120px;
+}
+
+.quantity-input input {
+  text-align: center;
+  border-left: none;
+  border-right: none;
+}
+
+.quantity-input .btn {
+  border-color: #ced4da;
+  background-color: white;
+}
+

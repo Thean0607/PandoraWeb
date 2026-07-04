@@ -1,0 +1,47 @@
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-white">@ViewBag.Title</h1>
+    <button class="btn btn-admin">
+        <i class="fas fa-save"></i> Lưu Thay Đổi
+    </button>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="admin-card mb-4">
+            <h5 class="text-white mb-4">Thông Tin Cửa Hàng</h5>
+            <div class="mb-3">
+                <label class="form-label text-muted">Tên cửa hàng</label>
+                <input type="text" class="form-control bg-dark text-white border-secondary" value="Pandora Store" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label text-muted">Email liên hệ</label>
+                <input type="email" class="form-control bg-dark text-white border-secondary" value="contact@pandora.vn" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label text-muted">Hotline</label>
+                <input type="text" class="form-control bg-dark text-white border-secondary" value="1900 6868" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label text-muted">Địa chỉ</label>
+                <textarea class="form-control bg-dark text-white border-secondary" rows="3">123 Đường Sáng Tạo, Quận 1, TP. HCM</textarea>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="admin-card mb-4">
+            <h5 class="text-white mb-4">Cấu Hình Chung</h5>
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="maintenance" />
+                <label class="form-check-label text-muted" for="maintenance">Chế độ bảo trì (Bảo vệ web)</label>
+            </div>
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="review" checked />
+                <label class="form-check-label text-muted" for="review">Tự động duyệt đánh giá 5 sao</label>
+            </div>
+        </div>
+    </div>
+</div>

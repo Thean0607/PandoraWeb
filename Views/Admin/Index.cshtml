@@ -1,0 +1,129 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h1 class="page-title">Tổng Quan Thống Kê</h1>
+
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="admin-card">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>Tổng Doanh Thu</h3>
+                    <p class="stat-value" id="statRevenue">125.4M</p>
+                </div>
+                <div class="stat-icon">
+                    <i class="fas fa-wallet"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="admin-card">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>Sản Phẩm</h3>
+                    <p class="stat-value" id="statProducts">0</p>
+                </div>
+                <div class="stat-icon">
+                    <i class="fas fa-box"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="admin-card">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>Khách Hàng</h3>
+                    <p class="stat-value" id="statCustomers">0</p>
+                </div>
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="admin-card">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>Đơn Hàng Mới</h3>
+                    <p class="stat-value">12</p>
+                </div>
+                <div class="stat-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="admin-card">
+            <h4 class="mb-4 text-white">Đơn hàng gần đây</h4>
+            <div class="table-responsive table-wrapper">
+                <table class="table admin-table">
+                    <thead>
+                        <tr>
+                            <th>Mã Đơn</th>
+                            <th>Khách Hàng</th>
+                            <th>Tổng Tiền</th>
+                            <th>Trạng Thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#ORD-001</td>
+                            <td>Nguyễn Văn A</td>
+                            <td>12,500,000 ₫</td>
+                            <td><span class="status-badge status-active">Hoàn Thành</span></td>
+                        </tr>
+                        <tr>
+                            <td>#ORD-002</td>
+                            <td>Trần Thị B</td>
+                            <td>8,200,000 ₫</td>
+                            <td><span class="status-badge status-warning">Đang Giao</span></td>
+                        </tr>
+                        <tr>
+                            <td>#ORD-003</td>
+                            <td>Lê Văn C</td>
+                            <td>3,150,000 ₫</td>
+                            <td><span class="status-badge status-inactive">Đã Hủy</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="admin-card">
+            <h4 class="mb-4 text-white">Hoạt động gần đây</h4>
+            <ul class="list-unstyled">
+                <li class="mb-3 border-bottom border-secondary pb-3">
+                    <p class="mb-1 text-white"><i class="fas fa-plus-circle text-success me-2"></i>Thêm sản phẩm mới: Nhẫn Kim Cương</p>
+                    <small class="text-muted">10 phút trước bởi Phạm Admin</small>
+                </li>
+                <li class="mb-3 border-bottom border-secondary pb-3">
+                    <p class="mb-1 text-white"><i class="fas fa-user-edit text-info me-2"></i>Cập nhật khách hàng: Nguyễn Văn A</p>
+                    <small class="text-muted">1 giờ trước bởi Hoàng Nhân Viên</small>
+                </li>
+                <li class="mb-0">
+                    <p class="mb-1 text-white"><i class="fas fa-truck text-warning me-2"></i>Đơn hàng #ORD-002 đang giao</p>
+                    <small class="text-muted">3 giờ trước</small>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('statProducts').textContent = getStorage('admin_products').length;
+            document.getElementById('statCustomers').textContent = getStorage('admin_customers').length;
+        });
+    </script>
+}
+

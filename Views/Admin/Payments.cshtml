@@ -1,0 +1,41 @@
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-white">@ViewBag.Title</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="admin-card h-100">
+            <div class="d-flex justify-content-between mb-4">
+                <h5 class="text-white">Thanh Toán Khi Nhận Hàng (COD)</h5>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" checked />
+                </div>
+            </div>
+            <p class="text-muted small">Phương thức thanh toán phổ biến nhất. Thu tiền khi giao hàng thành công.</p>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="admin-card h-100">
+            <div class="d-flex justify-content-between mb-4">
+                <h5 class="text-white">Thanh Toán VNPay</h5>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" checked />
+                </div>
+            </div>
+            <p class="text-muted small">Cổng thanh toán thẻ ATM, Visa, MasterCard.</p>
+            <div class="mb-3 mt-4">
+                <label class="form-label text-muted fs-7">VNPay TmnCode</label>
+                <input type="text" class="form-control form-control-sm bg-dark text-white border-secondary" value="QWERTY1234" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label text-muted fs-7">VNPay HashSecret</label>
+                <input type="password" class="form-control form-control-sm bg-dark text-white border-secondary" value="****************" />
+            </div>
+            <button class="btn btn-sm btn-outline-warning">Cập nhật cấu hình</button>
+        </div>
+    </div>
+</div>

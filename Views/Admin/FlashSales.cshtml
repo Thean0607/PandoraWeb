@@ -1,0 +1,69 @@
+@model IEnumerable<PandoraWeb.Models.Promotion>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-white">@ViewBag.Title</h1>
+    <a href="@Url.Action("Coupons", "Admin")" class="btn btn-admin">
+        <i class="fas fa-plus"></i> Tạo Chương Trình
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-info border-info text-light" style="background-color: rgba(13, 202, 240, 0.1);">
+            <i class="fas fa-info-circle me-2"></i> Flash Sales là những chương trình giảm giá sốc (giảm từ 30% trở lên) được tự động lấy từ hệ thống Mã Giảm Giá.
+        </div>
+    </div>
+</div>
+
+<div class="table-wrapper">
+    <table class="table admin-table table-hover">
+        <thead>
+            <tr>
+                <th>Tên Chương Trình (Code)</th>
+                <th>Giảm %</th>
+                <th>Thời Gian</th>
+                <th>Tình Trạng</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="fw-bold text-danger"><i class="fas fa-bolt me-2"></i>@item.Code</td>
+                        <td class="text-danger fw-bold fs-5">@item.DiscountPercentage%</td>
+                        <td>
+                            @item.StartDate.ToString("dd/MM/yyyy") - @item.EndDate.ToString("dd/MM/yyyy")
+                        </td>
+                        <td>
+                            @if(item.IsActive && item.EndDate >= DateTime.Now) {
+                                <span class="badge bg-danger pulse-animation">Đang diễn ra</span>
+                            } else {
+                                <span class="badge bg-secondary">Đã kết thúc</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td colspan="4" class="text-center py-4 text-muted">Không có chương trình Flash Sale nào.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .pulse-animation {
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+        70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+    }
+</style>

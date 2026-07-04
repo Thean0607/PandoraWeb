@@ -1,0 +1,62 @@
+@model IEnumerable<PandoraWeb.Models.Order>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    decimal totalRev = ViewBag.TotalRevenue ?? 0;
+    int totalOrders = ViewBag.TotalOrders ?? 0;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-white">@ViewBag.Title</h1>
+    <button class="btn btn-admin">
+        <i class="fas fa-file-export"></i> Tải Báo Cáo PDF
+    </button>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="admin-card text-center">
+            <h5 class="text-muted">Tổng Doanh Thu</h5>
+            <h2 class="text-warning fw-bold">@totalRev.ToString("N0") ₫</h2>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="admin-card text-center">
+            <h5 class="text-muted">Tổng Đơn Đã Thanh Toán</h5>
+            <h2 class="text-info fw-bold">@totalOrders</h2>
+        </div>
+    </div>
+</div>
+
+<div class="admin-card">
+    <h5 class="text-white mb-4">Giao Dịch Gần Đây (Đã thanh toán)</h5>
+    <div class="table-responsive">
+        <table class="table admin-table table-hover">
+            <thead>
+                <tr>
+                    <th>Mã Đơn</th>
+                    <th>Khách Hàng</th>
+                    <th>Ngày Mua</th>
+                    <th class="text-end">Doanh Thu</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>#@item.OrderId</td>
+                            <td>@(item.Customer != null ? item.Customer.FullName : "Khách vãng lai")</td>
+                            <td>@item.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="text-end fw-bold text-success">+@item.TotalAmount.ToString("N0") ₫</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="4" class="text-center py-4 text-muted">Chưa có dữ liệu.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

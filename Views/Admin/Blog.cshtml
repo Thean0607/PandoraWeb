@@ -1,0 +1,50 @@
+@model IEnumerable<PandoraWeb.Models.BlogPost>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-white">@ViewBag.Title</h1>
+    <button class="btn btn-admin">
+        <i class="fas fa-plus"></i> Viết Bài Mới
+    </button>
+</div>
+
+<div class="table-wrapper">
+    <table class="table admin-table table-hover">
+        <thead>
+            <tr>
+                <th>Tiêu Đề</th>
+                <th>Tác Giả</th>
+                <th>Ngày Đăng</th>
+                <th>Trạng Thái</th>
+                <th class="text-end">Thao Tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="fw-bold">@item.Title</td>
+                        <td>@item.Author</td>
+                        <td>@item.PublishedDate.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            @if(item.IsPublished) { <span class="badge bg-success">Đã đăng</span> }
+                            else { <span class="badge bg-secondary">Bản nháp</span> }
+                        </td>
+                        <td class="text-end">
+                            <button class="btn btn-icon btn-edit"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-icon btn-delete"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td colspan="5" class="text-center py-4 text-muted">Chưa có bài viết nào.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>

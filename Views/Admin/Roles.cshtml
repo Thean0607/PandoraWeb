@@ -1,0 +1,263 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    <style>
+        .permission-checkboxes {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .permission-item {
+            background-color: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--admin-border);
+        }
+        .form-check-input:checked {
+            background-color: var(--admin-accent);
+            border-color: var(--admin-accent);
+        }
+    </style>
+}
+
+<div class="page-title">
+    Phân Quyền Quản Lý
+    <button class="btn btn-admin" onclick="openRoleModal()">
+        <i class="fas fa-plus"></i> Thêm Nhóm Quyền
+    </button>
+</div>
+
+<div class="admin-card">
+    <div class="table-responsive table-wrapper">
+        <table class="table admin-table" id="roleTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên Nhóm Quyền</th>
+                    <th>Chi Tiết Quyền</th>
+                    <th>Thao Tác</th>
+                </tr>
+            </thead>
+            <tbody id="roleTbody">
+                <!-- Data will be loaded here -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Role Modal -->
+<div class="modal fade" id="roleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content admin-form">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Thêm Nhóm Quyền Mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="roleForm">
+                    <input type="hidden" id="roleId">
+                    <div class="mb-3">
+                        <label class="form-label">Tên Nhóm Quyền</label>
+                        <input type="text" class="form-control" id="roleName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Quyền Hạn (Permissions)</label>
+                        <div class="permission-checkboxes">
+                            <div class="permission-item form-check">
+                                <input class="form-check-input perm-cb" type="checkbox" value="all" id="perm_all">
+                                <label class="form-check-label text-white" for="perm_all">Toàn quyền (Admin)</label>
+                            </div>
+                            <div class="permission-item form-check">
+                                <input class="form-check-input perm-cb" type="checkbox" value="manage_product" id="perm_prod">
+                                <label class="form-check-label text-white" for="perm_prod">Quản lý Sản Phẩm (Thêm/Sửa/Xóa)</label>
+                            </div>
+                            <div class="permission-item form-check">
+                                <input class="form-check-input perm-cb" type="checkbox" value="read_product" id="perm_read_prod">
+                                <label class="form-check-label text-white" for="perm_read_prod">Xem Sản Phẩm</label>
+                            </div>
+                            <div class="permission-item form-check">
+                                <input class="form-check-input perm-cb" type="checkbox" value="manage_customer" id="perm_cust">
+                                <label class="form-check-label text-white" for="perm_cust">Quản lý Khách Hàng</label>
+                            </div>
+                            <div class="permission-item form-check">
+                                <input class="form-check-input perm-cb" type="checkbox" value="manage_employee" id="perm_emp">
+                                <label class="form-check-label text-white" for="perm_emp">Quản lý Nhân Viên</label>
+                            </div>
+                            <div class="permission-item form-check">
+                                <input class="form-check-input perm-cb" type="checkbox" value="manage_order" id="perm_order">
+                                <label class="form-check-label text-white" for="perm_order">Quản lý Đơn Hàng</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-admin" onclick="saveRole()">Lưu Thay Đổi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let roleModal;
+        
+        const permissionNames = {
+            'all': 'Toàn quyền',
+            'manage_product': 'Quản lý Sản Phẩm',
+            'read_product': 'Xem Sản Phẩm',
+            'manage_customer': 'Quản lý Khách Hàng',
+            'manage_employee': 'Quản lý Nhân Viên',
+            'manage_order': 'Quản lý Đơn Hàng'
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            roleModal = new bootstrap.Modal(document.getElementById('roleModal'));
+            renderRoles();
+
+            // Handle 'all' checkbox logic
+            document.getElementById('perm_all').addEventListener('change', function() {
+                const isChecked = this.checked;
+                document.querySelectorAll('.perm-cb').forEach(cb => {
+                    if (cb.id !== 'perm_all') {
+                        cb.checked = isChecked;
+                        cb.disabled = isChecked;
+                    }
+                });
+            });
+        });
+
+        function formatPermissions(permsArray) {
+            if (permsArray.includes('all')) {
+                return '<span class="status-badge status-active">Toàn quyền hệ thống</span>';
+            }
+            return permsArray.map(p => {
+                return `<span class="status-badge status-warning me-1 mb-1 d-inline-block">${permissionNames[p] || p}</span>`;
+            }).join('');
+        }
+
+        function renderRoles() {
+            const roles = getStorage('admin_roles');
+            const tbody = document.getElementById('roleTbody');
+            tbody.innerHTML = '';
+
+            roles.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>#${r.id}</td>
+                    <td><strong>${r.name}</strong></td>
+                    <td>${formatPermissions(r.permissions)}</td>
+                    <td>
+                        <button class="btn-icon btn-edit" onclick="editRole(${r.id})"><i class="fas fa-edit"></i></button>
+                        ${r.id === 1 ? '' : `<button class="btn-icon btn-delete" onclick="deleteRole(${r.id})"><i class="fas fa-trash"></i></button>`}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function openRoleModal(id = null) {
+            const form = document.getElementById('roleForm');
+            form.reset();
+            
+            document.querySelectorAll('.perm-cb').forEach(cb => {
+                cb.checked = false;
+                cb.disabled = false;
+            });
+
+            document.getElementById('roleId').value = '';
+            document.getElementById('modalTitle').textContent = 'Thêm Nhóm Quyền Mới';
+
+            if (id) {
+                const roles = getStorage('admin_roles');
+                const role = roles.find(r => r.id === id);
+                if (role) {
+                    document.getElementById('modalTitle').textContent = 'Sửa Nhóm Quyền';
+                    document.getElementById('roleId').value = role.id;
+                    document.getElementById('roleName').value = role.name;
+                    
+                    if (role.permissions.includes('all')) {
+                        document.getElementById('perm_all').checked = true;
+                        document.querySelectorAll('.perm-cb').forEach(cb => {
+                            if (cb.id !== 'perm_all') {
+                                cb.checked = true;
+                                cb.disabled = true;
+                            }
+                        });
+                    } else {
+                        role.permissions.forEach(p => {
+                            const cb = document.querySelector(`.perm-cb[value="${p}"]`);
+                            if (cb) cb.checked = true;
+                        });
+                    }
+                }
+            }
+            roleModal.show();
+        }
+
+        function editRole(id) {
+            openRoleModal(id);
+        }
+
+        function deleteRole(id) {
+            if (id === 1) {
+                alert('Không thể xóa quyền Admin gốc!');
+                return;
+            }
+            if (confirm('Bạn có chắc chắn muốn xóa nhóm quyền này? Các nhân viên thuộc nhóm này sẽ mất quyền truy cập.')) {
+                let roles = getStorage('admin_roles');
+                roles = roles.filter(r => r.id !== id);
+                setStorage('admin_roles', roles);
+                renderRoles();
+            }
+        }
+
+        function saveRole() {
+            const id = document.getElementById('roleId').value;
+            const name = document.getElementById('roleName').value;
+            
+            const perms = [];
+            const isAll = document.getElementById('perm_all').checked;
+            
+            if (isAll) {
+                perms.push('all');
+            } else {
+                document.querySelectorAll('.perm-cb:checked').forEach(cb => {
+                    perms.push(cb.value);
+                });
+            }
+
+            if (!name || perms.length === 0) {
+                alert('Vui lòng nhập tên nhóm và chọn ít nhất một quyền.');
+                return;
+            }
+
+            let roles = getStorage('admin_roles');
+
+            if (id) {
+                // Update
+                const index = roles.findIndex(r => r.id == id);
+                if (index !== -1) {
+                    roles[index] = { ...roles[index], name, permissions: perms };
+                }
+            } else {
+                // Add
+                const newRole = {
+                    id: generateId(roles),
+                    name,
+                    permissions: perms
+                };
+                roles.push(newRole);
+            }
+
+            setStorage('admin_roles', roles);
+            roleModal.hide();
+            renderRoles();
+        }
+    </script>
+}
+

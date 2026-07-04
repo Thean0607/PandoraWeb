@@ -1,0 +1,105 @@
+.faq-header {
+    margin-top: 100px;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.faq-title {
+    font-size: 2.5rem;
+    font-family: var(--font-serif);
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.faq-sidebar {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 100px;
+}
+
+.faq-nav-link {
+    display: block;
+    padding: 12px 15px;
+    color: var(--text-color);
+    text-decoration: none;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.faq-nav-link:hover, .faq-nav-link.active {
+    background-color: var(--light-color);
+    color: var(--primary-color);
+    padding-left: 20px;
+}
+
+.faq-nav-link.active {
+    border-left: 3px solid var(--accent-color);
+}
+
+.faq-section-title {
+    font-family: var(--font-serif);
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+/* Custom Accordion Styling */
+.faq-accordion .accordion-item {
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 10px;
+    border-radius: 0;
+}
+
+.faq-accordion .accordion-item:last-child {
+    border-bottom: none;
+}
+
+.faq-accordion .accordion-button {
+    padding: 20px 0;
+    font-weight: 600;
+    color: var(--primary-color);
+    background-color: transparent;
+    box-shadow: none;
+    font-size: 1.05rem;
+}
+
+.faq-accordion .accordion-button:not(.collapsed) {
+    color: var(--accent-color);
+}
+
+.faq-accordion .accordion-button::after {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23212529'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+}
+
+.faq-accordion .accordion-button:not(.collapsed)::after {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23d4af37'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+}
+
+.faq-accordion .accordion-body {
+    padding: 0 0 20px 0;
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.contact-support-box {
+    background-color: var(--light-color);
+    padding: 40px;
+    text-align: center;
+    border-radius: 8px;
+    margin-top: 60px;
+}
+
+@media (max-width: 991.98px) {
+    .faq-sidebar {
+        position: static;
+        margin-bottom: 30px;
+    }
+}

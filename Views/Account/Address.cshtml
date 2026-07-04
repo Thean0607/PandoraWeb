@@ -1,0 +1,85 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Address";
+}
+
+<!-- Breadcrumb -->
+    <div class="breadcrumb-wrap mt-5 pt-5 mb-4">
+        <div class="container-fluid px-4 px-lg-5 mt-4">
+            <h1 class="breadcrumb-title font-serif">Tài Khoản</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Trang Chủ</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Hồ Sơ Của Tôi</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Profile Section -->
+    <section class="pb-5">
+        <div class="container-fluid px-4 px-lg-5">
+            <div class="row">
+                <!-- Filter Toggle Button (Mobile Only) -->
+                <div class="d-lg-none mb-4">
+                    <button class="btn btn-outline-gold w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#profileSidebar" aria-controls="profileSidebar">
+                        <i class="fas fa-bars me-2"></i> Menu Tài Khoản
+                    </button>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="col-lg-3 mb-4 mb-lg-0">
+                    <div class="offcanvas-lg offcanvas-start" tabindex="-1" id="profileSidebar" aria-labelledby="profileSidebarLabel">
+                        <div class="offcanvas-header border-bottom">
+                            <h5 class="offcanvas-title font-serif" id="profileSidebarLabel">Menu Tài Khoản</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#profileSidebar" aria-label="Close"></button>
+                        </div>
+                        <div class="offcanvas-body p-3 p-lg-0 flex-column">
+                            <div class="card border-0 shadow-sm p-3 w-100">
+                                <div class="text-center mb-4 mt-3 d-none d-lg-block">
+                                    <h5 class="font-serif fw-bold mb-1">Nguyễn Văn A</h5>
+                                    <p class="text-muted fs-7 mb-0">Thành viên Bạc</p>
+                                </div>
+                                <hr class="mt-0 mb-3 text-muted d-none d-lg-block">
+                        <nav class="nav flex-column profile-sidebar">
+                            <a class="nav-link" href="@Url.Action("Profile", "Account")"><i class="far fa-user me-2"></i> Thông tin tài khoản</a>
+                            <a class="nav-link" href="@Url.Action("Orders", "Order")"><i class="fas fa-shopping-basket me-2"></i> Quản lý đơn hàng</a>
+                            <a class="nav-link" href="@Url.Action("Wishlist", "Order")"><i class="far fa-heart me-2"></i> Sản phẩm yêu thích</a>
+                            <a class="nav-link active" href="@Url.Action("Address", "Account")"><i class="far fa-address-book me-2"></i> Sổ địa chỉ</a>
+                            <a class="nav-link" href="@Url.Action("ChangePassword", "Account")"><i class="fas fa-lock me-2"></i> Đổi mật khẩu</a>
+                            <a class="nav-link text-danger mt-3" href="@Url.Action("Login", "Account")"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a>
+                        </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="col-lg-9">
+                    <div class="card border-0 shadow-sm p-4 p-md-5">
+                        <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+                            <h4 class="font-serif mb-0">Sổ Địa Chỉ</h4>
+                            <button class="btn btn-sm btn-gold"><i class="fas fa-plus me-1"></i> Thêm Địa Chỉ Mới</button>
+                        </div>
+                        <div class="card border mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <h6 class="mb-1 fw-bold">Nguyễn Văn A <span class="badge bg-success ms-2">Mặc định</span></h6>
+                                    <div>
+                                        <a href="#" class="text-primary-gold text-decoration-none me-3">Sửa</a>
+                                        <a href="#" class="text-danger text-decoration-none">Xóa</a>
+                                    </div>
+                                </div>
+                                <p class="text-muted mb-1">0901234567</p>
+                                <p class="text-muted mb-0">123 Đường Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Minimal -->
+
