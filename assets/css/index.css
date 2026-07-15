@@ -1,8 +1,8 @@
 /* Hero Section */
 .hero-section {
   position: relative;
-  height: 85vh;
-  min-height: 600px;
+  height: 40vh;
+  min-height: 250px;
   background-color: #111;
   display: flex;
   align-items: center;
@@ -48,6 +48,18 @@
   animation: fadeUp 1s ease forwards;
   opacity: 0;
   transform: translateY(30px);
+}
+
+.category-link i {
+  transition: transform 0.3s;
+}
+
+.category-link:hover i {
+  transform: translateX(5px);
+}
+
+.bg-gradient-dark {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
 }
 
 .hero-title {

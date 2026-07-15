@@ -4,51 +4,92 @@
     ViewBag.Title = "Index";
 }
 
-<!-- Hero Section -->
-    <section class="hero-section">
-        <!-- Placeholder image -->
-        <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=2000&auto=format&fit=crop" alt="Hero Banner" class="hero-img">
-        <div class="container-fluid px-4 px-lg-5">
-            <div class="hero-content">
-                <h1 class="hero-title">Elegance in Every Detail</h1>
-                <p class="hero-subtitle">Khám phá bộ sưu tập mùa xuân mới nhất với các thiết kế tinh xảo, tôn vinh vẻ đẹp vĩnh cửu.</p>
-                <a href="@Url.Action("Category", "Product")" class="btn btn-gold">Mua Ngay</a>
+    <!-- Hero Section Carousel -->
+    <div class="container mb-5">
+        <div id="heroCarousel" class="carousel slide rounded-4 overflow-hidden" data-bs-ride="carousel" data-bs-interval="3000" style="box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
             </div>
+            <div class="carousel-inner">
+                <!-- Slide 1 -->
+                <div class="carousel-item active hero-section">
+                    <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=2000&auto=format&fit=crop" alt="Hero Banner 1" class="hero-img">
+                    <div class="container-fluid h-100 d-flex align-items-center position-relative z-3">
+                        <div class="hero-content mx-3 mx-md-5">
+                            <h1 class="hero-title">Elegance in Every Detail</h1>
+                            <p class="hero-subtitle">Khám phá bộ sưu tập mùa xuân mới nhất với các thiết kế tinh xảo, tôn vinh vẻ đẹp vĩnh cửu.</p>
+                            <a href="@Url.Action("Category", "Product")" class="btn btn-gold">Mua Ngay</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Slide 2 -->
+                <div class="carousel-item hero-section">
+                    <img src="https://images.unsplash.com/photo-1599643478514-4a4e02632616?q=80&w=2000&auto=format&fit=crop" alt="Hero Banner 2" class="hero-img">
+                    <div class="container-fluid h-100 d-flex align-items-center position-relative z-3">
+                        <div class="hero-content mx-3 mx-md-5">
+                            <h1 class="hero-title">Timeless Classics</h1>
+                            <p class="hero-subtitle">Mỗi món trang sức là một câu chuyện tình yêu. Hãy để chúng tôi kể câu chuyện của bạn.</p>
+                            <a href="@Url.Action("Category", "Product")" class="btn btn-gold">Khám Phá Thêm</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Slide 3 -->
+                <div class="carousel-item hero-section">
+                    <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=2000&auto=format&fit=crop" alt="Hero Banner 3" class="hero-img">
+                    <div class="container-fluid h-100 d-flex align-items-center position-relative z-3">
+                        <div class="hero-content mx-3 mx-md-5">
+                            <h1 class="hero-title">Sparkle & Shine</h1>
+                            <p class="hero-subtitle">Tỏa sáng rực rỡ với bộ sưu tập cao cấp mang phong cách hiện đại đầy lôi cuốn.</p>
+                            <a href="@Url.Action("Category", "Product")" class="btn btn-gold">Xem Bộ Sưu Tập</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" style="z-index: 4;">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next" style="z-index: 4;">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
         </div>
-    </section>
+    </div>
 
     <!-- Featured Categories -->
     <section class="py-5 mt-5">
-        <div class="container-fluid px-4 px-lg-5">
+        <div class="container">
             <div class="section-title">
                 <h2>Danh Mục Nổi Bật</h2>
                 <div class="title-separator"></div>
             </div>
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="position-relative overflow-hidden group-hover" style="height: 400px;">
-                        <img src="https://images.unsplash.com/photo-1599643478514-4a4e02632616?q=80&w=600&auto=format&fit=crop" class="w-100 h-100 object-fit-cover transition" alt="Nhẫn">
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-4 col-sm-6">
+                    <div class="position-relative overflow-hidden group-hover rounded" style="height: 280px;">
+                        <img src="https://images.unsplash.com/photo-1605100804763-247f67b6348e?q=80&w=600&auto=format&fit=crop" class="w-100 h-100 object-fit-cover transition" alt="Nhẫn">
                         <div class="position-absolute bottom-0 start-0 w-100 p-4 bg-gradient-dark">
-                            <h3 class="text-white mb-0 font-serif">Nhẫn</h3>
-                            <a href="@Url.Action("Category", "Product")" class="text-white text-decoration-none">Khám phá <i class="fas fa-arrow-right ms-2"></i></a>
+                            <h3 class="text-white mb-0 font-serif fs-4">Nhẫn</h3>
+                            <a href="@Url.Action("Category", "Product")" class="text-white text-decoration-none small">Khám phá <i class="fas fa-arrow-right ms-2"></i></a>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="position-relative overflow-hidden group-hover" style="height: 400px;">
+                <div class="col-md-4 col-sm-6">
+                    <div class="position-relative overflow-hidden group-hover rounded" style="height: 280px;">
                         <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=600&auto=format&fit=crop" class="w-100 h-100 object-fit-cover transition" alt="Dây Chuyền">
                         <div class="position-absolute bottom-0 start-0 w-100 p-4 bg-gradient-dark">
-                            <h3 class="text-white mb-0 font-serif">Dây Chuyền</h3>
-                            <a href="@Url.Action("Category", "Product")" class="text-white text-decoration-none">Khám phá <i class="fas fa-arrow-right ms-2"></i></a>
+                            <h3 class="text-white mb-0 font-serif fs-4">Dây Chuyền</h3>
+                            <a href="@Url.Action("Category", "Product")" class="text-white text-decoration-none small">Khám phá <i class="fas fa-arrow-right ms-2"></i></a>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="position-relative overflow-hidden group-hover" style="height: 400px;">
+                <div class="col-md-4 col-sm-6">
+                    <div class="position-relative overflow-hidden group-hover rounded" style="height: 280px;">
                         <img src="https://images.unsplash.com/photo-1535632787350-4e68ef0ac584?q=80&w=600&auto=format&fit=crop" class="w-100 h-100 object-fit-cover transition" alt="Hoa Tai">
                         <div class="position-absolute bottom-0 start-0 w-100 p-4 bg-gradient-dark">
-                            <h3 class="text-white mb-0 font-serif">Hoa Tai</h3>
-                            <a href="@Url.Action("Category", "Product")" class="text-white text-decoration-none">Khám phá <i class="fas fa-arrow-right ms-2"></i></a>
+                            <h3 class="text-white mb-0 font-serif fs-4">Hoa Tai</h3>
+                            <a href="@Url.Action("Category", "Product")" class="text-white text-decoration-none small">Khám phá <i class="fas fa-arrow-right ms-2"></i></a>
                         </div>
                     </div>
                 </div>
@@ -58,7 +99,7 @@
 
     <!-- Trending Products -->
     <section class="py-5 bg-secondary-soft">
-        <div class="container-fluid px-4 px-lg-5">
+        <div class="container">
             <div class="section-title">
                 <h2>Sản Phẩm Bán Chạy</h2>
                 <div class="title-separator"></div>
@@ -68,7 +109,7 @@
             {
                 foreach (var item in Model)
                 {
-                    <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="col-lg-2 col-md-3 col-sm-4 col-6">
                         <div class="product-card">
                             <div class="product-img-wrapper">
                                 <!-- If image is missing, use a placeholder -->
@@ -103,7 +144,7 @@
 
     <!-- Feature Highlights -->
     <section class="py-5">
-        <div class="container-fluid px-4 px-lg-5">
+        <div class="container">
             <div class="row text-center">
                 <div class="col-md-4 mb-4 mb-md-0">
                     <i class="fas fa-shipping-fast text-primary-gold fs-1 mb-3"></i>

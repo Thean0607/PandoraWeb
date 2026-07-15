@@ -16,8 +16,9 @@
 .product-img-wrapper {
   position: relative;
   overflow: hidden;
-  background-color: #f9f9f9;
+  background-color: var(--secondary-color);
   padding-top: 100%; /* 1:1 Aspect Ratio */
+  border-radius: 8px; /* Soft rounding */
 }
 
 .product-img-wrapper img {
@@ -27,7 +28,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.5s ease;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .product-card:hover .product-img-wrapper img {
@@ -57,13 +58,13 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: white;
+  background: var(--bg-light);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text-dark);
   text-decoration: none;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow-sm);
   transition: all 0.2s;
 }
 

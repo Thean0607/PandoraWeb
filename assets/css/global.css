@@ -1,15 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
 
 :root {
-  --primary-color: #d4af37; /* Gold */
+  --primary-color: #d4af37; /* Original Gold */
   --primary-hover: #b5952f;
-  --secondary-color: #f4ece6; /* Soft warm background */
-  --text-dark: #222222;
+  --secondary-color: #f8f5f0; /* Cleaner warm background */
+  --text-dark: #2C3539; /* Keep the softer dark text for readability */
   --text-light: #ffffff;
   --text-muted: #777777;
   --bg-light: #ffffff;
   --border-color: #e5e5e5;
   --transition-speed: 0.3s;
+  
+  /* Additional premium tokens */
+  --shadow-sm: 0 4px 10px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.05);
 }
 
 body {
@@ -17,6 +21,7 @@ body {
   color: var(--text-dark);
   background-color: var(--bg-light);
   line-height: 1.6;
+  padding-top: 100px; /* Offset for fixed navbar */
 }
 
 h1, h2, h3, h4, h5, h6, .font-serif {

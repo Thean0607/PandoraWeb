@@ -6,7 +6,7 @@
 
 <!-- Breadcrumb & Title -->
     <div class="breadcrumb-wrap mt-5 pt-5">
-        <div class="container-fluid px-4 px-lg-5 mt-4">
+        <div class="container mt-4">
             <h1 class="breadcrumb-title font-serif">Tất Cả Sản Phẩm</h1>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
@@ -19,7 +19,13 @@
 
     <!-- Category Content -->
     <section class="py-5">
-        <div class="container-fluid px-4 px-lg-5">
+        <div class="container">
+            @using (Html.BeginForm("Category", "Product", FormMethod.Get, new { id = "filterForm" }))
+            {
+                if (!string.IsNullOrEmpty(ViewBag.Search))
+                {
+                    <input type="hidden" name="search" value="@ViewBag.Search" />
+                }
             <div class="row">
                 <!-- Filter Toggle Button (Mobile Only) -->
                 <div class="d-lg-none mb-3">
@@ -42,56 +48,30 @@
                         <!-- Filter by Category -->
                         <div class="mb-4">
                             <h5 class="fs-6 fw-bold mb-3">Danh Mục</h5>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" value="" id="cat1">
-                                <label class="form-check-label text-muted" for="cat1">Nhẫn (15)</label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" value="" id="cat2">
-                                <label class="form-check-label text-muted" for="cat2">Dây Chuyền (20)</label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" value="" id="cat3">
-                                <label class="form-check-label text-muted" for="cat3">Hoa Tai (12)</label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" value="" id="cat4">
-                                <label class="form-check-label text-muted" for="cat4">Lắc Tay (8)</label>
-                            </div>
-                        </div>
-
-                        <!-- Filter by Material -->
-                        <div class="mb-4">
-                            <h5 class="fs-6 fw-bold mb-3">Chất Liệu</h5>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" value="" id="mat1">
-                                <label class="form-check-label text-muted" for="mat1">Vàng 18K</label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" value="" id="mat2">
-                                <label class="form-check-label text-muted" for="mat2">Vàng Hồng</label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" value="" id="mat3">
-                                <label class="form-check-label text-muted" for="mat3">Bạc Ý 925</label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" value="" id="mat4">
-                                <label class="form-check-label text-muted" for="mat4">Bạch Kim</label>
-                            </div>
+                            @if(ViewBag.Categories != null)
+                            {
+                                var selectedCats = ViewBag.SelectedCategories as System.Collections.Generic.List<int> ?? new System.Collections.Generic.List<int>();
+                                foreach (var category in ViewBag.Categories)
+                                {
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" name="cat" value="@category.CategoryId" id="cat_@category.CategoryId" @(selectedCats.Contains(category.CategoryId) ? "checked" : "")>
+                                        <label class="form-check-label text-muted" for="cat_@category.CategoryId">@category.CategoryName</label>
+                                    </div>
+                                }
+                            }
                         </div>
 
                         <!-- Filter by Price -->
                         <div class="mb-4">
                             <h5 class="fs-6 fw-bold mb-3">Mức Giá</h5>
-                            <input type="range" class="form-range" min="0" max="50000000" step="1000000" id="priceRange">
+                            <input type="range" class="form-range" name="maxPrice" min="0" max="50000000" step="1000000" id="priceRange" value="@(ViewBag.MaxPrice ?? 50000000)" oninput="document.getElementById('priceDisplay').innerText = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(this.value)">
                             <div class="d-flex justify-content-between text-muted fs-7">
                                 <span>0 ₫</span>
-                                <span>50,000,000 ₫</span>
+                                <span id="priceDisplay">@(string.Format(new System.Globalization.CultureInfo("vi-VN"), "{0:C0}", ViewBag.MaxPrice ?? 50000000))</span>
                             </div>
                         </div>
 
-                        <button class="btn btn-gold w-100">Áp Dụng Tùy Chọn</button>
+                        <button type="submit" class="btn btn-gold w-100">Áp Dụng Tùy Chọn</button>
                             </div>
                         </div>
                     </div>
@@ -100,12 +80,11 @@
                 <!-- Product Grid -->
                 <div class="col-lg-9">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <p class="mb-0 text-muted">Hiển thị 1-9 trong số 55 sản phẩm</p>
-                        <select class="form-select w-auto border-0 bg-light">
-                            <option>Mới nhất</option>
-                            <option>Giá: Thấp đến Cao</option>
-                            <option>Giá: Cao xuống Thấp</option>
-                            <option>Phổ biến nhất</option>
+                        <p class="mb-0 text-muted">Hiển thị @Model.Count() sản phẩm @(!string.IsNullOrEmpty(ViewBag.Search) ? $"cho \"{ViewBag.Search}\"" : "")</p>
+                        <select class="form-select w-auto border-0 bg-light" name="sort" onchange="document.getElementById('filterForm').submit();">
+                            <option value="newest" @(ViewBag.Sort == "newest" ? "selected" : "")>Mới nhất</option>
+                            <option value="price_asc" @(ViewBag.Sort == "price_asc" ? "selected" : "")>Giá: Thấp đến Cao</option>
+                            <option value="price_desc" @(ViewBag.Sort == "price_desc" ? "selected" : "")>Giá: Cao xuống Thấp</option>
                         </select>
                     </div>
 
@@ -115,7 +94,7 @@
                             foreach (var item in Model)
                             {
                                 <!-- Product Item -->
-                                <div class="col-md-4 col-sm-6">
+                                <div class="col-lg-3 col-md-4 col-sm-6 col-6">
                                     <div class="product-card">
                                         <div class="product-img-wrapper">
                                             <a href="@Url.Action("ProductDetail", "Product", new { id = item.ProductId })">
@@ -160,6 +139,7 @@
                     </nav>
                 </div>
             </div>
+            }
         </div>
     </section>
 

@@ -28,8 +28,8 @@
 <body>
 
     <!-- Header / Navbar -->
-    <nav class="navbar navbar-expand-lg fixed-top">
-        <div class="container-fluid px-4 px-lg-5">
+    <nav class="navbar navbar-expand-lg fixed-top navbar-dark">
+        <div class="container">
             <a class="navbar-brand" href="@Url.Action("Index", "Home")">PANDORA</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -51,7 +51,14 @@
 
                 </ul>
                 <div class="d-flex align-items-center mt-3 mt-lg-0">
-                    <a href="#" class="nav-icon"><i class="fas fa-search"></i></a>
+                    <form class="d-flex align-items-center me-3" action="@Url.Action("Category", "Product")" method="get" style="max-width: 200px;">
+                        <div class="input-group input-group-sm">
+                            <input type="text" class="form-control rounded-start-pill border-end-0 bg-transparent text-white" name="search" placeholder="Tìm kiếm..." aria-label="Search" style="box-shadow: none; border-color: rgba(255,255,255,0.2);">
+                            <button class="btn btn-outline-secondary bg-transparent border-start-0 rounded-end-pill" type="submit" style="border-color: rgba(255,255,255,0.2);">
+                                <i class="fas fa-search text-white"></i>
+                            </button>
+                        </div>
+                    </form>
                     
                     @if (Session["FullName"] != null)
                     {
@@ -95,7 +102,7 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <div class="container-fluid px-4 px-lg-5">
+        <div class="container">
             <div class="row">
                 <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
                     <a href="@Url.Action("Index", "Home")" class="navbar-brand text-white mb-3 d-inline-block">PANDORA</a>
