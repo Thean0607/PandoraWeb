@@ -1,52 +1,70 @@
-@model IEnumerable<PandoraWeb.Models.Product>
+@model PandoraWeb.ViewModels.HomeViewModel
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Trang Chủ";
 }
 
     <!-- Hero Section Carousel -->
     <div class="container mb-5">
         <div id="heroCarousel" class="carousel slide rounded-4 overflow-hidden" data-bs-ride="carousel" data-bs-interval="3000" style="box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-            <div class="carousel-indicators">
-                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
-            </div>
-            <div class="carousel-inner">
-                <!-- Slide 1 -->
-                <div class="carousel-item active hero-section">
-                    <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=2000&auto=format&fit=crop" alt="Hero Banner 1" class="hero-img">
-                    <div class="container-fluid h-100 d-flex align-items-center position-relative z-3">
-                        <div class="hero-content mx-3 mx-md-5">
-                            <h1 class="hero-title">Elegance in Every Detail</h1>
-                            <p class="hero-subtitle">Khám phá bộ sưu tập mùa xuân mới nhất với các thiết kế tinh xảo, tôn vinh vẻ đẹp vĩnh cửu.</p>
-                            <a href="@Url.Action("Category", "Product")" class="btn btn-gold">Mua Ngay</a>
+            @if(Model.Banners != null && Model.Banners.Any())
+            {
+                <div class="carousel-indicators">
+                    @for(int i = 0; i < Model.Banners.Count(); i++)
+                    {
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")" aria-current="@(i == 0 ? "true" : "false")" aria-label="Slide @(i+1)"></button>
+                    }
+                </div>
+                <div class="carousel-inner">
+                    @{ int j = 0; }
+                    @foreach (var banner in Model.Banners)
+                    {
+                        var imgUrl = banner.ImageUrl != null && banner.ImageUrl.StartsWith("http") ? banner.ImageUrl : Url.Content("~/" + banner.ImageUrl);
+                        <div class="carousel-item @(j == 0 ? "active" : "") hero-section">
+                            <img src="@imgUrl" alt="@banner.Title" class="hero-img">
+                            <div class="container-fluid h-100 d-flex align-items-center position-relative z-3">
+                                <div class="hero-content mx-3 mx-md-5">
+                                    <h1 class="hero-title">@banner.Title</h1>
+                                    <p class="hero-subtitle">Khám phá bộ sưu tập mới nhất với các thiết kế tinh xảo.</p>
+                                    <a href="@(string.IsNullOrEmpty(banner.LinkUrl) ? Url.Action("Category", "Product") : banner.LinkUrl)" class="btn btn-gold">Mua Ngay</a>
+                                </div>
+                            </div>
+                        </div>
+                        j++;
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                </div>
+                <div class="carousel-inner">
+                    <!-- Slide 1 -->
+                    <div class="carousel-item active hero-section">
+                        <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=2000&auto=format&fit=crop" alt="Hero Banner 1" class="hero-img">
+                        <div class="container-fluid h-100 d-flex align-items-center position-relative z-3">
+                            <div class="hero-content mx-3 mx-md-5">
+                                <h1 class="hero-title">Elegance in Every Detail</h1>
+                                <p class="hero-subtitle">Khám phá bộ sưu tập mùa xuân mới nhất với các thiết kế tinh xảo, tôn vinh vẻ đẹp vĩnh cửu.</p>
+                                <a href="@Url.Action("Category", "Product")" class="btn btn-gold">Mua Ngay</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Slide 2 -->
+                    <div class="carousel-item hero-section">
+                        <img src="https://images.unsplash.com/photo-1599643478514-4a4e02632616?q=80&w=2000&auto=format&fit=crop" alt="Hero Banner 2" class="hero-img">
+                        <div class="container-fluid h-100 d-flex align-items-center position-relative z-3">
+                            <div class="hero-content mx-3 mx-md-5">
+                                <h1 class="hero-title">Timeless Classics</h1>
+                                <p class="hero-subtitle">Mỗi món trang sức là một câu chuyện tình yêu. Hãy để chúng tôi kể câu chuyện của bạn.</p>
+                                <a href="@Url.Action("Category", "Product")" class="btn btn-gold">Khám Phá Thêm</a>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <!-- Slide 2 -->
-                <div class="carousel-item hero-section">
-                    <img src="https://images.unsplash.com/photo-1599643478514-4a4e02632616?q=80&w=2000&auto=format&fit=crop" alt="Hero Banner 2" class="hero-img">
-                    <div class="container-fluid h-100 d-flex align-items-center position-relative z-3">
-                        <div class="hero-content mx-3 mx-md-5">
-                            <h1 class="hero-title">Timeless Classics</h1>
-                            <p class="hero-subtitle">Mỗi món trang sức là một câu chuyện tình yêu. Hãy để chúng tôi kể câu chuyện của bạn.</p>
-                            <a href="@Url.Action("Category", "Product")" class="btn btn-gold">Khám Phá Thêm</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- Slide 3 -->
-                <div class="carousel-item hero-section">
-                    <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=2000&auto=format&fit=crop" alt="Hero Banner 3" class="hero-img">
-                    <div class="container-fluid h-100 d-flex align-items-center position-relative z-3">
-                        <div class="hero-content mx-3 mx-md-5">
-                            <h1 class="hero-title">Sparkle & Shine</h1>
-                            <p class="hero-subtitle">Tỏa sáng rực rỡ với bộ sưu tập cao cấp mang phong cách hiện đại đầy lôi cuốn.</p>
-                            <a href="@Url.Action("Category", "Product")" class="btn btn-gold">Xem Bộ Sưu Tập</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            }
             <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" style="z-index: 4;">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                 <span class="visually-hidden">Previous</span>
@@ -62,37 +80,32 @@
     <section class="py-5 mt-5">
         <div class="container">
             <div class="section-title">
-                <h2>Danh Mục Nổi Bật</h2>
+                <h2>Bộ Sưu Tập Nổi Bật</h2>
                 <div class="title-separator"></div>
             </div>
             <div class="row g-4 justify-content-center">
-                <div class="col-md-4 col-sm-6">
-                    <div class="position-relative overflow-hidden group-hover rounded" style="height: 280px;">
-                        <img src="https://images.unsplash.com/photo-1605100804763-247f67b6348e?q=80&w=600&auto=format&fit=crop" class="w-100 h-100 object-fit-cover transition" alt="Nhẫn">
-                        <div class="position-absolute bottom-0 start-0 w-100 p-4 bg-gradient-dark">
-                            <h3 class="text-white mb-0 font-serif fs-4">Nhẫn</h3>
-                            <a href="@Url.Action("Category", "Product")" class="text-white text-decoration-none small">Khám phá <i class="fas fa-arrow-right ms-2"></i></a>
+            @if(Model.Collections != null && Model.Collections.Any())
+            {
+                foreach (var item in Model.Collections)
+                {
+                    var imgUrl = item.ImageUrl != null && item.ImageUrl.StartsWith("http") ? item.ImageUrl : Url.Content("~/" + item.ImageUrl);
+                    <div class="col-md-4 col-sm-6">
+                        <div class="position-relative overflow-hidden group-hover rounded" style="height: 280px;">
+                            <img src="@imgUrl" class="w-100 h-100 object-fit-cover transition" alt="@item.CollectionName" onerror="this.src='https://images.unsplash.com/photo-1605100804763-247f67b6348e?q=80&w=600'">
+                            <div class="position-absolute bottom-0 start-0 w-100 p-4 bg-gradient-dark">
+                                <h3 class="text-white mb-0 font-serif fs-4">@item.CollectionName</h3>
+                                <a href="@Url.Action("Category", "Product")" class="text-white text-decoration-none small">Khám phá <i class="fas fa-arrow-right ms-2"></i></a>
+                            </div>
                         </div>
                     </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center py-5">
+                    <p class="text-muted">Chưa có bộ sưu tập nào. Hãy thêm trong trang quản trị.</p>
                 </div>
-                <div class="col-md-4 col-sm-6">
-                    <div class="position-relative overflow-hidden group-hover rounded" style="height: 280px;">
-                        <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=600&auto=format&fit=crop" class="w-100 h-100 object-fit-cover transition" alt="Dây Chuyền">
-                        <div class="position-absolute bottom-0 start-0 w-100 p-4 bg-gradient-dark">
-                            <h3 class="text-white mb-0 font-serif fs-4">Dây Chuyền</h3>
-                            <a href="@Url.Action("Category", "Product")" class="text-white text-decoration-none small">Khám phá <i class="fas fa-arrow-right ms-2"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6">
-                    <div class="position-relative overflow-hidden group-hover rounded" style="height: 280px;">
-                        <img src="https://images.unsplash.com/photo-1535632787350-4e68ef0ac584?q=80&w=600&auto=format&fit=crop" class="w-100 h-100 object-fit-cover transition" alt="Hoa Tai">
-                        <div class="position-absolute bottom-0 start-0 w-100 p-4 bg-gradient-dark">
-                            <h3 class="text-white mb-0 font-serif fs-4">Hoa Tai</h3>
-                            <a href="@Url.Action("Category", "Product")" class="text-white text-decoration-none small">Khám phá <i class="fas fa-arrow-right ms-2"></i></a>
-                        </div>
-                    </div>
-                </div>
+            }
             </div>
         </div>
     </section>
@@ -105,15 +118,15 @@
                 <div class="title-separator"></div>
             </div>
             <div class="row">
-            @if(Model != null && Model.Any())
+            @if(Model.TrendingProducts != null && Model.TrendingProducts.Any())
             {
-                foreach (var item in Model)
+                foreach (var item in Model.TrendingProducts)
                 {
+                    var imgUrl = item.ImageUrl != null && item.ImageUrl.StartsWith("http") ? item.ImageUrl : Url.Content("~/" + item.ImageUrl);
                     <div class="col-lg-2 col-md-3 col-sm-4 col-6">
                         <div class="product-card">
                             <div class="product-img-wrapper">
-                                <!-- If image is missing, use a placeholder -->
-                                <img src="~/@item.ImageUrl" onerror="this.src='https://images.unsplash.com/photo-1605100804763-247f67b2548e?q=80&w=600'" alt="@item.ProductName">
+                                <img src="@imgUrl" onerror="this.src='https://images.unsplash.com/photo-1605100804763-247f67b2548e?q=80&w=600'" alt="@item.ProductName">
                                 <div class="product-action">
                                     <a href="javascript:void(0);" class="action-btn btn-add-cart" data-pid="@item.ProductId" data-bs-toggle="tooltip" title="Thêm vào giỏ hàng"><i class="fas fa-shopping-cart"></i></a>
                                     <a href="@Url.Action("ProductDetail", "Product", new { id = item.ProductId })" class="action-btn" data-bs-toggle="tooltip" title="Xem chi tiết"><i class="fas fa-eye"></i></a>
@@ -121,7 +134,7 @@
                                 </div>
                             </div>
                             <div class="product-info">
-                                <div class="product-category">@item.Category.CategoryName</div>
+                                <div class="product-category">@(item.Category != null ? item.Category.CategoryName : "")</div>
                                 <h3 class="product-title"><a href="@Url.Action("ProductDetail", "Product", new { id = item.ProductId })">@item.ProductName</a></h3>
                                 <div class="product-price">@item.BasePrice.ToString("N0") ₫</div>
                             </div>

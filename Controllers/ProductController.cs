@@ -9,6 +9,30 @@ namespace PandoraWeb.Controllers
     {
         private PandoraDbContext db = new PandoraDbContext();
 
+        [HttpGet]
+        public JsonResult SearchSuggestions(string query)
+        {
+            if (string.IsNullOrEmpty(query))
+                return Json(new object[] { }, JsonRequestBehavior.AllowGet);
+
+            var products = db.Products.Include(p => p.Category)
+                .Where(p => p.ProductName.Contains(query) || p.Description.Contains(query))
+                .Take(5)
+                .ToList();
+
+            var result = products.Select(p => new
+            {
+                p.ProductId,
+                p.ProductName,
+                PriceFormatted = p.BasePrice.ToString("N0") + " ₫",
+                ImageUrl = (p.ImageUrl != null && p.ImageUrl.StartsWith("http")) ? p.ImageUrl : Url.Content("~/" + p.ImageUrl),
+                CategoryName = p.Category != null ? p.Category.CategoryName : "",
+                DetailUrl = Url.Action("ProductDetail", "Product", new { id = p.ProductId })
+            });
+
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
         public ActionResult Category(string search, System.Collections.Generic.List<int> cat, decimal? maxPrice, string sort)
         {
             ViewBag.ActiveMenu = "Category";

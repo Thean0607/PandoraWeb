@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Web.Mvc;
 using System.Data.Entity;
 using PandoraWeb.Models.Data;
@@ -14,10 +14,12 @@ namespace PandoraWeb.Controllers
             ViewBag.ActiveMenu = "Home";
             ViewBag.Title = "Trang Chủ";
 
-            // Lấy 4 sản phẩm mới nhất hoặc bán chạy nhất để hiển thị ở trang chủ
-            var topProducts = db.Products.Include(p => p.Category).Take(8).ToList();
+            var vm = new PandoraWeb.ViewModels.HomeViewModel();
+            vm.Banners = db.Banners.Where(b => b.IsActive).OrderBy(b => b.DisplayOrder).ToList();
+            vm.Collections = db.Collections.Take(3).ToList();
+            vm.TrendingProducts = db.Products.Include(p => p.Category).Take(8).ToList();
 
-            return View(topProducts);
+            return View(vm);
         }
 
         public ActionResult About()

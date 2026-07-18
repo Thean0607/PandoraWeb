@@ -47,20 +47,8 @@ namespace PandoraWeb.Controllers
             // Handle Image Upload
             if (imageFile != null && imageFile.ContentLength > 0)
             {
-                var fileName = Path.GetFileName(imageFile.FileName);
-                var ext = Path.GetExtension(fileName);
-                var newFileName = Guid.NewGuid().ToString() + ext;
-                var path = Path.Combine(Server.MapPath("~/assets/img/products/"), newFileName);
-                
-                // Ensure directory exists
-                var dir = Server.MapPath("~/assets/img/products/");
-                if (!Directory.Exists(dir))
-                {
-                    Directory.CreateDirectory(dir);
-                }
-
-                imageFile.SaveAs(path);
-                imageUrl = "assets/img/products/" + newFileName;
+                var cloudinaryHelper = new PandoraWeb.Helpers.CloudinaryHelper();
+                imageUrl = cloudinaryHelper.UploadImage(imageFile);
             }
 
             if (productId.HasValue && productId.Value > 0)
@@ -242,11 +230,8 @@ namespace PandoraWeb.Controllers
             string imageUrl = null;
             if (imageFile != null && imageFile.ContentLength > 0)
             {
-                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
-                var dir = Server.MapPath("~/assets/img/collections/");
-                if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-                imageFile.SaveAs(Path.Combine(dir, fileName));
-                imageUrl = "assets/img/collections/" + fileName;
+                var cloudinaryHelper = new PandoraWeb.Helpers.CloudinaryHelper();
+                imageUrl = cloudinaryHelper.UploadImage(imageFile);
             }
 
             if (id.HasValue && id.Value > 0)

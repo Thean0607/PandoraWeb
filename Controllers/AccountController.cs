@@ -43,7 +43,7 @@ namespace PandoraWeb.Controllers
             return View();
         }
 
-        public ActionResult Profile()
+        public new ActionResult Profile()
         {
             if (Session["FullName"] == null) return RedirectToAction("Login");
             ViewBag.ActiveMenu = "Profile";
