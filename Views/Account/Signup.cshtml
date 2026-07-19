@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="~/assets/css/components/quantity-input.css">
     <link rel="stylesheet" href="~/assets/css/components/section-title.css">
     <link rel="stylesheet" href="~/assets/css/components/breadcrumb.css">
-    <link rel="stylesheet" href="~/assets/css/auth.css">
+    <link rel="stylesheet" href="~/assets/css/auth.css?v=2">
 </head>
 <body>
 
@@ -42,33 +42,33 @@
                 <div class="row g-3">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Họ</label>
-                        <input type="text" name="lastName" class="form-control py-2" placeholder="Ví dụ: Nguyễn" autocomplete="family-name" required>
+                        <input type="text" name="lastName" class="form-control py-2" placeholder="Ví dụ: Nguyễn" autocomplete="family-name" required oninvalid="this.setCustomValidity('Vui lòng điền thông tin này.')" oninput="this.setCustomValidity('')">
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Tên</label>
-                        <input type="text" name="firstName" class="form-control py-2" placeholder="Ví dụ: Văn A" autocomplete="given-name" required>
+                        <input type="text" name="firstName" class="form-control py-2" placeholder="Ví dụ: Văn A" autocomplete="given-name" required oninvalid="this.setCustomValidity('Vui lòng điền thông tin này.')" oninput="this.setCustomValidity('')">
                     </div>
                 </div>
                 
                 <div class="mb-3">
                     <label class="form-label">Email</label>
-                    <input type="email" name="email" class="form-control py-2" placeholder="Nhập địa chỉ email" autocomplete="email" required>
+                    <input type="email" name="email" class="form-control py-2" placeholder="Nhập địa chỉ email" autocomplete="email" required oninvalid="this.setCustomValidity('Vui lòng điền thông tin này.')" oninput="this.setCustomValidity('')">
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Số điện thoại</label>
-                    <input type="tel" name="phone" class="form-control py-2" placeholder="Nhập số điện thoại" autocomplete="tel" required>
+                    <input type="tel" name="phone" class="form-control py-2" placeholder="Nhập số điện thoại" autocomplete="tel" required oninvalid="this.setCustomValidity('Vui lòng điền thông tin này.')" oninput="this.setCustomValidity('')">
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Mật khẩu</label>
-                    <input type="password" name="password" class="form-control py-2" placeholder="Tạo mật khẩu" autocomplete="new-password" minlength="6" required>
+                    <input type="password" name="password" class="form-control py-2" placeholder="Tạo mật khẩu" autocomplete="new-password" minlength="6" required oninvalid="this.setCustomValidity('Vui lòng điền thông tin này.')" oninput="this.setCustomValidity('')">
                 </div>
                 <div class="mb-4">
                     <label class="form-label">Xác nhận mật khẩu</label>
-                    <input type="password" name="confirmPassword" class="form-control py-2" placeholder="Nhập lại mật khẩu" autocomplete="new-password" minlength="6" required>
+                    <input type="password" name="confirmPassword" class="form-control py-2" placeholder="Nhập lại mật khẩu" autocomplete="new-password" minlength="6" required oninvalid="this.setCustomValidity('Vui lòng điền thông tin này.')" oninput="this.setCustomValidity('')">
                 </div>
                 
                 <div class="form-check mb-4">
-                    <input class="form-check-input" type="checkbox" value="" id="termsCheck" required>
+                    <input class="form-check-input" type="checkbox" value="" id="termsCheck" required oninvalid="this.setCustomValidity('Bạn cần đồng ý với các điều khoản.')" oninput="this.setCustomValidity('')">
                     <label class="form-check-label text-muted fs-7" for="termsCheck">
                         Tôi đồng ý với các <a href="#" class="text-white">Điều khoản dịch vụ</a> và <a href="#" class="text-white">Chính sách bảo mật</a> của Pandora.
                     </label>

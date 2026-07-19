@@ -28,18 +28,25 @@ namespace PandoraWeb.Controllers
             ViewBag.ActiveMenu = "Catalog";
             ViewBag.ActiveSubMenu = "Products";
             ViewBag.Title = "Quản lý Sản Phẩm";
-            var products = db.Products.Include(p => p.Category).OrderByDescending(p => p.ProductId).ToList();
+            var products = db.Products.Include(p => p.Category).Include(p => p.Collection).OrderByDescending(p => p.ProductId).ToList();
             ViewBag.Categories = db.Categories.ToList();
+            ViewBag.Collections = db.Collections.ToList();
             return View(products);
         }
 
         [HttpPost]
-        public ActionResult SaveProduct(int? productId, string productName, int categoryId, decimal price, int stock, string status, System.Web.HttpPostedFileBase imageFile)
+        public ActionResult SaveProduct(int? productId, string productName, int categoryId, int? collectionId, string price, int stock, string status, string description, System.Web.HttpPostedFileBase imageFile, System.Collections.Generic.IEnumerable<System.Web.HttpPostedFileBase> extraImages)
         {
             if (string.IsNullOrEmpty(productName))
             {
                 TempData["Error"] = "Tên sản phẩm không được để trống!";
                 return RedirectToAction("Products");
+            }
+            
+            decimal parsedPrice = 0;
+            if (!string.IsNullOrEmpty(price))
+            {
+                decimal.TryParse(price.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out parsedPrice);
             }
 
             string imageUrl = null;
@@ -59,7 +66,9 @@ namespace PandoraWeb.Controllers
                 {
                     p.ProductName = productName;
                     p.CategoryId = categoryId;
-                    p.BasePrice = price;
+                    p.CollectionId = collectionId;
+                    p.Description = description;
+                    p.BasePrice = parsedPrice;
                     p.Status = status;
                     p.UpdatedAt = DateTime.Now;
                     
@@ -89,7 +98,9 @@ namespace PandoraWeb.Controllers
                 {
                     ProductName = productName,
                     CategoryId = categoryId,
-                    BasePrice = price,
+                    CollectionId = collectionId,
+                    Description = description,
+                    BasePrice = parsedPrice,
                     Status = status,
                     ImageUrl = imageUrl ?? "assets/img/products/default.jpg",
                     CreatedAt = DateTime.Now,
@@ -110,8 +121,111 @@ namespace PandoraWeb.Controllers
             }
 
             db.SaveChanges();
+
+            // Lấy ID sản phẩm cuối cùng sau khi insert (nếu là thêm mới)
+            int targetProductId = productId ?? db.Products.Max(prod => prod.ProductId);
+
+            // Handle Extra Images Upload
+            if (extraImages != null)
+            {
+                var cloudinaryHelper = new PandoraWeb.Helpers.CloudinaryHelper();
+                foreach (var file in extraImages)
+                {
+                    if (file != null && file.ContentLength > 0)
+                    {
+                        string extraUrl = cloudinaryHelper.UploadImage(file);
+                        if (!string.IsNullOrEmpty(extraUrl))
+                        {
+                            var pImage = new ProductImage
+                            {
+                                ProductId = targetProductId,
+                                ImageUrl = extraUrl,
+                                IsPrimary = false,
+                                DisplayOrder = 0
+                            };
+                            db.ProductImages.Add(pImage);
+                        }
+                    }
+                }
+                db.SaveChanges();
+            }
+            
             TempData["Success"] = "Đã lưu sản phẩm thành công!";
             return RedirectToAction("Products");
+        }
+
+        // GET: Admin/Collections
+        public ActionResult Collections()
+        {
+            ViewBag.ActiveMenu = "Catalog";
+            ViewBag.ActiveSubMenu = "Collections";
+            ViewBag.Title = "Quản lý Bộ Sưu Tập";
+            var collections = db.Collections.OrderByDescending(c => c.CollectionId).ToList();
+            return View(collections);
+        }
+
+        [HttpPost]
+        public ActionResult SaveCollection(int? collectionId, string collectionName, string description, System.Web.HttpPostedFileBase imageFile)
+        {
+            if (string.IsNullOrEmpty(collectionName))
+            {
+                TempData["Error"] = "Tên bộ sưu tập không được để trống!";
+                return RedirectToAction("Collections");
+            }
+
+            string imageUrl = null;
+            if (imageFile != null && imageFile.ContentLength > 0)
+            {
+                var cloudinaryHelper = new PandoraWeb.Helpers.CloudinaryHelper();
+                imageUrl = cloudinaryHelper.UploadImage(imageFile);
+            }
+
+            if (collectionId.HasValue && collectionId.Value > 0)
+            {
+                var c = db.Collections.Find(collectionId.Value);
+                if (c != null)
+                {
+                    c.CollectionName = collectionName;
+                    c.Description = description;
+                    if (imageUrl != null) c.ImageUrl = imageUrl;
+                }
+            }
+            else
+            {
+                var c = new Collection
+                {
+                    CollectionName = collectionName,
+                    Description = description,
+                    ImageUrl = imageUrl ?? "assets/img/collections/default.jpg"
+                };
+                db.Collections.Add(c);
+            }
+            db.SaveChanges();
+            TempData["Success"] = "Đã lưu bộ sưu tập thành công!";
+            return RedirectToAction("Collections");
+        }
+
+        [HttpPost]
+        public ActionResult DeleteCollection(int id)
+        {
+            try
+            {
+                var c = db.Collections.Find(id);
+                if (c != null)
+                {
+                    var products = db.Products.Where(p => p.CollectionId == id).ToList();
+                    foreach (var p in products) p.CollectionId = null;
+                    
+                    db.Collections.Remove(c);
+                    db.SaveChanges();
+                    return Json(new { success = true, message = "Đã xóa bộ sưu tập." });
+                }
+                return Json(new { success = false, message = "Không tìm thấy bộ sưu tập." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
 
         [HttpPost]
@@ -385,7 +499,7 @@ namespace PandoraWeb.Controllers
             // Group by spending
             var segments = db.Customers.Select(c => new {
                 Customer = c,
-                TotalSpent = db.Orders.Where(o => o.CustomerId == c.CustomerId && o.PaymentStatus == "Paid").Sum(o => (decimal?)o.TotalAmount) ?? 0
+                TotalSpent = db.Orders.Where(o => o.CustomerId == c.CustomerId && o.PaymentStatus == "Paid").Sum(o => (decimal?)o.TotalAmount) ?? 0m
             }).OrderByDescending(x => x.TotalSpent).ToList();
             
             ViewBag.Segments = segments;
@@ -481,6 +595,72 @@ namespace PandoraWeb.Controllers
             ViewBag.Title = "Quản lý Banners";
             var banners = db.Banners.OrderBy(b => b.DisplayOrder).ToList();
             return View(banners);
+        }
+
+        [HttpPost]
+        public ActionResult SaveBanner(int? bannerId, string title, string linkUrl, int displayOrder, bool isActive, System.Web.HttpPostedFileBase imageFile)
+        {
+            if (string.IsNullOrEmpty(title))
+            {
+                TempData["Error"] = "Tiêu đề không được để trống!";
+                return RedirectToAction("Banners");
+            }
+
+            string imageUrl = null;
+            if (imageFile != null && imageFile.ContentLength > 0)
+            {
+                var cloudinaryHelper = new PandoraWeb.Helpers.CloudinaryHelper();
+                imageUrl = cloudinaryHelper.UploadImage(imageFile);
+            }
+
+            if (bannerId.HasValue && bannerId.Value > 0)
+            {
+                var b = db.Banners.Find(bannerId.Value);
+                if (b != null)
+                {
+                    b.Title = title;
+                    b.LinkUrl = linkUrl;
+                    b.DisplayOrder = displayOrder;
+                    b.IsActive = isActive;
+                    if (imageUrl != null) b.ImageUrl = imageUrl;
+                }
+            }
+            else
+            {
+                var b = new Banner
+                {
+                    Title = title,
+                    LinkUrl = linkUrl,
+                    DisplayOrder = displayOrder,
+                    IsActive = isActive,
+                    ImageUrl = imageUrl ?? "assets/img/hero/default.jpg",
+                    CreatedAt = DateTime.Now
+                };
+                db.Banners.Add(b);
+            }
+            db.SaveChanges();
+            TempData["Success"] = "Đã lưu banner thành công!";
+            return RedirectToAction("Banners");
+        }
+
+        [HttpPost]
+        public ActionResult DeleteBanner(int id)
+        {
+            try
+            {
+                var b = db.Banners.Find(id);
+                if (b != null)
+                {
+                    db.Banners.Remove(b);
+                    db.SaveChanges();
+                    return Json(new { success = true, message = "Đã xóa banner." });
+                }
+                return Json(new { success = false, message = "Không tìm thấy banner." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
 
         // --- NEW CMS ACTIONS ---

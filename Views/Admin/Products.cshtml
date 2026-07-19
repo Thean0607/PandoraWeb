@@ -46,7 +46,7 @@
                     var statusText = p.Status == "active" ? "Đang Bán" : "Ngừng KD";
                     var stock = p.ProductVariants?.FirstOrDefault()?.Stock ?? 0;
                     
-                    <tr data-id="@p.ProductId" data-name="@p.ProductName" data-cat="@p.CategoryId" data-price="@p.BasePrice" data-stock="@stock" data-status="@p.Status">
+                    <tr data-id="@p.ProductId" data-name="@p.ProductName" data-cat="@p.CategoryId" data-col="@p.CollectionId" data-price="@p.BasePrice.ToString(System.Globalization.CultureInfo.InvariantCulture)" data-stock="@stock" data-status="@p.Status" data-desc="@p.Description" data-image="@p.ImageUrl">
                         <td>#@p.ProductId</td>
                         <td>
                             <div class="d-flex align-items-center">
@@ -74,7 +74,7 @@
 
 <!-- Product Modal -->
 <div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content admin-form">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalTitle">Thêm Sản Phẩm Mới</h5>
@@ -83,40 +83,75 @@
             <div class="modal-body">
                 <form id="productForm" method="post" action="@Url.Action("SaveProduct", "Admin")" enctype="multipart/form-data">
                     <input type="hidden" name="productId" id="productId">
+                    
                     <div class="mb-3">
                         <label class="form-label">Tên Sản Phẩm</label>
                         <input type="text" class="form-control" name="productName" id="productName" required>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Danh Mục</label>
-                        <select class="form-select" name="categoryId" id="productCategory" required>
-                            @foreach (var cat in ViewBag.Categories as IEnumerable<PandoraWeb.Models.Category>)
-                            {
-                                <option value="@cat.CategoryId">@cat.CategoryName</option>
-                            }
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Giá (VNĐ)</label>
-                        <input type="number" class="form-control" name="price" id="productPrice" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Hình Ảnh</label>
-                        <input type="file" class="form-control" name="imageFile" id="productImage" accept="image/*">
-                        <div class="mt-2 text-center d-none" id="imagePreviewContainer">
-                            <img src="" id="imagePreview" alt="Preview" style="max-height: 120px; border-radius: 8px; border: 1px solid var(--admin-border);">
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Danh Mục</label>
+                            <select class="form-select" name="categoryId" id="productCategory" required>
+                                <option value="">-- Chọn danh mục --</option>
+                                @foreach (var cat in ViewBag.Categories as IEnumerable<PandoraWeb.Models.Category>)
+                                {
+                                    <option value="@cat.CategoryId">@cat.CategoryName</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Bộ Sưu Tập</label>
+                            <select class="form-select" name="collectionId" id="productCollection">
+                                <option value="">-- Không thuộc bộ sưu tập nào --</option>
+                                @if(ViewBag.Collections != null)
+                                {
+                                    foreach (var col in ViewBag.Collections as IEnumerable<PandoraWeb.Models.Collection>)
+                                    {
+                                        <option value="@col.CollectionId">@col.CollectionName</option>
+                                    }
+                                }
+                            </select>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Tồn Kho</label>
-                        <input type="number" class="form-control" name="stock" id="productStock" required>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Giá (VNĐ)</label>
+                            <input type="number" class="form-control" name="price" id="productPrice" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Tồn Kho</label>
+                            <input type="number" class="form-control" name="stock" id="productStock" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Trạng Thái</label>
+                            <select class="form-select" name="status" id="productStatus">
+                                <option value="active">Đang Bán</option>
+                                <option value="inactive">Ngừng Kinh Doanh</option>
+                            </select>
+                        </div>
                     </div>
+
                     <div class="mb-3">
-                        <label class="form-label">Trạng Thái</label>
-                        <select class="form-select" name="status" id="productStatus">
-                            <option value="active">Đang Bán</option>
-                            <option value="inactive">Ngừng Kinh Doanh</option>
-                        </select>
+                        <label class="form-label">Mô tả sản phẩm</label>
+                        <textarea class="form-control" name="description" id="productDesc" rows="3"></textarea>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Hình Ảnh Chính (Cover)</label>
+                            <input type="file" class="form-control" name="imageFile" id="productImage" accept="image/*">
+                            <div class="mt-2 text-center d-none" id="imagePreviewContainer">
+                                <img src="" id="imagePreview" alt="Preview" style="max-height: 120px; border-radius: 8px; border: 1px solid var(--admin-border);">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Ảnh Phụ (Cho phép chọn nhiều)</label>
+                            <input type="file" class="form-control" name="extraImages" id="extraImages" accept="image/*" multiple>
+                            <div class="mt-2 d-flex flex-wrap gap-2 d-none" id="extraImagesPreviewContainer">
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -153,6 +188,30 @@
                     previewContainer.classList.add('d-none');
                 }
             });
+            // Handle extra images preview
+            document.getElementById('extraImages').addEventListener('change', function(e) {
+                const files = e.target.files;
+                const previewContainer = document.getElementById('extraImagesPreviewContainer');
+                previewContainer.innerHTML = '';
+                
+                if (files && files.length > 0) {
+                    previewContainer.classList.remove('d-none');
+                    Array.from(files).forEach(file => {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const img = document.createElement('img');
+                            img.src = e.target.result;
+                            img.style.maxHeight = '80px';
+                            img.style.borderRadius = '4px';
+                            img.style.border = '1px solid var(--admin-border)';
+                            previewContainer.appendChild(img);
+                        }
+                        reader.readAsDataURL(file);
+                    });
+                } else {
+                    previewContainer.classList.add('d-none');
+                }
+            });
         });
 
         function openProductModal() {
@@ -160,8 +219,11 @@
             form.reset();
             document.getElementById('productId').value = '';
             document.getElementById('productImage').value = '';
+            document.getElementById('extraImages').value = '';
             document.getElementById('imagePreviewContainer').classList.add('d-none');
             document.getElementById('imagePreview').src = '';
+            document.getElementById('extraImagesPreviewContainer').innerHTML = '';
+            document.getElementById('extraImagesPreviewContainer').classList.add('d-none');
             document.getElementById('modalTitle').textContent = 'Thêm Sản Phẩm Mới';
             productModal.show();
         }
@@ -171,13 +233,28 @@
             document.getElementById('productId').value = tr.dataset.id;
             document.getElementById('productName').value = tr.dataset.name;
             document.getElementById('productCategory').value = tr.dataset.cat;
+            document.getElementById('productCollection').value = tr.dataset.col || '';
+            document.getElementById('productDesc').value = tr.dataset.desc || '';
             document.getElementById('productPrice').value = tr.dataset.price;
             document.getElementById('productStock').value = tr.dataset.stock;
             document.getElementById('productStatus').value = tr.dataset.status;
             
             document.getElementById('productImage').value = '';
-            document.getElementById('imagePreviewContainer').classList.add('d-none');
-            document.getElementById('imagePreview').src = '';
+            document.getElementById('extraImages').value = '';
+            
+            const previewContainer = document.getElementById('imagePreviewContainer');
+            const previewImg = document.getElementById('imagePreview');
+            
+            if (tr.dataset.image) {
+                previewImg.src = '/' + tr.dataset.image;
+                previewContainer.classList.remove('d-none');
+            } else {
+                previewContainer.classList.add('d-none');
+                previewImg.src = '';
+            }
+            
+            document.getElementById('extraImagesPreviewContainer').innerHTML = '';
+            document.getElementById('extraImagesPreviewContainer').classList.add('d-none');
             
             document.getElementById('modalTitle').textContent = 'Sửa Sản Phẩm';
             productModal.show();

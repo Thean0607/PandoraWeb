@@ -5,7 +5,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h3 mb-0 text-white">@ViewBag.Title</h1>
-    <button class="btn btn-admin">
+    <button class="btn btn-admin" onclick="openBannerModal()">
         <i class="fas fa-plus"></i> Thêm Banner
     </button>
 </div>
@@ -28,15 +28,24 @@
                 {
                     <tr>
                         <td>@item.DisplayOrder</td>
-                        <td><img src="~/@item.ImageUrl" style="height:40px; border-radius:4px;" /></td>
+                        <td>
+                            @{
+                                var imgUrl = item.ImageUrl != null && item.ImageUrl.StartsWith("http") ? item.ImageUrl : Url.Content("~/" + item.ImageUrl);
+                            }
+                            <img src="@imgUrl" style="height:40px; border-radius:4px;" />
+                        </td>
                         <td class="fw-bold">@item.Title</td>
                         <td>
                             @if(item.IsActive) { <span class="badge bg-success">Hiển thị</span> }
                             else { <span class="badge bg-secondary">Đã ẩn</span> }
                         </td>
                         <td class="text-end">
-                            <button class="btn btn-icon btn-edit"><i class="fas fa-edit"></i></button>
-                            <button class="btn btn-icon btn-delete"><i class="fas fa-trash"></i></button>
+                            <button class="btn btn-icon btn-edit" onclick="editBanner(@item.BannerId, '@item.Title', '@item.LinkUrl', @item.DisplayOrder, @(item.IsActive ? "true" : "false"), '@imgUrl')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-icon btn-delete" onclick="deleteBanner(@item.BannerId)">
+                                <i class="fas fa-trash"></i>
+                            </button>
                         </td>
                     </tr>
                 }
@@ -48,3 +57,117 @@
         </tbody>
     </table>
 </div>
+
+<!-- Banner Modal -->
+<div class="modal fade" id="bannerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content admin-form">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Thêm Banner</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="bannerForm" method="post" action="@Url.Action("SaveBanner", "Admin")" enctype="multipart/form-data">
+                    <input type="hidden" name="bannerId" id="bannerId">
+                    <div class="mb-3">
+                        <label class="form-label">Tiêu Đề (Mô tả nội bộ)</label>
+                        <input type="text" class="form-control" name="title" id="bannerTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Đường Dẫn Đích (Khi bấm vào banner)</label>
+                        <input type="text" class="form-control" name="linkUrl" id="bannerLinkUrl" placeholder="Ví dụ: /Product/Category?categoryId=1">
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="form-label">Thứ Tự Hiển Thị</label>
+                            <input type="number" class="form-control" name="displayOrder" id="bannerDisplayOrder" value="0" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Trạng Thái</label>
+                            <select class="form-select" name="isActive" id="bannerIsActive">
+                                <option value="true">Hiển Thị</option>
+                                <option value="false">Ẩn</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Hình Ảnh (Tỷ lệ 16:9 ngang)</label>
+                        <input type="file" class="form-control" name="imageFile" id="bannerImage" accept="image/*">
+                        <div class="mt-2 text-center d-none" id="imagePreviewContainer">
+                            <img src="" id="imagePreview" alt="Preview" style="max-height: 120px; border-radius: 8px; border: 1px solid var(--admin-border);">
+                        </div>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" class="btn btn-admin">Lưu Thay Đổi</button>
+            </div>
+                </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const bannerModal = new bootstrap.Modal(document.getElementById('bannerModal'));
+
+        function openBannerModal() {
+            document.getElementById('modalTitle').textContent = "Thêm Banner Mới";
+            document.getElementById('bannerForm').reset();
+            document.getElementById('bannerId').value = "";
+            document.getElementById('imagePreviewContainer').classList.add('d-none');
+            document.getElementById('imagePreview').src = "";
+            document.getElementById('bannerDisplayOrder').value = 0;
+            bannerModal.show();
+        }
+
+        function editBanner(id, title, linkUrl, displayOrder, isActive, imgUrl) {
+            document.getElementById('modalTitle').textContent = "Sửa Banner";
+            document.getElementById('bannerId').value = id;
+            document.getElementById('bannerTitle').value = title;
+            document.getElementById('bannerLinkUrl').value = linkUrl;
+            document.getElementById('bannerDisplayOrder').value = displayOrder;
+            document.getElementById('bannerIsActive').value = isActive.toString();
+            
+            if (imgUrl) {
+                document.getElementById('imagePreview').src = imgUrl;
+                document.getElementById('imagePreviewContainer').classList.remove('d-none');
+            } else {
+                document.getElementById('imagePreviewContainer').classList.add('d-none');
+            }
+            
+            bannerModal.show();
+        }
+
+        // Image Preview
+        document.getElementById('bannerImage').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('imagePreview').src = e.target.result;
+                    document.getElementById('imagePreviewContainer').classList.remove('d-none');
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function deleteBanner(id) {
+            if(confirm("Bạn có chắc chắn muốn xóa banner này?")) {
+                fetch('@Url.Action("DeleteBanner", "Admin")', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'id=' + id
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success) {
+                        location.reload();
+                    } else {
+                        alert(data.message);
+                    }
+                });
+            }
+        }
+    </script>
+}

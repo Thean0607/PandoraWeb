@@ -1,0 +1,188 @@
+@model IEnumerable<PandoraWeb.Models.Collection>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-white">@ViewBag.Title</h1>
+    <button class="btn btn-admin" onclick="openCollectionModal()">
+        <i class="fas fa-plus"></i> Thêm Bộ Sưu Tập
+    </button>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="table-wrapper">
+    <table class="table admin-table table-hover">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Bộ Sưu Tập</th>
+                <th>Mô Tả</th>
+                <th class="text-end">Thao Tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr data-id="@item.CollectionId" data-name="@item.CollectionName" data-desc="@item.Description" data-image="@item.ImageUrl">
+                        <td>#@item.CollectionId</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                {
+                                    <img src="~/@item.ImageUrl" alt="@item.CollectionName" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; margin-right: 15px;">
+                                }
+                                <strong>@item.CollectionName</strong>
+                            </div>
+                        </td>
+                        <td><small class="text-muted">@(string.IsNullOrEmpty(item.Description) ? "Không có" : (item.Description.Length > 50 ? item.Description.Substring(0,50) + "..." : item.Description))</small></td>
+                        <td class="text-end">
+                            <button class="btn btn-icon btn-edit" onclick="editCollection(this)">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-icon btn-delete" onclick="deleteCollection(@item.CollectionId)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="4" class="text-center py-4 text-muted">Chưa có bộ sưu tập nào.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal Thêm/Sửa -->
+<div class="modal fade" id="collectionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content admin-form">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Thêm Bộ Sưu Tập</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="collectionForm" method="post" action="@Url.Action("SaveCollection", "Admin")" enctype="multipart/form-data">
+                    <input type="hidden" id="collectionId" name="collectionId" value="" />
+                    <div class="mb-3">
+                        <label class="form-label">Tên Bộ Sưu Tập <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="collectionName" name="collectionName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mô Tả</label>
+                        <textarea class="form-control" id="collectionDesc" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Hình Ảnh (Cover)</label>
+                        <input type="file" class="form-control" name="imageFile" id="collectionImage" accept="image/*">
+                        <div class="mt-2 text-center d-none" id="imagePreviewContainer">
+                            <img src="" id="imagePreview" alt="Preview" style="max-height: 120px; border-radius: 8px; border: 1px solid var(--admin-border);">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-admin">Lưu Thay Đổi</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let collectionModal;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            collectionModal = new bootstrap.Modal(document.getElementById('collectionModal'));
+            
+            // Image preview
+            document.getElementById('collectionImage').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                const previewContainer = document.getElementById('imagePreviewContainer');
+                const previewImg = document.getElementById('imagePreview');
+                
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImg.src = e.target.result;
+                        previewContainer.classList.remove('d-none');
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+
+        function openCollectionModal() {
+            document.getElementById('collectionForm').reset();
+            document.getElementById('collectionId').value = '';
+            document.getElementById('collectionImage').value = '';
+            document.getElementById('imagePreviewContainer').classList.add('d-none');
+            document.getElementById('imagePreview').src = '';
+            document.getElementById('modalTitle').textContent = 'Thêm Bộ Sưu Tập';
+            collectionModal.show();
+        }
+
+        function editCollection(btn) {
+            const tr = btn.closest('tr');
+            document.getElementById('collectionId').value = tr.dataset.id;
+            document.getElementById('collectionName').value = tr.dataset.name;
+            document.getElementById('collectionDesc').value = tr.dataset.desc;
+            
+            document.getElementById('collectionImage').value = '';
+            const previewContainer = document.getElementById('imagePreviewContainer');
+            const previewImg = document.getElementById('imagePreview');
+            
+            if (tr.dataset.image) {
+                previewImg.src = '/' + tr.dataset.image;
+                previewContainer.classList.remove('d-none');
+            } else {
+                previewContainer.classList.add('d-none');
+                previewImg.src = '';
+            }
+            
+            document.getElementById('modalTitle').textContent = 'Sửa Bộ Sưu Tập';
+            collectionModal.show();
+        }
+
+        function deleteCollection(id) {
+            if (confirm('Bạn có chắc chắn muốn xóa bộ sưu tập này? Các sản phẩm thuộc bộ sưu tập sẽ không bị xóa nhưng sẽ mất liên kết.')) {
+                fetch('@Url.Action("DeleteCollection", "Admin")', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ id: id })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success) {
+                        location.reload();
+                    } else {
+                        alert(data.message || 'Không thể xóa!');
+                    }
+                })
+                .catch(err => console.error(err));
+            }
+        }
+    </script>
+}

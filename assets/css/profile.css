@@ -1,13 +1,13 @@
 .profile-sidebar .nav-link {
-    color: var(--text-dark);
+    color: var(--text-dark) !important;
     padding: 10px 15px;
     border-radius: 5px;
     margin-bottom: 5px;
     transition: all 0.3s ease;
 }
 .profile-sidebar .nav-link:hover, .profile-sidebar .nav-link.active {
-    background-color: var(--secondary-color);
-    color: var(--primary-color);
+    background-color: var(--secondary-color) !important;
+    color: var(--primary-color) !important;
     font-weight: 500;
 }
 .avatar-wrapper {

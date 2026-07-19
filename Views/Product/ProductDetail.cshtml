@@ -80,10 +80,11 @@
                     <div class="d-flex align-items-center mb-4 gap-3">
                         <div class="quantity-input input-group" style="width: 130px;">
                             <button class="btn btn-minus" type="button"><i class="fas fa-minus"></i></button>
-                            <input type="text" class="form-control" value="1">
+                            <input type="text" class="form-control quantity-val" value="1" id="productQuantity">
                             <button class="btn btn-plus" type="button"><i class="fas fa-plus"></i></button>
                         </div>
                         <button class="btn btn-gold flex-grow-1 py-3 btn-add-cart" data-pid="@Model.ProductId"><i class="fas fa-shopping-bag me-2"></i>Thêm Vào Giỏ Hàng</button>
+                        <button class="btn btn-dark flex-grow-1 py-3 btn-buy-now" data-pid="@Model.ProductId"><i class="fas fa-bolt me-2"></i>Mua Ngay</button>
                         <button class="btn btn-outline-dark py-3 px-4 btn-wishlist" data-pid="@Model.ProductId"><i class="far fa-heart"></i></button>
                     </div>
 
@@ -128,4 +129,38 @@
 
     <!-- Footer -->
 
-
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const buyNowBtn = document.querySelector('.btn-buy-now');
+            if(buyNowBtn) {
+                buyNowBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const pid = this.getAttribute('data-pid');
+                    const qtyInput = document.getElementById('productQuantity');
+                    const quantity = qtyInput ? qtyInput.value : 1;
+                    
+                    // Call AddToCart API
+                    fetch('@Url.Action("AddToCart", "Order")', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `productId=${pid}&quantity=${quantity}`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.href = '@Url.Action("Checkout", "Order")';
+                        } else {
+                            alert(data.message || 'Có lỗi xảy ra');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                });
+            }
+        });
+    </script>
+}

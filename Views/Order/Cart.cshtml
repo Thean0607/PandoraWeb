@@ -8,6 +8,13 @@
 <div class="container mt-5 pt-5 pb-5">
     <h1 class="font-serif mb-4 pt-4 text-center">Giỏ Hàng Của Bạn</h1>
     
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger text-center">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
     <div class="row">
         <div class="col-lg-8 mb-4">
             <div class="card border-0 shadow-sm">
@@ -41,7 +48,14 @@
                                                         {
                                                             <span class="text-muted fs-7 d-block">Chất liệu: @item.Material</span>
                                                         }
-                                                        <div class="text-primary-gold fw-bold mt-1">@item.Price.ToString("N0") ₫</div>
+                                                        @if (item.IsOutOfStock)
+                                                        {
+                                                            <span class="badge bg-danger mt-1">Hết hàng</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="text-primary-gold fw-bold mt-1">@item.Price.ToString("N0") ₫</div>
+                                                        }
                                                     </div>
                                                 </div>
                                             </td>
@@ -96,9 +110,14 @@
                     <strong class="fs-5 text-primary-gold cart-total">@subTotal.ToString("N0") ₫</strong>
                 </div>
                 
-                @if (Model != null && Model.Count > 0)
+                @if (Model != null && Model.Count > 0 && ViewBag.HasOutOfStock != true)
                 {
                     <a href="@Url.Action("Checkout", "Order")" class="btn btn-gold w-100 py-3 mb-3">TIẾN HÀNH THANH TOÁN</a>
+                }
+                else if (ViewBag.HasOutOfStock == true)
+                {
+                    <button class="btn btn-secondary w-100 py-3 mb-3" disabled title="Vui lòng loại bỏ sản phẩm hết hàng để thanh toán">TIẾN HÀNH THANH TOÁN</button>
+                    <p class="text-danger text-center small">Một số sản phẩm trong giỏ đã hết hàng.</p>
                 }
                 else
                 {

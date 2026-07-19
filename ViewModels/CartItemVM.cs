@@ -1,4 +1,4 @@
-﻿namespace PandoraWeb.ViewModels
+namespace PandoraWeb.ViewModels
 {
     public class CartItemVM
     {
@@ -10,6 +10,7 @@
         public int Quantity { get; set; }
         public string Size { get; set; }
         public string Material { get; set; }
+        public bool IsOutOfStock { get; set; }
         public decimal Total => Price * Quantity;
     }
 }

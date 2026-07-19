@@ -2,6 +2,9 @@ using System.Linq;
 using System.Web.Mvc;
 using PandoraWeb.Models;
 using PandoraWeb.Models.Data;
+using PandoraWeb.ViewModels;
+using System.Collections.Generic;
+using System.Data.Entity;
 
 namespace PandoraWeb.Controllers
 {
@@ -36,6 +39,9 @@ namespace PandoraWeb.Controllers
                 Session["CustomerId"] = cus.CustomerId;
                 Session["FullName"] = cus.FullName;
                 Session["Role"] = "Customer";
+                
+                SyncDbCartToSession(cus.CustomerId);
+                
                 return RedirectToAction("Index", "Home");
             }
 
@@ -103,6 +109,8 @@ namespace PandoraWeb.Controllers
             Session["CustomerId"] = customer.CustomerId;
             Session["FullName"] = customer.FullName;
             Session["Role"] = "Customer";
+            
+            SyncDbCartToSession(customer.CustomerId);
 
             return RedirectToAction("Index", "Home");
         }
@@ -119,6 +127,64 @@ namespace PandoraWeb.Controllers
             ViewBag.ActiveMenu = "Address";
             ViewBag.Title = "Địa Chỉ Giao Hàng";
             return View();
+        }
+
+        private void SyncDbCartToSession(int customerId)
+        {
+            var dbCart = db.Carts.Include("CartItems.Variant.Product").FirstOrDefault(c => c.CustomerId == customerId);
+            var sessionCart = Session["Cart"] as List<CartItemVM> ?? new List<CartItemVM>();
+
+            if (dbCart != null)
+            {
+                foreach (var dbItem in dbCart.CartItems)
+                {
+                    var existing = sessionCart.FirstOrDefault(x => x.ProductId == dbItem.Variant.ProductId && x.VariantId == dbItem.VariantId);
+                    if (existing == null)
+                    {
+                        var product = dbItem.Variant.Product;
+                        string sizeStr = "", materialStr = "";
+                        if (dbItem.Variant.SizeId.HasValue) sizeStr = db.Sizes.Find(dbItem.Variant.SizeId)?.SizeValue;
+                        if (dbItem.Variant.MaterialId.HasValue) materialStr = db.Materials.Find(dbItem.Variant.MaterialId)?.MaterialName;
+
+                        sessionCart.Add(new CartItemVM
+                        {
+                            ProductId = product.ProductId,
+                            VariantId = dbItem.VariantId,
+                            ProductName = product.ProductName,
+                            ImageUrl = product.ImageUrl,
+                            Price = product.BasePrice + dbItem.Variant.PriceAdjustment,
+                            Quantity = dbItem.Quantity,
+                            Size = sizeStr,
+                            Material = materialStr
+                        });
+                    }
+                }
+            }
+            Session["Cart"] = sessionCart;
+
+            // Đồng thời lưu ngược những thứ có sẵn trong session (trước khi login) vào DB
+            var currentCart = db.Carts.Include("CartItems").FirstOrDefault(c => c.CustomerId == customerId);
+            if (currentCart == null)
+            {
+                currentCart = new Cart { CustomerId = customerId, CreatedDate = System.DateTime.Now };
+                db.Carts.Add(currentCart);
+                db.SaveChanges();
+            }
+
+            var oldItems = db.CartItems.Where(i => i.CartId == currentCart.CartId).ToList();
+            db.CartItems.RemoveRange(oldItems);
+            db.SaveChanges();
+
+            foreach (var item in sessionCart)
+            {
+                db.CartItems.Add(new CartItem
+                {
+                    CartId = currentCart.CartId,
+                    VariantId = item.VariantId,
+                    Quantity = item.Quantity
+                });
+            }
+            db.SaveChanges();
         }
     }
 }

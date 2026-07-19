@@ -23,7 +23,52 @@ namespace PandoraWeb.Controllers
             {
                 cart = new List<CartItemVM>();
             }
+
+            // Kiểm tra tồn kho
+            foreach (var item in cart)
+            {
+                var variant = db.ProductVariants.Find(item.VariantId);
+                if (variant == null || variant.Stock < item.Quantity)
+                {
+                    item.IsOutOfStock = true;
+                    ViewBag.HasOutOfStock = true;
+                }
+                else
+                {
+                    item.IsOutOfStock = false;
+                }
+            }
+
             return View(cart);
+        }
+
+        private void SaveCartToDb(int customerId, List<CartItemVM> sessionCart)
+        {
+            var dbCart = db.Carts.Include(c => c.CartItems).FirstOrDefault(c => c.CustomerId == customerId);
+            if (dbCart == null)
+            {
+                dbCart = new Cart { CustomerId = customerId, CreatedDate = DateTime.Now };
+                db.Carts.Add(dbCart);
+                db.SaveChanges();
+            }
+            
+            var oldItems = db.CartItems.Where(i => i.CartId == dbCart.CartId).ToList();
+            db.CartItems.RemoveRange(oldItems);
+            db.SaveChanges();
+
+            if (sessionCart != null && sessionCart.Any())
+            {
+                foreach (var item in sessionCart)
+                {
+                    db.CartItems.Add(new CartItem
+                    {
+                        CartId = dbCart.CartId,
+                        VariantId = item.VariantId,
+                        Quantity = item.Quantity
+                    });
+                }
+                db.SaveChanges();
+            }
         }
 
         [HttpPost]
@@ -37,7 +82,7 @@ namespace PandoraWeb.Controllers
                 : db.ProductVariants.FirstOrDefault(v => v.ProductId == productId);
 
             int finalVariantId = variant?.VariantId ?? 0;
-            decimal price = product.BasePrice + (variant?.PriceAdjustment ?? 0);
+            decimal price = product.BasePrice + (variant?.PriceAdjustment ?? 0m);
             
             // Lấy thêm thông tin size/material
             string sizeStr = "", materialStr = "";
@@ -70,6 +115,12 @@ namespace PandoraWeb.Controllers
             }
 
             Session["Cart"] = cart;
+
+            if (Session["CustomerId"] != null)
+            {
+                SaveCartToDb((int)Session["CustomerId"], cart);
+            }
+
             return Json(new { success = true, totalItems = cart.Sum(x => x.Quantity) });
         }
 
@@ -82,6 +133,11 @@ namespace PandoraWeb.Controllers
                 var item = cart.FirstOrDefault(x => x.ProductId == productId && x.VariantId == variantId);
                 if (item != null) cart.Remove(item);
                 Session["Cart"] = cart;
+
+                if (Session["CustomerId"] != null)
+                {
+                    SaveCartToDb((int)Session["CustomerId"], cart);
+                }
             }
             return Json(new { success = true });
         }
@@ -95,6 +151,11 @@ namespace PandoraWeb.Controllers
                 var item = cart.FirstOrDefault(x => x.ProductId == productId && x.VariantId == variantId);
                 if (item != null) item.Quantity = quantity;
                 Session["Cart"] = cart;
+
+                if (Session["CustomerId"] != null)
+                {
+                    SaveCartToDb((int)Session["CustomerId"], cart);
+                }
             }
             return Json(new { success = true });
         }
@@ -107,6 +168,16 @@ namespace PandoraWeb.Controllers
             if (cart == null || !cart.Any())
             {
                 return RedirectToAction("Cart");
+            }
+
+            foreach (var item in cart)
+            {
+                var variant = db.ProductVariants.Find(item.VariantId);
+                if (variant == null || variant.Stock < item.Quantity)
+                {
+                    TempData["ErrorMessage"] = $"Sản phẩm '{item.ProductName}' không đủ số lượng trong kho. Vui lòng cập nhật lại giỏ hàng.";
+                    return RedirectToAction("Cart");
+                }
             }
 
             if (Session["CustomerId"] != null)
@@ -190,6 +261,11 @@ namespace PandoraWeb.Controllers
             db.SaveChanges();
 
             Session["Cart"] = null;
+            if (Session["CustomerId"] != null)
+            {
+                SaveCartToDb((int)Session["CustomerId"], new List<CartItemVM>());
+            }
+
             return RedirectToAction("OrderSuccess");
         }
 

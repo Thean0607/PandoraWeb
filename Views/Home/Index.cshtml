@@ -177,3 +177,18 @@
             </div>
         </div>
     </section>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var heroCarousel = document.getElementById('heroCarousel');
+            if(heroCarousel) {
+                var carousel = new bootstrap.Carousel(heroCarousel, {
+                    interval: 3000,
+                    ride: 'carousel'
+                });
+                carousel.cycle();
+            }
+        });
+    </script>
+}

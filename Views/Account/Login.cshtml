@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="~/assets/css/components/quantity-input.css">
     <link rel="stylesheet" href="~/assets/css/components/section-title.css">
     <link rel="stylesheet" href="~/assets/css/components/breadcrumb.css">
-    <link rel="stylesheet" href="~/assets/css/auth.css">
+    <link rel="stylesheet" href="~/assets/css/auth.css?v=2">
 </head>
 <body>
 
@@ -41,14 +41,14 @@
                 }
                 <div class="mb-3">
                     <label class="form-label">Email hoặc Số điện thoại</label>
-                    <input type="text" name="loginId" class="form-control py-2" placeholder="Nhập email hoặc SĐT" required autofocus>
+                    <input type="text" name="loginId" class="form-control py-2" placeholder="Nhập email hoặc SĐT" required autofocus oninvalid="this.setCustomValidity('Vui lòng điền thông tin này.')" oninput="this.setCustomValidity('')">
                 </div>
                 <div class="mb-4">
                     <div class="d-flex justify-content-between">
                         <label class="form-label">Mật khẩu</label>
                         <a href="#" class="text-muted fs-7 text-decoration-none">Quên mật khẩu?</a>
                     </div>
-                    <input type="password" name="password" class="form-control py-2" placeholder="Nhập mật khẩu" autocomplete="current-password" required>
+                    <input type="password" name="password" class="form-control py-2" placeholder="Nhập mật khẩu" autocomplete="current-password" required oninvalid="this.setCustomValidity('Vui lòng điền thông tin này.')" oninput="this.setCustomValidity('')">
                 </div>
                 
                 <button type="submit" class="btn btn-gold w-100 py-2 mb-3">Đăng Nhập</button>
