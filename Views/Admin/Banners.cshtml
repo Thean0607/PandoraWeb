@@ -30,9 +30,9 @@
                         <td>@item.DisplayOrder</td>
                         <td>
                             @{
-                                var imgUrl = item.ImageUrl != null && item.ImageUrl.StartsWith("http") ? item.ImageUrl : Url.Content("~/" + item.ImageUrl);
+                                var imgUrl = PandoraWeb.Helpers.ImageHelper.GetImageUrl(item.ImageUrl, "~/assets/img/hero/default.jpg");
                             }
-                            <img src="@imgUrl" style="height:40px; border-radius:4px;" />
+                            <img src="@imgUrl" style="height:40px; border-radius:4px;" onerror="this.onerror=null; this.src='@Url.Content("~/assets/img/hero/default.jpg")';" />
                         </td>
                         <td class="fw-bold">@item.Title</td>
                         <td>
@@ -92,7 +92,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Hình Ảnh (Tỷ lệ 16:9 ngang)</label>
-                        <input type="file" class="form-control" name="imageFile" id="bannerImage" accept="image/*">
+                        <input type="file" class="form-control" name="imageFile" id="bannerImage" accept="image/*, .png, .jpg, .jpeg, .gif, .webp, .svg, .bmp, .ico, .tiff, .avif, .heic, *">
                         <div class="mt-2 text-center d-none" id="imagePreviewContainer">
                             <img src="" id="imagePreview" alt="Preview" style="max-height: 120px; border-radius: 8px; border: 1px solid var(--admin-border);">
                         </div>

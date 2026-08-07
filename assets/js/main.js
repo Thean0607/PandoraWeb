@@ -49,6 +49,11 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        // Avoid double-triggering when .btn-update-cart has its own AJAX update handler
+        if (btnMinus.classList.contains('btn-update-cart') || btnPlus.classList.contains('btn-update-cart')) {
+            return;
+        }
+
         input.setAttribute('inputmode', 'numeric');
         setQuantityValue(input, input.value);
 
@@ -162,29 +167,36 @@ document.addEventListener('DOMContentLoaded', function() {
             const pid = btn.getAttribute('data-pid');
             if (!pid) return;
 
-            // Fetch add to cart
+            const qtyInput = document.getElementById('productQuantity');
+            const qty = qtyInput ? (parseInt(qtyInput.value, 10) || 1) : 1;
+
+            const selectedVariantRadio = document.querySelector('input[name="variantId"]:checked');
+            const vid = selectedVariantRadio ? selectedVariantRadio.value : btn.getAttribute('data-vid');
+
+            const params = new URLSearchParams({ productId: pid, quantity: qty });
+            if (vid) params.append('variantId', vid);
+
             fetch('/Order/AddToCart', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({ productId: pid, quantity: 1 })
+                body: params
             })
             .then(res => {
                 if (!res.ok) throw new Error('Network response was not ok');
                 return res.json();
             })
             .then(data => {
-                console.log('AddToCart response:', data);
                 if(data.success) {
                     const toastEl = document.getElementById('cartToast');
                     if (toastEl) {
-                        toastEl.querySelector('.toast-body').innerHTML = '<i class="fas fa-check-circle me-2"></i> Đã thêm sản phẩm vào giỏ hàng!';
+                        toastEl.querySelector('.toast-body').innerHTML = '<i class="fas fa-check-circle me-2"></i> ' + (data.message || 'Đã thêm sản phẩm vào giỏ hàng!');
                         const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
                         toast.show();
                     }
                     const badge = document.getElementById('cart-badge');
                     if (badge) badge.textContent = data.totalItems;
                 } else {
-                    alert('Lỗi: ' + data.message);
+                    alert('Lỗi: ' + (data.message || 'Không thể thêm sản phẩm'));
                 }
             })
             .catch(err => {
@@ -199,12 +211,27 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', function() {
             const pid = this.getAttribute('data-pid');
             const vid = this.getAttribute('data-vid');
+            const row = this.closest('tr');
+
             fetch('/Order/RemoveFromCart', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ productId: pid, variantId: vid })
             }).then(res => res.json()).then(data => {
-                if (data.success) window.location.reload();
+                if (data.success) {
+                    if (data.isEmpty) {
+                        window.location.reload();
+                        return;
+                    }
+                    if (row) row.remove();
+                    
+                    const badge = document.getElementById('cart-badge');
+                    if (badge) badge.textContent = data.totalItems;
+
+                    document.querySelectorAll('.cart-subtotal, .cart-total').forEach(el => {
+                        el.textContent = data.subTotal;
+                    });
+                }
             });
         });
     });
@@ -216,9 +243,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const vid = this.getAttribute('data-vid');
             const action = this.getAttribute('data-action');
             const input = this.parentElement.querySelector('.cart-qty-input');
-            let qty = parseInt(input.value);
+            const row = this.closest('tr');
+            let qty = parseInt(input.value) || 1;
             
-            if (action === 'minus') qty = Math.max(1, qty - 1);
+            if (action === 'minus') qty = Math.max(0, qty - 1);
             else qty += 1;
             
             fetch('/Order/UpdateQuantity', {
@@ -226,7 +254,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ productId: pid, variantId: vid, quantity: qty })
             }).then(res => res.json()).then(data => {
-                if (data.success) window.location.reload();
+                if (data.success) {
+                    if (data.isEmpty) {
+                        window.location.reload();
+                        return;
+                    }
+                    if (qty <= 0 && row) {
+                        row.remove();
+                    } else if (input) {
+                        input.value = qty;
+                        if (row) {
+                            const itemTotalEl = row.querySelector('.cart-item-total');
+                            if (itemTotalEl) itemTotalEl.textContent = data.itemTotal;
+                        }
+                    }
+                    
+                    const badge = document.getElementById('cart-badge');
+                    if (badge) badge.textContent = data.totalItems;
+
+                    document.querySelectorAll('.cart-subtotal, .cart-total').forEach(el => {
+                        el.textContent = data.subTotal;
+                    });
+                }
             });
         });
     });    // Handle Add/Remove from Wishlist

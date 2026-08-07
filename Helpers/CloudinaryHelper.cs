@@ -1,5 +1,6 @@
 using System;
 using System.Configuration;
+using System.IO;
 using System.Web;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
@@ -12,13 +13,23 @@ namespace PandoraWeb.Helpers
 
         public CloudinaryHelper()
         {
-            string cloudName = ConfigurationManager.AppSettings["Cloudinary:CloudName"];
-            string apiKey = ConfigurationManager.AppSettings["Cloudinary:ApiKey"];
-            string apiSecret = ConfigurationManager.AppSettings["Cloudinary:ApiSecret"];
+            try
+            {
+                string cloudName = ConfigurationManager.AppSettings["Cloudinary:CloudName"];
+                string apiKey = ConfigurationManager.AppSettings["Cloudinary:ApiKey"];
+                string apiSecret = ConfigurationManager.AppSettings["Cloudinary:ApiSecret"];
 
-            Account account = new Account(cloudName, apiKey, apiSecret);
-            _cloudinary = new Cloudinary(account);
-            _cloudinary.Api.Secure = true; 
+                if (!string.IsNullOrWhiteSpace(cloudName) && !string.IsNullOrWhiteSpace(apiKey) && !string.IsNullOrWhiteSpace(apiSecret))
+                {
+                    Account account = new Account(cloudName, apiKey, apiSecret);
+                    _cloudinary = new Cloudinary(account);
+                    _cloudinary.Api.Secure = true;
+                }
+            }
+            catch
+            {
+                _cloudinary = null;
+            }
         }
 
         public string UploadImage(HttpPostedFileBase file)
@@ -26,22 +37,59 @@ namespace PandoraWeb.Helpers
             if (file == null || file.ContentLength == 0)
                 return null;
 
-            var uploadParams = new ImageUploadParams()
+            // 1. Try Cloudinary first if configured
+            if (_cloudinary != null)
             {
-                File = new FileDescription(file.FileName, file.InputStream),
-                Folder = "PandoraWeb/Products",
-                UseFilename = true,
-                UniqueFilename = true
-            };
+                try
+                {
+                    var uploadParams = new ImageUploadParams()
+                    {
+                        File = new FileDescription(file.FileName, file.InputStream),
+                        Folder = "PandoraWeb/Products",
+                        UseFilename = true,
+                        UniqueFilename = true
+                    };
 
-            var uploadResult = _cloudinary.Upload(uploadParams);
-
-            if (uploadResult.Error != null)
-            {
-                throw new Exception(uploadResult.Error.Message);
+                    var uploadResult = _cloudinary.Upload(uploadParams);
+                    if (uploadResult != null && uploadResult.SecureUrl != null)
+                    {
+                        return uploadResult.SecureUrl.ToString();
+                    }
+                }
+                catch
+                {
+                    // Fallback to local upload
+                }
             }
 
-            return uploadResult.SecureUrl.ToString();
+            // 2. Local fallback upload supporting all file extensions
+            try
+            {
+                string uploadFolder = HttpContext.Current.Server.MapPath("~/uploads/");
+                if (!Directory.Exists(uploadFolder))
+                {
+                    Directory.CreateDirectory(uploadFolder);
+                }
+
+                string fileExtension = Path.GetExtension(file.FileName);
+                if (string.IsNullOrEmpty(fileExtension))
+                {
+                    fileExtension = ".jpg";
+                }
+
+                string uniqueFileName = $"{Guid.NewGuid()}{fileExtension}";
+                string savePath = Path.Combine(uploadFolder, uniqueFileName);
+
+                file.InputStream.Position = 0;
+                file.SaveAs(savePath);
+
+                return $"uploads/{uniqueFileName}";
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Lỗi khi tải hình ảnh lên: " + ex.Message);
+            }
         }
     }
 }
+

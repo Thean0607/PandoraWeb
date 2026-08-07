@@ -45,15 +45,14 @@
                     var statusClass = p.Status == "active" ? "status-active" : "status-inactive";
                     var statusText = p.Status == "active" ? "Đang Bán" : "Ngừng KD";
                     var stock = p.ProductVariants?.FirstOrDefault()?.Stock ?? 0;
+                    var prodImgUrl = PandoraWeb.Helpers.ImageHelper.GetImageUrl(p.ImageUrl, "~/assets/img/products/default.jpg");
+                    var rawProdImgUrl = PandoraWeb.Helpers.ImageHelper.GetImageUrl(p.ImageUrl, "");
                     
-                    <tr data-id="@p.ProductId" data-name="@p.ProductName" data-cat="@p.CategoryId" data-col="@p.CollectionId" data-price="@p.BasePrice.ToString(System.Globalization.CultureInfo.InvariantCulture)" data-stock="@stock" data-status="@p.Status" data-desc="@p.Description" data-image="@p.ImageUrl">
+                    <tr data-id="@p.ProductId" data-name="@p.ProductName" data-cat="@p.CategoryId" data-col="@p.CollectionId" data-price="@p.BasePrice.ToString(System.Globalization.CultureInfo.InvariantCulture)" data-stock="@stock" data-status="@p.Status" data-desc="@p.Description" data-image="@rawProdImgUrl">
                         <td>#@p.ProductId</td>
                         <td>
                             <div class="d-flex align-items-center">
-                                @if (!string.IsNullOrEmpty(p.ImageUrl))
-                                {
-                                    <img src="~/@p.ImageUrl" alt="@p.ProductName" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 10px;">
-                                }
+                                <img src="@prodImgUrl" alt="@p.ProductName" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 10px;" onerror="this.onerror=null; this.src='@Url.Content("~/assets/img/products/default.jpg")';">
                                 <strong>@p.ProductName</strong>
                             </div>
                         </td>
@@ -141,14 +140,14 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="form-label">Hình Ảnh Chính (Cover)</label>
-                            <input type="file" class="form-control" name="imageFile" id="productImage" accept="image/*">
+                            <input type="file" class="form-control" name="imageFile" id="productImage" accept="image/*, .png, .jpg, .jpeg, .gif, .webp, .svg, .bmp, .ico, .tiff, .avif, .heic, *">
                             <div class="mt-2 text-center d-none" id="imagePreviewContainer">
                                 <img src="" id="imagePreview" alt="Preview" style="max-height: 120px; border-radius: 8px; border: 1px solid var(--admin-border);">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Ảnh Phụ (Cho phép chọn nhiều)</label>
-                            <input type="file" class="form-control" name="extraImages" id="extraImages" accept="image/*" multiple>
+                            <input type="file" class="form-control" name="extraImages" id="extraImages" accept="image/*, .png, .jpg, .jpeg, .gif, .webp, .svg, .bmp, .ico, .tiff, .avif, .heic, *" multiple>
                             <div class="mt-2 d-flex flex-wrap gap-2 d-none" id="extraImagesPreviewContainer">
                             </div>
                         </div>

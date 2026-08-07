@@ -29,15 +29,14 @@
                                     <th scope="col"></th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @if (Model != null && Model.Count > 0)
+                                                   @if (Model != null && Model.Count > 0)
                                 {
                                     foreach (var item in Model)
                                     {
-                                        <tr>
+                                        <tr class="cart-item-row" data-pid="@item.ProductId" data-vid="@item.VariantId">
                                             <td>
                                                 <div class="d-flex align-items-center">
-                                                    <img src="@(!string.IsNullOrEmpty(item.ImageUrl) ? Url.Content("~/" + item.ImageUrl) : "https://images.unsplash.com/photo-1605100804763-247f67b2548e?q=80&w=150")" class="img-fluid rounded" style="width: 80px;" alt="@item.ProductName">
+                                                    <img src="@(!string.IsNullOrEmpty(item.ImageUrl) ? (item.ImageUrl.StartsWith("http") ? item.ImageUrl : Url.Content("~/" + item.ImageUrl)) : "https://images.unsplash.com/photo-1605100804763-247f67b2548e?q=80&w=150")" class="img-fluid rounded" style="width: 80px;" alt="@item.ProductName">
                                                     <div class="ms-3">
                                                         <h6 class="mb-1"><a href="@Url.Action("ProductDetail", "Product", new { id = item.ProductId })" class="text-dark text-decoration-none font-serif">@item.ProductName</a></h6>
                                                         @if (!string.IsNullOrEmpty(item.Size))
@@ -66,13 +65,13 @@
                                                     <button class="btn btn-sm btn-plus btn-outline-secondary btn-update-cart" data-pid="@item.ProductId" data-vid="@item.VariantId" data-action="plus" type="button"><i class="fas fa-plus"></i></button>
                                                 </div>
                                             </td>
-                                            <td class="text-end fw-bold">@item.Total.ToString("N0") ₫</td>
+                                            <td class="text-end fw-bold cart-item-total">@item.Total.ToString("N0") ₫</td>
                                             <td class="text-end">
                                                 <button class="btn btn-link text-danger btn-remove-cart" data-pid="@item.ProductId" data-vid="@item.VariantId" type="button"><i class="fas fa-times"></i></button>
                                             </td>
                                         </tr>
                                     }
-                                }
+                                }                             }
                                 else
                                 {
                                     <tr>

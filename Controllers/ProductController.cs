@@ -100,13 +100,22 @@ namespace PandoraWeb.Controllers
 
             if (id == null)
             {
-                // Nếu không truyền ID, mặc định lấy sản phẩm đầu tiên hoặc báo lỗi
-                var defaultProduct = db.Products.Include(p => p.Category).FirstOrDefault();
+                var defaultProduct = db.Products
+                    .Include(p => p.Category)
+                    .Include(p => p.ProductVariants.Select(v => v.Size))
+                    .Include(p => p.ProductVariants.Select(v => v.Material))
+                    .Include(p => p.ProductImages)
+                    .FirstOrDefault();
                 if (defaultProduct == null) return HttpNotFound();
                 return View(defaultProduct);
             }
 
-            var product = db.Products.Include(p => p.Category).FirstOrDefault(p => p.ProductId == id);
+            var product = db.Products
+                .Include(p => p.Category)
+                .Include(p => p.ProductVariants.Select(v => v.Size))
+                .Include(p => p.ProductVariants.Select(v => v.Material))
+                .Include(p => p.ProductImages)
+                .FirstOrDefault(p => p.ProductId == id);
             
             if (product == null)
             {

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Web.Mvc;
 using PandoraWeb.Models;
@@ -11,6 +12,11 @@ namespace PandoraWeb.Controllers
     public class AccountController : Controller
     {
         private PandoraDbContext db = new PandoraDbContext();
+
+        public AccountController()
+        {
+            EnsureAvatarColumnExists();
+        }
 
         public ActionResult Login()
         {
@@ -49,11 +55,137 @@ namespace PandoraWeb.Controllers
             return View();
         }
 
+        private void EnsureAvatarColumnExists()
+        {
+            try
+            {
+                db.Database.ExecuteSqlCommand("IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Customers]') AND name = 'AvatarUrl') ALTER TABLE [dbo].[Customers] ADD [AvatarUrl] NVARCHAR(500) NULL;");
+            }
+            catch
+            {
+            }
+        }
+
         public new ActionResult Profile()
         {
-            if (Session["FullName"] == null) return RedirectToAction("Login");
+            if (Session["CustomerId"] == null) return RedirectToAction("Login");
+            EnsureAvatarColumnExists();
             ViewBag.ActiveMenu = "Profile";
-            return View();
+            ViewBag.Title = "Hồ Sơ Của Tôi";
+
+            int customerId = (int)Session["CustomerId"];
+            var customer = db.Customers.Find(customerId);
+            if (customer == null) return RedirectToAction("Login");
+
+            if (!string.IsNullOrEmpty(customer.AvatarUrl))
+            {
+                Session["AvatarUrl"] = PandoraWeb.Helpers.ImageHelper.GetImageUrl(customer.AvatarUrl, "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop");
+            }
+
+            return View(customer);
+        }
+
+        [HttpPost]
+        public new ActionResult Profile(string fullName, string email, string phoneNumber, string gender, DateTime? dateOfBirth, System.Web.HttpPostedFileBase avatarFile)
+        {
+            if (Session["CustomerId"] == null) return RedirectToAction("Login");
+            EnsureAvatarColumnExists();
+            ViewBag.ActiveMenu = "Profile";
+            ViewBag.Title = "Hồ Sơ Của Tôi";
+
+            int customerId = (int)Session["CustomerId"];
+            var customer = db.Customers.Find(customerId);
+            if (customer == null) return RedirectToAction("Login");
+
+            if (avatarFile != null && avatarFile.ContentLength > 0)
+            {
+                try
+                {
+                    var cloudinaryHelper = new PandoraWeb.Helpers.CloudinaryHelper();
+                    string uploadedUrl = cloudinaryHelper.UploadImage(avatarFile);
+                    if (!string.IsNullOrEmpty(uploadedUrl))
+                    {
+                        customer.AvatarUrl = uploadedUrl;
+                        Session["AvatarUrl"] = PandoraWeb.Helpers.ImageHelper.GetImageUrl(uploadedUrl, "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop");
+                    }
+                }
+                catch
+                {
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(fullName))
+            {
+                customer.FullName = fullName.Trim();
+            }
+
+            if (!string.IsNullOrWhiteSpace(email) && email.Trim().ToLower() != customer.Email.ToLower())
+            {
+                string cleanEmail = email.Trim().ToLower();
+                var dupCus = db.Customers.FirstOrDefault(c => c.CustomerId != customerId && c.Email.ToLower() == cleanEmail);
+                var dupEmp = db.Employees.FirstOrDefault(e => e.Email.ToLower() == cleanEmail);
+                if (dupCus != null || dupEmp != null)
+                {
+                    ViewBag.Error = "Email này đã được sử dụng bởi một tài khoản khác.";
+                    return View(customer);
+                }
+                customer.Email = email.Trim();
+                Session["CustomerEmail"] = customer.Email;
+            }
+
+            customer.PhoneNumber = phoneNumber?.Trim();
+            customer.Gender = gender;
+            customer.DateOfBirth = dateOfBirth;
+
+            db.SaveChanges();
+
+            Session["FullName"] = customer.FullName;
+            TempData["SuccessMessage"] = "Cập nhật thông tin tài khoản thành công!";
+
+            return View(customer);
+        }
+
+        [HttpPost]
+        public ActionResult UploadAvatar(System.Web.HttpPostedFileBase avatarFile)
+        {
+            EnsureAvatarColumnExists();
+
+            if (Session["CustomerId"] == null)
+            {
+                return Json(new { success = false, message = "Bạn chưa đăng nhập." });
+            }
+
+            if (avatarFile == null || avatarFile.ContentLength == 0)
+            {
+                return Json(new { success = false, message = "Vui lòng chọn file hình ảnh hợp lệ." });
+            }
+
+            try
+            {
+                var cloudinaryHelper = new PandoraWeb.Helpers.CloudinaryHelper();
+                string uploadedUrl = cloudinaryHelper.UploadImage(avatarFile);
+
+                if (!string.IsNullOrEmpty(uploadedUrl))
+                {
+                    int customerId = (int)Session["CustomerId"];
+                    var customer = db.Customers.Find(customerId);
+                    if (customer != null)
+                    {
+                        customer.AvatarUrl = uploadedUrl;
+                        db.SaveChanges();
+
+                        string resolvedUrl = PandoraWeb.Helpers.ImageHelper.GetImageUrl(uploadedUrl, "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop");
+                        Session["AvatarUrl"] = resolvedUrl;
+
+                        return Json(new { success = true, avatarUrl = resolvedUrl, message = "Đã tải lên ảnh đại diện thành công!" });
+                    }
+                }
+                return Json(new { success = false, message = "Không thể lưu hình ảnh." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
 
         public ActionResult Logout()
@@ -117,9 +249,145 @@ namespace PandoraWeb.Controllers
 
         public ActionResult ChangePassword()
         {
+            if (Session["CustomerId"] == null && Session["EmployeeId"] == null)
+            {
+                return RedirectToAction("Login");
+            }
             ViewBag.ActiveMenu = "ChangePassword";
             ViewBag.Title = "Đổi Mật Khẩu";
             return View();
+        }
+
+        [HttpPost]
+        public ActionResult ChangePassword(string currentPassword, string newPassword, string confirmPassword)
+        {
+            if (Session["CustomerId"] == null && Session["EmployeeId"] == null)
+            {
+                return RedirectToAction("Login");
+            }
+            ViewBag.ActiveMenu = "ChangePassword";
+            ViewBag.Title = "Đổi Mật Khẩu";
+
+            if (string.IsNullOrWhiteSpace(currentPassword) || string.IsNullOrWhiteSpace(newPassword) || string.IsNullOrWhiteSpace(confirmPassword))
+            {
+                ViewBag.Error = "Vui lòng nhập đầy đủ các trường thông tin.";
+                return View();
+            }
+
+            if (newPassword.Length < 6)
+            {
+                ViewBag.Error = "Mật khẩu mới phải có ít nhất 6 ký tự.";
+                return View();
+            }
+
+            if (newPassword != confirmPassword)
+            {
+                ViewBag.Error = "Mật khẩu mới và mật khẩu xác nhận không khớp.";
+                return View();
+            }
+
+            if (Session["CustomerId"] != null)
+            {
+                int customerId = (int)Session["CustomerId"];
+                var customer = db.Customers.Find(customerId);
+                if (customer != null)
+                {
+                    if (customer.PasswordHash != currentPassword)
+                    {
+                        ViewBag.Error = "Mật khẩu hiện tại không chính xác.";
+                        return View();
+                    }
+                    customer.PasswordHash = newPassword;
+                    db.SaveChanges();
+                    ViewBag.Success = "Đổi mật khẩu tài khoản thành công!";
+                    return View();
+                }
+            }
+            else if (Session["EmployeeId"] != null)
+            {
+                int empId = (int)Session["EmployeeId"];
+                var emp = db.Employees.Find(empId);
+                if (emp != null)
+                {
+                    if (emp.PasswordHash != currentPassword)
+                    {
+                        ViewBag.Error = "Mật khẩu hiện tại không chính xác.";
+                        return View();
+                    }
+                    emp.PasswordHash = newPassword;
+                    db.SaveChanges();
+                    ViewBag.Success = "Đổi mật khẩu tài khoản quản trị thành công!";
+                    return View();
+                }
+            }
+
+            return RedirectToAction("Login");
+        }
+
+        public ActionResult ForgotPassword()
+        {
+            ViewBag.ActiveMenu = "ForgotPassword";
+            ViewBag.Title = "Quên Mật Khẩu";
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult ForgotPassword(string loginId, string newPassword, string confirmPassword)
+        {
+            ViewBag.ActiveMenu = "ForgotPassword";
+            ViewBag.Title = "Quên Mật Khẩu";
+
+            if (string.IsNullOrWhiteSpace(loginId))
+            {
+                ViewBag.Error = "Vui lòng nhập Email hoặc Số điện thoại tài khoản của bạn.";
+                return View();
+            }
+
+            string target = loginId.Trim();
+            var customer = db.Customers.FirstOrDefault(c => c.Email == target || c.PhoneNumber == target);
+            var employee = db.Employees.FirstOrDefault(e => e.Email == target);
+
+            if (customer == null && employee == null)
+            {
+                ViewBag.Error = "Không tìm thấy tài khoản tương ứng với thông tin bạn đã nhập.";
+                ViewBag.LoginId = target;
+                return View();
+            }
+
+            string accName = customer != null ? customer.FullName : employee.FullName;
+            ViewBag.AccountFound = true;
+            ViewBag.LoginId = target;
+            ViewBag.AccountName = accName;
+
+            if (string.IsNullOrWhiteSpace(newPassword))
+            {
+                return View();
+            }
+
+            if (newPassword.Length < 6)
+            {
+                ViewBag.Error = "Mật khẩu mới phải có ít nhất 6 ký tự.";
+                return View();
+            }
+
+            if (newPassword != confirmPassword)
+            {
+                ViewBag.Error = "Mật khẩu xác nhận không khớp.";
+                return View();
+            }
+
+            if (customer != null)
+            {
+                customer.PasswordHash = newPassword;
+            }
+            else if (employee != null)
+            {
+                employee.PasswordHash = newPassword;
+            }
+
+            db.SaveChanges();
+            TempData["SuccessMessage"] = "Đặt lại mật khẩu thành công! Vui lòng đăng nhập với mật khẩu mới.";
+            return RedirectToAction("Login");
         }
 
         public ActionResult Address()

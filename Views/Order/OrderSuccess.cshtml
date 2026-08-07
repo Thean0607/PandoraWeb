@@ -1,75 +1,123 @@
+@model PandoraWeb.Models.Order
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewBag.Title = "OrderSuccess";
+    ViewBag.Title = "Đặt Hàng Thành Công - Pandora";
 }
 
 <!-- Success Content -->
-    <div class="container py-5 mt-5 bg-light min-vh-100 d-flex justify-content-center align-items-center">
-        <div class="card border-0 shadow-sm p-4 p-md-5 w-100 mt-5" style="max-width: 600px;">
-            <div class="text-center mb-4">
-                <div class="rounded-circle bg-success text-white d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                    <i class="fas fa-check fs-1"></i>
-                </div>
-                <h2 class="font-serif text-success mb-2">Đặt Hàng Thành Công!</h2>
-                <p class="text-muted">Cảm ơn bạn đã lựa chọn Pandora. Đơn hàng của bạn đã được xác nhận và đang trong quá trình xử lý.</p>
+<div class="container py-5 mt-5 bg-light min-vh-100 d-flex justify-content-center align-items-center">
+    <div class="card border-0 shadow-sm p-4 p-md-5 w-100 mt-4" style="max-width: 680px;">
+        <div class="text-center mb-4">
+            <div class="rounded-circle bg-success text-white d-inline-flex align-items-center justify-content-center mb-3 shadow" style="width: 75px; height: 75px;">
+                <i class="fas fa-check fs-1"></i>
             </div>
+            <h2 class="font-serif text-success mb-2">Đặt Hàng Thành Công!</h2>
+            <p class="text-muted mb-2">Cảm ơn bạn đã lựa chọn trang sức Pandora. Đơn hàng của bạn đã được tiếp nhận và xử lý thành công.</p>
+            @if (Model != null && Model.Customer != null && !string.IsNullOrEmpty(Model.Customer.Email))
+            {
+                <div class="alert alert-warning border-0 bg-light-gold text-dark py-2 px-3 my-2 d-inline-block rounded-pill shadow-sm fs-7">
+                    <i class="fas fa-paper-plane text-primary-gold me-2"></i>
+                    Email xác nhận chi tiết đơn hàng đã được gửi tới: <strong>@Model.Customer.Email</strong>
+                </div>
+            }
+        </div>
 
-            <div class="bg-secondary-soft p-4 rounded mb-4">
-                <div class="d-flex justify-content-between mb-2">
+        @if (Model != null)
+        {
+            <div class="bg-white p-4 rounded border shadow-sm mb-4">
+                <div class="d-flex justify-content-between align-items-center pb-3 mb-3 border-bottom">
                     <span class="text-muted">Mã đơn hàng:</span>
-                    <span class="fw-bold">#PAN847291</span>
+                    <span class="fw-bold fs-5 text-primary-gold">#PAN@(Model.OrderId)</span>
                 </div>
                 <div class="d-flex justify-content-between mb-2">
-                    <span class="text-muted">Ngày đặt:</span>
-                    <span class="fw-bold">@DateTime.Now.ToString("dd/MM/yyyy")</span>
+                    <span class="text-muted">Thời gian đặt:</span>
+                    <span class="fw-bold">@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</span>
                 </div>
+                @if (Model.ShippingAddress != null)
+                {
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Người nhận:</span>
+                        <span class="fw-bold">@Model.ShippingAddress.ReceiverName (@Model.ShippingAddress.PhoneNumber)</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Địa chỉ giao:</span>
+                        <span class="fw-bold text-end" style="max-width: 300px;">@Model.ShippingAddress.StreetAddress</span>
+                    </div>
+                }
                 <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Phương thức thanh toán:</span>
+                    <span class="fw-bold">@(Model.PaymentMethod == "BANK" ? "Chuyển khoản ngân hàng" : "Thanh toán khi nhận hàng (COD)")</span>
+                </div>
+                <div class="d-flex justify-content-between pt-2 border-top">
                     <span class="text-muted">Tổng thanh toán:</span>
-                    <span class="fw-bold text-primary-gold fs-5">22,400,000 ₫</span>
-                </div>
-                <div class="d-flex justify-content-between">
-                    <span class="text-muted">Phương thức:</span>
-                    <span class="fw-bold">Thanh toán khi nhận hàng (COD)</span>
+                    <span class="fw-bold text-primary-gold fs-4">@Model.TotalAmount.ToString("N0") ₫</span>
                 </div>
             </div>
 
-            <div class="mb-5">
-                <h5 class="font-serif mb-4 text-center">Các bước tiếp theo</h5>
-                <div class="d-flex mb-3">
-                    <div class="text-primary-gold me-3 mt-1">
-                        <i class="fas fa-envelope fs-4"></i>
-                    </div>
-                    <div>
-                        <div class="fw-bold">Xác nhận Email</div>
-                        <p class="text-muted small mb-0">Một email xác nhận chi tiết đơn hàng đã được gửi đến email của bạn.</p>
-                    </div>
-                </div>
-                <div class="d-flex mb-3">
-                    <div class="text-primary-gold me-3 mt-1">
-                        <i class="fas fa-box fs-4"></i>
-                    </div>
-                    <div>
-                        <div class="fw-bold">Chuẩn bị hàng</div>
-                        <p class="text-muted small mb-0">Chúng tôi sẽ đóng gói sản phẩm cẩn thận trong hộp quà Pandora tiêu chuẩn.</p>
+            if (Model.OrderItems != null && Model.OrderItems.Any())
+            {
+                <div class="mb-4">
+                    <h6 class="font-serif fw-bold mb-3 border-bottom pb-2">Chi tiết sản phẩm đã đặt</h6>
+                    <div class="list-group list-group-flush">
+                        @foreach (var item in Model.OrderItems)
+                        {
+                            var prodName = item.Variant != null && item.Variant.Product != null ? item.Variant.Product.ProductName : "Sản phẩm Pandora";
+                            <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-bold fs-7">@prodName</div>
+                                    <small class="text-muted">Số lượng: @item.Quantity x @item.UnitPrice.ToString("N0") ₫</small>
+                                </div>
+                                <div class="fw-bold text-dark fs-7">@((item.Quantity * item.UnitPrice).ToString("N0")) ₫</div>
+                            </div>
+                        }
                     </div>
                 </div>
-                <div class="d-flex mb-3">
-                    <div class="text-primary-gold me-3 mt-1">
-                        <i class="fas fa-truck fs-4"></i>
-                    </div>
-                    <div>
-                        <div class="fw-bold">Giao hàng</div>
-                        <p class="text-muted small mb-0">Thời gian giao hàng dự kiến từ 2-3 ngày làm việc.</p>
-                    </div>
+            }
+        }
+        else
+        {
+            <div class="bg-white p-4 rounded border mb-4 text-center">
+                <p class="text-muted mb-0">Thông tin đơn hàng đã được khởi tạo thành công.</p>
+            </div>
+        }
+
+        <div class="mb-4 bg-light p-3 rounded">
+            <h6 class="font-serif mb-3 text-center fw-bold">Các bước tiếp theo</h6>
+            <div class="d-flex mb-3">
+                <div class="text-primary-gold me-3 mt-1">
+                    <i class="fas fa-envelope-open-text fs-5"></i>
+                </div>
+                <div>
+                    <div class="fw-bold fs-7">Xác nhận đơn hàng qua Email</div>
+                    <p class="text-muted small mb-0">Hệ thống đã tự động gửi email thông báo chi tiết đơn hàng tới <strong>@(Model?.Customer?.Email ?? "email của bạn")</strong>. Vui lòng kiểm tra hộp thư của bạn.</p>
                 </div>
             </div>
-
-            <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center mt-auto">
-                <a href="@Url.Action("Orders", "Order")" class="btn btn-outline-gold px-4 py-2">Xem Đơn Hàng</a>
-                <a href="@Url.Action("Category", "Product")" class="btn btn-gold px-4 py-2">Tiếp Tục Mua Sắm</a>
+            <div class="d-flex mb-3">
+                <div class="text-primary-gold me-3 mt-1">
+                    <i class="fas fa-box fs-5"></i>
+                </div>
+                <div>
+                    <div class="fw-bold fs-7">Đóng gói cao cấp</div>
+                    <p class="text-muted small mb-0">Sản phẩm được đóng gói trang trọng trong hộp quà Pandora chuẩn hãng.</p>
+                </div>
+            </div>
+            <div class="d-flex">
+                <div class="text-primary-gold me-3 mt-1">
+                    <i class="fas fa-truck fs-5"></i>
+                </div>
+                <div>
+                    <div class="fw-bold fs-7">Giao hàng tận nơi</div>
+                    <p class="text-muted small mb-0">Thời gian vận chuyển từ 2-4 ngày làm việc trên toàn quốc.</p>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Footer Minimal -->
+        <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center mt-auto">
+            <a href="@Url.Action("Orders", "Order")" class="btn btn-outline-gold px-3 py-2 fw-bold">Quản Lý Đơn Hàng</a>
+            <a href="@Url.Action("Lookup", "Order")" class="btn btn-outline-secondary px-3 py-2 fw-bold">Tra Cứu Đơn Hàng</a>
+            <a href="@Url.Action("Category", "Product")" class="btn btn-gold px-3 py-2 fw-bold">Tiếp Tục Mua Sắm</a>
+        </div>
+    </div>
+</div>
+
 

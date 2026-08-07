@@ -40,14 +40,13 @@
             {
                 foreach (var item in Model)
                 {
-                    <tr data-id="@item.CollectionId" data-name="@item.CollectionName" data-desc="@item.Description" data-image="@item.ImageUrl">
+                    var resolvedImgUrl = PandoraWeb.Helpers.ImageHelper.GetImageUrl(item.ImageUrl, "~/assets/img/collections/default.jpg");
+                    var rawImgUrl = PandoraWeb.Helpers.ImageHelper.GetImageUrl(item.ImageUrl, "");
+                    <tr data-id="@item.CollectionId" data-name="@item.CollectionName" data-desc="@item.Description" data-image="@rawImgUrl">
                         <td>#@item.CollectionId</td>
                         <td>
                             <div class="d-flex align-items-center">
-                                @if (!string.IsNullOrEmpty(item.ImageUrl))
-                                {
-                                    <img src="~/@item.ImageUrl" alt="@item.CollectionName" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; margin-right: 15px;">
-                                }
+                                <img src="@resolvedImgUrl" alt="@item.CollectionName" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; margin-right: 15px;" onerror="this.onerror=null; this.src='@Url.Content("~/assets/img/collections/default.jpg")';">
                                 <strong>@item.CollectionName</strong>
                             </div>
                         </td>
@@ -94,7 +93,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Hình Ảnh (Cover)</label>
-                        <input type="file" class="form-control" name="imageFile" id="collectionImage" accept="image/*">
+                        <input type="file" class="form-control" name="imageFile" id="collectionImage" accept="image/*, .png, .jpg, .jpeg, .gif, .webp, .svg, .bmp, .ico, .tiff, .avif, .heic, *">
                         <div class="mt-2 text-center d-none" id="imagePreviewContainer">
                             <img src="" id="imagePreview" alt="Preview" style="max-height: 120px; border-radius: 8px; border: 1px solid var(--admin-border);">
                         </div>
@@ -155,7 +154,7 @@
             const previewImg = document.getElementById('imagePreview');
             
             if (tr.dataset.image) {
-                previewImg.src = '/' + tr.dataset.image;
+                previewImg.src = tr.dataset.image;
                 previewContainer.classList.remove('d-none');
             } else {
                 previewContainer.classList.add('d-none');

@@ -1,0 +1,347 @@
+﻿
+--- TOC and body [170-265] ---
+ 170| ''
+ 171| ''
+ 172| ''
+ 173| 'MỤC LỤC'
+ 174| '(Bold, size 14)'
+ 175| ''
+ 176| 'Lời mở đầu: (size 13)'
+ 177| 'Chương 1...................................................1'
+ 178| '1.1................................................................1'
+ 179| '1.1.1'
+ 180| '1.1.2'
+ 181| '1.1.3'
+ 182| '1.2 7'
+ 183| '1.2.1'
+ 184| '1.2.2'
+ 185| '….'
+ 186| 'Chương 230'
+ 187| '2.130'
+ 188| '2.1.1'
+ 189| '2.1.2'
+ 190| '….'
+ 191| 'KẾT LUẬN 120'
+ 192| 'PHỤ LỤC122'
+ 193| 'DANH MỤC TÀI LIỆU TAM KHẢO127'
+ 194| 'Ghi chú:'
+ 195| '- In đậm và in hoa tiêu đề của các chương, mục lớn'
+ 196| '- Chữ số thứ nhất chỉ thứ tự chương'
+ 197| '- Chữ số thứ 2 chỉ thứ tự mục trong chương'
+ 198| '- Chữ số thứ 3,…, chỉ thứ tự các tiểu mục'
+ 199| ''
+ 200| '(Mẫu)'
+ 201| 'DANH MỤC BẢNG, HÌNH'
+ 202| '(In đậm, in hoa, size14)'
+ 203| ''
+ 204| 'Bảng 1.1 (size 13)'
+ 205| 'Bảng 1.2'
+ 206| '…'
+ 207| 'Hình 1.1'
+ 208| '…….....................................................................'
+ 209| '……......................................................................'
+ 210| ''
+ 211| ''
+ 212| 'Ghi chú:'
+ 213| 'Xếp sau trang Mục lục'
+ 214| 'Số thứ nhất chỉ số thự tự chương'
+ 215| 'Số thứ hai chỉ thứ tự bảng biểu trong mỗi chương'
+ 216| 'Tên đề của bảng biểu nằm phía trên của bảng phải có ghi chú, giải thích, nêu rõ nguồn trích hoặc sao chụp'
+ 217| '(Mẫu)'
+ 218| 'DANH MỤC HÌNH'
+ 219| '(In đậm, in hoa, size14)'
+ 220| ''
+ 221| 'Hình 1.1'
+ 222| 'Hình 1.2'
+ 223| '…'
+ 224| ''
+ 225| ''
+ 226| 'Ghi chú:'
+ 227| 'Xếp sau trang Mục lục'
+ 228| 'Số thứ nhất chỉ số thự tự chương'
+ 229| 'Số thứ hai chỉ thứ tự hình,…trong mỗi chương'
+ 230| 'Ở cuối mỗi hình, trong mỗi chương phải có ghi chú, giải thích, nêu rõ nguồn trích hoặc sao chụp,…'
+ 231| 'Tên của hình (đồ thị, hình vẽ) đặt ở bên dưới hình (đồ thị, hình vẽ)'
+ 232| '(Mẫu)'
+ 233| 'KÍ HIỆU CÁC CỤM TỪ VIẾT TẮT (size 14)'
+ 234| '(Được xếp sau trang Danh mục Các bảng biểu, hình)'
+ 235| ''
+ 236| ''
+ 237| ''
+ 238| ''
+ 239| ''
+ 240| 'Ghi chú:'
+ 241| 'Cụm từ viết viết tắt là các chữ cái và các ký hiệu thay chữ được viết liền nhau, để thay cho một cụm từ có nghĩa thường được lặp nhiều lần trong văn bản hoặc được mọi người mặc nhiên chấp nhận, xếp theo thự tự ABC'
+ 242| ''
+ 243| '(Mẫu)'
+ 244| 'Trình bày mỗi trang của đồ án, tiểu luận'
+ 245| 'Bắt đầu đánh số trang từ chương 1, in đậm tiêu đề các chương, các mục'
+ 246| ''
+ 247| 'CHƯƠNG 1 (bold, size 16-)'
+ 248| 'Tên chương (bold, size 16-)'
+ 249| ''
+ 250| 'Nội dung size13…'
+ 251| '(Mẫu)'
+ 252| 'PHỤ LỤC'
+ 253| '(Đánh số trang riêng)'
+ 254| '(Mẫu)'
+ 255| 'DANH MỤC TÀI LIỆU THAM KHẢO'
+ 256| ''
+ 257| '1. Nguyễn Văn An (2005), An cư với lạc nghiệp, Nhà xuất bản Văn hóa Thông tin, Hà Nội.'
+ 258| '2. Nguyễn Văn Bằng (2007), Chi tiết máy, NXB Đại học bách khoa Hà Nội, lưu hành nội bộ.'
+ 259| '……………….'
+ 260| ''
+ 261| ''
+ 262| 'Ghi chú:'
+ 263| 'Danh mục tài liệu tham khảo tiếng việt phải xếp theo abc tên tác giả, năm xuất bản, tên tài liệu, nơi phát hành'
+ 264| 'Danh mục tài liệu tham khảo tiếng anh xếp theo tên họ và vần ABC tên tác giả, năm xuất bản, tên tài liệu, nơi phát hành'
+ 265| 'Danh mục tài liệu tham khảo trên internet tên tác giả, năm xuất bản, tên tài liệu, nơi phát hành và đường liên kết (link) ngày , tháng, năm truy cập;'
+
+--- Instructions [1-41] ---
+   1| '(Mẫu)'
+   2| 'HƯỚNG DẪN'
+   3| 'TRÌNH BÀY TIỂU LUẬN – ĐỒ ÁN'
+   4| ''
+   5| 'Trang bìa (xem mẫu kèm theo) hình thức: bìa tiểu luận học phần  màu trắng, đồ án cơ sở màu xanh lá, đồ án chuyên ngành màu vàng, (số lượng cuốn theo quy định của khoa)'
+   6| 'Trang bìa trong (xem mẫu đính kèm)'
+   7| 'Trang phiếu chấm Tiểu luận/ Đồ án (xem mẫu kèm theo)'
+   8| 'Giảng viên hướng dẫn nhận xét và cho điểm các vấn đề:'
+   9| 'Cấu trúc của báo cáo'
+  10| 'Cơ sở lý luận'
+  11| 'Tính thực tiễn và khả năng ứng dụng của tiểu luận tốt nghiệp.'
+  12| 'Các hướng nghiên cứu của đề tài có thể tiếp tục phát triển cao hơn.'
+  13| 'Kết quả: Đạt ở mức nào (hoặc không đạt) - cho điểm vào trang phiếu chấm này.'
+  14| 'Trang Mục lục (xem mẫu kèm theo)'
+  15| 'Trang Danh mục các bảng biểu, hình,.. (xem mẫu kèm theo)'
+  16| 'Danh mục chữ viết tắt (xếp theo thứ tự ABC)'
+  17| 'Tờ nhiệm vụ (bản chính)'
+  18| 'Nội dung chính (xem mẫu đính kèm)'
+  19| 'Phụ lục đưa vào sau trang cuối cùng của chương cuối cùng của đồ án, tiểu luận (xem mẫu kèm theo)'
+  20| 'Cách thể hiện đồ án, tiểu luận (xem các mẫu kèm theo)'
+  21| 'Đồ án, tiểu luận viết trên khổ giấy  A4'
+  22| 'Bìa là loại giấy cứng khổ giấy A4'
+  23| 'Logo trường được lưu tại đường link của phòng đào tạo đặt ở ở giữa, nửa phía trên của trang bìa và trang bìa lót (xem các mẫu kèm theo)'
+  24| 'Đồ án, tiểu luận đóng bằng đinh bấm, bọc gáy, không được đóng bằng lò xo - đục lỗ'
+  25| 'Mỗi trang đươc trình bày theo quy định  (xem mẫu kèm theo)'
+  26| 'Chữ viết ở các trang của đồ án, tiểu luận là size 13, Font Times New Roman,   không được dùng các kiểu chữ dạng thư p háp.'
+  27| 'Chữ in màu đen; hình vẽ, đồ thị, lô gô của trường ĐH Nguyễn Tất Thành có thể in màu.'
+  28| 'Viết theo chương, mục, các tiểu mục. (không viết theo phần rồi mới đến chương,  mục, tiểu mục,…)'
+  29| 'Cách đánh số các chương mục, tiểu mục phải theo quy định (xem mẫu kèm theo)'
+  30| 'Canh lề trái 3,5cm; lề phải  2cm; lề trên 2,5cm; lề dưới 2,5cm'
+  31| 'Khoảng cách dòng 1,5 line'
+  32| 'Số chương, Số lượng trang "nội dung khoa học của đề tài" theo quy định của khoa'
+  33| 'Từ trang sau "Bìa lót" đến trước trang "Chương 1" đánh số thứ tự La mã thường'
+  34| 'Từ trang chương 1 đánh số thứ tự bình thường'
+  35| 'Vị trí đánh số trang ở giữa phía dưới'
+  36| 'Các chú thích phải đánh số và viết ghi chú ở cuối mỗi trang.'
+  37| 'Tài liệu tham khảo bắt buộc phải ghi, đưa vào sau phụ lục, xếp theo thứ tự abc'
+  38| 'Hạn chế viết tắt, nếu phải viết tắt phải mở ngoặc và đóng ngoặc (…) để giải nghĩa ngay từ các chữ viết tắt đầu tiên, sau đó liệt kê thành trang, đưa vào sau các trang danh mục các bảng, biểu, hình,…'
+  39| ''
+  40| ''
+  41| ''
+
+--- Loi cam on / loi mo dau [115-125] ---
+ 115| '(Mẫu)'
+ 116| 'LỜI CẢM ƠN'
+ 117| '(bold, size 14, xếp sau trang lời mở đầu)'
+ 118| ''
+ 119| ''
+ 120| ''
+ 121| 'Nội dung size13'
+ 122| ''
+ 123| ''
+ 124| ''
+ 125| ''
+
+--- Chuong 1 and refs [240-267] ---
+ 240| 'Ghi chú:'
+ 241| 'Cụm từ viết viết tắt là các chữ cái và các ký hiệu thay chữ được viết liền nhau, để thay cho một cụm từ có nghĩa thường được lặp nhiều lần trong văn bản hoặc được mọi người mặc nhiên chấp nhận, xếp theo thự tự ABC'
+ 242| ''
+ 243| '(Mẫu)'
+ 244| 'Trình bày mỗi trang của đồ án, tiểu luận'
+ 245| 'Bắt đầu đánh số trang từ chương 1, in đậm tiêu đề các chương, các mục'
+ 246| ''
+ 247| 'CHƯƠNG 1 (bold, size 16-)'
+ 248| 'Tên chương (bold, size 16-)'
+ 249| ''
+ 250| 'Nội dung size13…'
+ 251| '(Mẫu)'
+ 252| 'PHỤ LỤC'
+ 253| '(Đánh số trang riêng)'
+ 254| '(Mẫu)'
+ 255| 'DANH MỤC TÀI LIỆU THAM KHẢO'
+ 256| ''
+ 257| '1. Nguyễn Văn An (2005), An cư với lạc nghiệp, Nhà xuất bản Văn hóa Thông tin, Hà Nội.'
+ 258| '2. Nguyễn Văn Bằng (2007), Chi tiết máy, NXB Đại học bách khoa Hà Nội, lưu hành nội bộ.'
+ 259| '……………….'
+ 260| ''
+ 261| ''
+ 262| 'Ghi chú:'
+ 263| 'Danh mục tài liệu tham khảo tiếng việt phải xếp theo abc tên tác giả, năm xuất bản, tên tài liệu, nơi phát hành'
+ 264| 'Danh mục tài liệu tham khảo tiếng anh xếp theo tên họ và vần ABC tên tác giả, năm xuất bản, tên tài liệu, nơi phát hành'
+ 265| 'Danh mục tài liệu tham khảo trên internet tên tác giả, năm xuất bản, tên tài liệu, nơi phát hành và đường liên kết (link) ngày , tháng, năm truy cập;'
+ 266| 'Danh mục tài liệu tham khảo xếp cuối cùng, sau các trang phụ lục'
+ 267| ''
+
+--- STRUCTURAL LINES (filtered) ---
+   2| HƯỚNG DẪN
+   3| TRÌNH BÀY TIỂU LUẬN – ĐỒ ÁN
+   8| Giảng viên hướng dẫn nhận xét và cho điểm các vấn đề:
+  14| Trang Mục lục (xem mẫu kèm theo)
+  15| Trang Danh mục các bảng biểu, hình,.. (xem mẫu kèm theo)
+  16| Danh mục chữ viết tắt (xếp theo thứ tự ABC)
+  17| Tờ nhiệm vụ (bản chính)
+  19| Phụ lục đưa vào sau trang cuối cùng của chương cuối cùng của đồ án, tiểu luận (xem mẫu kèm theo)
+  25| Mỗi trang đươc trình bày theo quy định  (xem mẫu kèm theo)
+  28| Viết theo chương, mục, các tiểu mục. (không viết theo phần rồi mới đến chương,  mục, tiểu mục,…)
+  29| Cách đánh số các chương mục, tiểu mục phải theo quy định (xem mẫu kèm theo)
+  32| Số chương, Số lượng trang "nội dung khoa học của đề tài" theo quy định của khoa
+  33| Từ trang sau "Bìa lót" đến trước trang "Chương 1" đánh số thứ tự La mã thường
+  34| Từ trang chương 1 đánh số thứ tự bình thường
+  37| Tài liệu tham khảo bắt buộc phải ghi, đưa vào sau phụ lục, xếp theo thứ tự abc
+  38| Hạn chế viết tắt, nếu phải viết tắt phải mở ngoặc và đóng ngoặc (…) để giải nghĩa ngay từ các chữ viết tắt đầu tiên, sau đó liệt kê thành trang, đưa vào sau các trang danh mục các bảng, biểu, hình,…
+  67| Giảng viên hướng dẫn:………………… (Bold, size 14, in hoa)
+ 100| Giảng viên hướng dẫn:………………… (Bold, size 14, in hoa)
+ 116| LỜI CẢM ƠN
+ 117| (bold, size 14, xếp sau trang lời mở đầu)
+ 159| 3. Tham gia đóng góp:
+ 160| 4. Tham gia đóng góp:
+ 173| MỤC LỤC
+ 176| Lời mở đầu: (size 13)
+ 177| Chương 1...................................................1
+ 178| 1.1................................................................1
+ 179| 1.1.1
+ 180| 1.1.2
+ 181| 1.1.3
+ 182| 1.2 7
+ 183| 1.2.1
+ 184| 1.2.2
+ 186| Chương 230
+ 187| 2.130
+ 188| 2.1.1
+ 189| 2.1.2
+ 191| KẾT LUẬN 120
+ 192| PHỤ LỤC122
+ 193| DANH MỤC TÀI LIỆU TAM KHẢO127
+ 195| - In đậm và in hoa tiêu đề của các chương, mục lớn
+ 196| - Chữ số thứ nhất chỉ thứ tự chương
+ 197| - Chữ số thứ 2 chỉ thứ tự mục trong chương
+ 201| DANH MỤC BẢNG, HÌNH
+ 213| Xếp sau trang Mục lục
+ 214| Số thứ nhất chỉ số thự tự chương
+ 215| Số thứ hai chỉ thứ tự bảng biểu trong mỗi chương
+ 218| DANH MỤC HÌNH
+ 227| Xếp sau trang Mục lục
+ 228| Số thứ nhất chỉ số thự tự chương
+ 229| Số thứ hai chỉ thứ tự hình,…trong mỗi chương
+ 230| Ở cuối mỗi hình, trong mỗi chương phải có ghi chú, giải thích, nêu rõ nguồn trích hoặc sao chụp,…
+ 234| (Được xếp sau trang Danh mục Các bảng biểu, hình)
+ 244| Trình bày mỗi trang của đồ án, tiểu luận
+ 245| Bắt đầu đánh số trang từ chương 1, in đậm tiêu đề các chương, các mục
+ 247| CHƯƠNG 1 (bold, size 16-)
+ 248| Tên chương (bold, size 16-)
+ 252| PHỤ LỤC
+ 255| DANH MỤC TÀI LIỆU THAM KHẢO
+ 257| 1. Nguyễn Văn An (2005), An cư với lạc nghiệp, Nhà xuất bản Văn hóa Thông tin, Hà Nội.
+ 258| 2. Nguyễn Văn Bằng (2007), Chi tiết máy, NXB Đại học bách khoa Hà Nội, lưu hành nội bộ.
+ 263| Danh mục tài liệu tham khảo tiếng việt phải xếp theo abc tên tác giả, năm xuất bản, tên tài liệu, nơi phát hành
+ 264| Danh mục tài liệu tham khảo tiếng anh xếp theo tên họ và vần ABC tên tác giả, năm xuất bản, tên tài liệu, nơi phát hành
+ 265| Danh mục tài liệu tham khảo trên internet tên tác giả, năm xuất bản, tên tài liệu, nơi phát hành và đường liên kết (link) ngày , tháng, năm truy cập;
+ 266| Danh mục tài liệu tham khảo xếp cuối cùng, sau các trang phụ lục
+
+--- BETWEEN 'Lời mở đầu' and 'CHƯƠNG 1' ---
+ 176| Lời mở đầu: (size 13)
+ 177| 'Chương 1...................................................1'
+ 178| '1.1................................................................1'
+ 179| '1.1.1'
+ 180| '1.1.2'
+ 181| '1.1.3'
+ 182| '1.2 7'
+ 183| '1.2.1'
+ 184| '1.2.2'
+ 185| '….'
+ 186| 'Chương 230'
+ 187| '2.130'
+ 188| '2.1.1'
+ 189| '2.1.2'
+ 190| '….'
+ 191| 'KẾT LUẬN 120'
+ 192| 'PHỤ LỤC122'
+ 193| 'DANH MỤC TÀI LIỆU TAM KHẢO127'
+ 194| 'Ghi chú:'
+ 195| '- In đậm và in hoa tiêu đề của các chương, mục lớn'
+ 196| '- Chữ số thứ nhất chỉ thứ tự chương'
+ 197| '- Chữ số thứ 2 chỉ thứ tự mục trong chương'
+ 198| '- Chữ số thứ 3,…, chỉ thứ tự các tiểu mục'
+ 199| ''
+ 200| '(Mẫu)'
+ 201| 'DANH MỤC BẢNG, HÌNH'
+ 202| '(In đậm, in hoa, size14)'
+ 203| ''
+ 204| 'Bảng 1.1 (size 13)'
+ 205| 'Bảng 1.2'
+ 206| '…'
+ 207| 'Hình 1.1'
+ 208| '…….....................................................................'
+ 209| '……......................................................................'
+ 210| ''
+ 211| ''
+ 212| 'Ghi chú:'
+ 213| 'Xếp sau trang Mục lục'
+ 214| 'Số thứ nhất chỉ số thự tự chương'
+ 215| 'Số thứ hai chỉ thứ tự bảng biểu trong mỗi chương'
+ 216| 'Tên đề của bảng biểu nằm phía trên của bảng phải có ghi chú, giải thích, nêu rõ nguồn trích hoặc sao chụp'
+ 217| '(Mẫu)'
+ 218| 'DANH MỤC HÌNH'
+ 219| '(In đậm, in hoa, size14)'
+ 220| ''
+ 221| 'Hình 1.1'
+ 222| 'Hình 1.2'
+ 223| '…'
+ 224| ''
+ 225| ''
+ 226| 'Ghi chú:'
+ 227| 'Xếp sau trang Mục lục'
+ 228| 'Số thứ nhất chỉ số thự tự chương'
+ 229| 'Số thứ hai chỉ thứ tự hình,…trong mỗi chương'
+ 230| 'Ở cuối mỗi hình, trong mỗi chương phải có ghi chú, giải thích, nêu rõ nguồn trích hoặc sao chụp,…'
+ 231| 'Tên của hình (đồ thị, hình vẽ) đặt ở bên dưới hình (đồ thị, hình vẽ)'
+ 232| '(Mẫu)'
+ 233| 'KÍ HIỆU CÁC CỤM TỪ VIẾT TẮT (size 14)'
+ 234| '(Được xếp sau trang Danh mục Các bảng biểu, hình)'
+ 235| ''
+ 236| ''
+ 237| ''
+ 238| ''
+ 239| ''
+ 240| 'Ghi chú:'
+ 241| 'Cụm từ viết viết tắt là các chữ cái và các ký hiệu thay chữ được viết liền nhau, để thay cho một cụm từ có nghĩa thường được lặp nhiều lần trong văn bản hoặc được mọi người mặc nhiên chấp nhận, xếp theo thự tự ABC'
+ 242| ''
+ 243| '(Mẫu)'
+ 244| 'Trình bày mỗi trang của đồ án, tiểu luận'
+ 245| 'Bắt đầu đánh số trang từ chương 1, in đậm tiêu đề các chương, các mục'
+ 246| ''
+ 247| CHƯƠNG 1 (bold, size 16-)
+
+--- CHƯƠNG 1 section until CHƯƠNG 2 ---
+ 247| 'CHƯƠNG 1 (bold, size 16-)'
+ 248| 'Tên chương (bold, size 16-)'
+ 249| ''
+ 250| 'Nội dung size13…'
+ 251| '(Mẫu)'
+ 252| 'PHỤ LỤC'
+ 253| '(Đánh số trang riêng)'
+ 254| '(Mẫu)'
+ 255| 'DANH MỤC TÀI LIỆU THAM KHẢO'
+ 256| ''
+ 257| '1. Nguyễn Văn An (2005), An cư với lạc nghiệp, Nhà xuất bản Văn hóa Thông tin, Hà Nội.'
+ 258| '2. Nguyễn Văn Bằng (2007), Chi tiết máy, NXB Đại học bách khoa Hà Nội, lưu hành nội bộ.'
+ 259| '……………….'
+ 260| ''
+ 261| ''
+ 262| 'Ghi chú:'
+ 263| 'Danh mục tài liệu tham khảo tiếng việt phải xếp theo abc tên tác giả, năm xuất bản, tên tài liệu, nơi phát hành'
+ 264| 'Danh mục tài liệu tham khảo tiếng anh xếp theo tên họ và vần ABC tên tác giả, năm xuất bản, tên tài liệu, nơi phát hành'
+ 265| 'Danh mục tài liệu tham khảo trên internet tên tác giả, năm xuất bản, tên tài liệu, nơi phát hành và đường liên kết (link) ngày , tháng, năm truy cập;'
+ 266| 'Danh mục tài liệu tham khảo xếp cuối cùng, sau các trang phụ lục'
+ 267| ''

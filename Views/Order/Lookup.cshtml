@@ -1,0 +1,149 @@
+@model PandoraWeb.Models.Order
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Tra Cứu Đơn Hàng - Pandora";
+    string orderIdVal = ViewBag.OrderIdVal as string ?? "";
+    string searchKeyVal = ViewBag.SearchKeyVal as string ?? "";
+}
+
+<div class="breadcrumb-wrap mt-5 pt-5 mb-4">
+    <div class="container mt-4">
+        <h1 class="breadcrumb-title font-serif text-center">Tra Cứu Đơn Hàng</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb justify-content-center">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Trang Chủ</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Tra Cứu Đơn Hàng</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Search Form Card -->
+            <div class="card border-0 shadow-sm p-4 p-md-5 mb-4">
+                <h4 class="font-serif mb-3 text-center"><i class="fas fa-search text-primary-gold me-2"></i>Tra cứu thông tin đơn hàng</h4>
+                <p class="text-muted text-center fs-7 mb-4">Nhập Mã đơn hàng và Số điện thoại hoặc Email bạn đã sử dụng khi đặt hàng để tra cứu tiến độ đơn hàng nhanh chóng.</p>
+
+                @if (ViewBag.ErrorMessage != null)
+                {
+                    <div class="alert alert-danger text-center mb-4">
+                        <i class="fas fa-exclamation-triangle me-2"></i>@ViewBag.ErrorMessage
+                    </div>
+                }
+
+                <form action="@Url.Action("Lookup", "Order")" method="post">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold fs-7">Mã đơn hàng <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control py-2" name="orderId" value="@orderIdVal" placeholder="Ví dụ: #PAN1 hoặc 1" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold fs-7">Số điện thoại hoặc Email <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control py-2" name="searchKey" value="@searchKeyVal" placeholder="SĐT hoặc Email đã đặt hàng" required>
+                        </div>
+                        <div class="col-12 text-center mt-4">
+                            <button type="submit" class="btn btn-gold px-5 py-2 fw-bold">
+                                <i class="fas fa-search me-2"></i>Tra Cứu Ngay
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Result Card -->
+            @if (Model != null)
+            {
+                string statusClass = "bg-warning text-dark";
+                string statusText = Model.OrderStatus ?? "Chờ xử lý";
+                if (Model.OrderStatus == "Shipped" || Model.OrderStatus == "Delivered")
+                {
+                    statusClass = "bg-success";
+                    statusText = "Đã giao hàng";
+                }
+                else if (Model.OrderStatus == "Cancelled")
+                {
+                    statusClass = "bg-danger";
+                    statusText = "Đã hủy";
+                }
+                else if (Model.OrderStatus == "Processing")
+                {
+                    statusClass = "bg-info text-dark";
+                    statusText = "Đang xử lý";
+                }
+
+                <div class="card border-0 shadow-sm p-4 p-md-5 bg-white">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 mb-4 border-bottom">
+                        <div>
+                            <h4 class="font-serif mb-1">Chi Tiết Đơn Hàng <span class="text-primary-gold">#PAN@(Model.OrderId)</span></h4>
+                            <small class="text-muted">Ngày đặt: @Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</small>
+                        </div>
+                        <div>
+                            <span class="badge @statusClass fs-6 px-3 py-2">@statusText</span>
+                        </div>
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <h6 class="font-serif fw-bold text-dark mb-2">Thông tin người nhận</h6>
+                            <p class="mb-1 fs-7"><strong>Họ tên:</strong> @(Model.ShippingAddress != null ? Model.ShippingAddress.ReceiverName : (Model.Customer != null ? Model.Customer.FullName : "Khách hàng"))</p>
+                            <p class="mb-1 fs-7"><strong>Số điện thoại:</strong> @(Model.ShippingAddress != null ? Model.ShippingAddress.PhoneNumber : (Model.Customer != null ? Model.Customer.PhoneNumber : ""))</p>
+                            <p class="mb-1 fs-7"><strong>Email:</strong> @(Model.Customer != null ? Model.Customer.Email : "")</p>
+                            <p class="mb-0 fs-7"><strong>Địa chỉ giao:</strong> @(Model.ShippingAddress != null ? Model.ShippingAddress.StreetAddress : "")</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="font-serif fw-bold text-dark mb-2">Thanh toán & Ghi chú</h6>
+                            <p class="mb-1 fs-7"><strong>Phương thức thanh toán:</strong> @(Model.PaymentMethod == "BANK" ? "Chuyển khoản ngân hàng" : "Thanh toán khi nhận hàng (COD)")</p>
+                            <p class="mb-1 fs-7"><strong>Trạng thái thanh toán:</strong> @(Model.PaymentStatus == "Paid" ? "Đã thanh toán" : "Chờ thanh toán")</p>
+                            @if (!string.IsNullOrEmpty(Model.Notes))
+                            {
+                                <p class="mb-0 fs-7"><strong>Ghi chú:</strong> @Model.Notes</p>
+                            }
+                        </div>
+                    </div>
+
+                    <h6 class="font-serif fw-bold text-dark mb-3">Danh sách sản phẩm đã đặt</h6>
+                    <div class="table-responsive mb-4">
+                        <table class="table align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Sản phẩm</th>
+                                    <th class="text-center">Số lượng</th>
+                                    <th class="text-end">Đơn giá</th>
+                                    <th class="text-end">Thành tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.OrderItems != null && Model.OrderItems.Any())
+                                {
+                                    foreach (var item in Model.OrderItems)
+                                    {
+                                        var prodName = item.Variant != null && item.Variant.Product != null ? item.Variant.Product.ProductName : "Sản phẩm Pandora";
+                                        var lineTotal = item.Quantity * item.UnitPrice;
+                                        <tr>
+                                            <td class="fw-bold font-serif fs-7">@prodName</td>
+                                            <td class="text-center">@item.Quantity</td>
+                                            <td class="text-end fs-7">@item.UnitPrice.ToString("N0") ₫</td>
+                                            <td class="text-end fw-bold text-dark fs-7">@lineTotal.ToString("N0") ₫</td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" class="text-end text-muted">Phí vận chuyển:</td>
+                                    <td class="text-end text-success fw-bold">Miễn phí</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" class="text-end fw-bold fs-6">Tổng thanh toán:</td>
+                                    <td class="text-end fw-bold text-primary-gold fs-5">@Model.TotalAmount.ToString("N0") ₫</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

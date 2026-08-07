@@ -182,6 +182,8 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\CloudinaryHelper.cs" />
+    <Compile Include="Helpers\EmailHelper.cs" />
+    <Compile Include="Helpers\ImageHelper.cs" />
     <Compile Include="ViewModels\HomeViewModel.cs" />
     <Compile Include="Migrations\202607040217415_AddCMSModels.cs" />
     <Compile Include="Migrations\202607040217415_AddCMSModels.Designer.cs">
@@ -299,6 +301,7 @@
     <Content Include="Views\Shared\_AdminLayout.cshtml" />
     <Content Include="Views\Account\Address.cshtml" />
     <Content Include="Views\Account\ChangePassword.cshtml" />
+    <Content Include="Views\Account\ForgotPassword.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Account\Profile.cshtml" />
     <Content Include="Views\Account\Signup.cshtml" />

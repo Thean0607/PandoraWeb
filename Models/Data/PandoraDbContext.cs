@@ -7,6 +7,7 @@ namespace PandoraWeb.Models.Data
         // Truyền tên chuỗi kết nối vào DbContext constructor
         public PandoraDbContext() : base("name=PandoraConnectionString")
         {
+            Database.SetInitializer<PandoraDbContext>(null);
         }
 
         public DbSet<Role> Roles { get; set; }

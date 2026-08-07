@@ -34,6 +34,9 @@ namespace PandoraWeb.Models
         [StringLength(20)]
         public string Status { get; set; } // active, inactive
 
+        [StringLength(500)]
+        public string AvatarUrl { get; set; }
+
         public DateTime CreatedAt { get; set; }
 
         public virtual ICollection<Order> Orders { get; set; }

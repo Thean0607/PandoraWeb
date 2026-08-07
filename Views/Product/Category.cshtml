@@ -98,7 +98,7 @@
                                     <div class="product-card">
                                         <div class="product-img-wrapper">
                                             <a href="@Url.Action("ProductDetail", "Product", new { id = item.ProductId })">
-                                                <img src="~/@item.ImageUrl" onerror="this.src='https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=600'" alt="@item.ProductName">
+                                                <img src="@PandoraWeb.Helpers.ImageHelper.GetImageUrl(item.ImageUrl, "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=600")" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=600'" alt="@item.ProductName">
                                             </a>
                                             <div class="product-action">
                                                 <a href="javascript:void(0);" class="action-btn btn-add-cart" data-pid="@item.ProductId" title="Thêm vào giỏ hàng"><i class="fas fa-shopping-cart"></i></a>

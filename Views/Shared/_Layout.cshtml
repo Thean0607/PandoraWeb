@@ -49,6 +49,9 @@
                     <li class="nav-item">
                         <a class="nav-link @(ViewBag.ActiveMenu == "Contact" ? "active" : "")" href="@Url.Action("Contact", "Home")">Liên Hệ</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewBag.ActiveMenu == "Lookup" ? "active" : "")" href="@Url.Action("Lookup", "Order")">Tra Cứu Đơn Hàng</a>
+                    </li>
 
                 </ul>
                 <div class="d-flex align-items-center mt-3 mt-lg-0">

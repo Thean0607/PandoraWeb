@@ -1,7 +1,7 @@
 @model List<PandoraWeb.ViewModels.CartItemVM>
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewBag.Title = "Checkout";
+    ViewBag.Title = "Thanh Toán - Pandora";
     decimal subTotal = Model != null ? Model.Sum(x => x.Total) : 0;
     
     var customer = ViewBag.Customer as PandoraWeb.Models.Customer;
@@ -13,54 +13,73 @@
     string addrVal = address != null ? $"{address.StreetAddress}, {address.Ward}, {address.District}, {address.City}".Trim(new char[] { ',', ' ' }) : "";
 }
 
-<div class="container mt-4 pb-5">
+<div class="container mt-5 pt-4 pb-5">
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (customer == null)
+    {
+        <div class="alert alert-info border-0 shadow-sm d-flex align-items-center mb-4 p-3 rounded" style="background-color: #f0f7ff;">
+            <i class="fas fa-user-clock text-primary fs-3 me-3"></i>
+            <div class="flex-grow-1">
+                <strong class="d-block text-dark">Đặt hàng nhanh không cần đăng nhập (Khách vãng lai)</strong>
+                <small class="text-muted">Bạn có thể nhập thông tin để chốt đơn ngay. Hoặc <a href="@Url.Action("Login", "Account")" class="fw-bold text-primary text-decoration-none">Đăng nhập ngay</a> để tích điểm thành viên và quản lý đơn hàng tốt hơn.</small>
+            </div>
+        </div>
+    }
+
     <div class="row">
         <!-- Checkout Form -->
         <div class="col-lg-8 mb-4">
             <div class="card border-0 shadow-sm p-4 mb-4">
-                <h4 class="font-serif mb-4">1. Thông tin giao hàng</h4>
-                <form class="checkout-form" id="form-checkout" action="@Url.Action("Checkout", "Order")" method="post" novalidate>
+                <h4 class="font-serif mb-4 pb-2 border-bottom"><i class="fas fa-shipping-fast text-primary-gold me-2"></i>1. Thông tin giao hàng</h4>
+                <form class="checkout-form" id="form-checkout" action="@Url.Action("Checkout", "Order")" method="post">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label">Họ và tên</label>
-                            <input type="text" class="form-control" name="fullName" value="@nameVal" placeholder="Nhập họ tên" required>
+                            <label class="form-label fw-bold fs-7">Họ và tên <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control py-2" name="fullName" value="@nameVal" placeholder="Nhập họ và tên người nhận" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Số điện thoại</label>
-                            <input type="tel" class="form-control" name="phone" value="@phoneVal" placeholder="Nhập số điện thoại" required>
+                            <label class="form-label fw-bold fs-7">Số điện thoại <span class="text-danger">*</span></label>
+                            <input type="tel" class="form-control py-2" name="phone" value="@phoneVal" placeholder="Nhập số điện thoại" required>
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Địa chỉ email</label>
-                            <input type="email" class="form-control" name="email" value="@emailVal" placeholder="Nhập email" required>
+                            <label class="form-label fw-bold fs-7">Địa chỉ email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control py-2" name="email" value="@emailVal" placeholder="Nhập địa chỉ email nhận thông tin đơn hàng" required>
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Địa chỉ giao hàng</label>
-                            <input type="text" class="form-control" name="address" value="@addrVal" placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố" required>
+                            <label class="form-label fw-bold fs-7">Địa chỉ nhận hàng chi tiết <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control py-2" name="address" value="@addrVal" placeholder="Số nhà, tên đường, Phường/Xã, Quận/Huyện, Tỉnh/Thành phố" required>
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Ghi chú đơn hàng (Tùy chọn)</label>
-                            <textarea class="form-control" name="notes" rows="3" placeholder="Ghi chú về thời gian giao hàng hoặc lời nhắn"></textarea>
+                            <label class="form-label fw-bold fs-7">Ghi chú đơn hàng (Tùy chọn)</label>
+                            <textarea class="form-control" name="notes" rows="3" placeholder="Lời nhắn cho cửa hàng hoặc chỉ dẫn giao hàng..."></textarea>
                         </div>
                     </div>
 
-                    <h4 class="font-serif mb-4 mt-5">2. Phương thức thanh toán</h4>
-                    <div class="form-check mb-3 p-3 border rounded">
-                        <input class="form-check-input ms-1" type="radio" name="paymentMethod" value="COD" id="cod" checked>
-                        <label class="form-check-label ms-2 d-flex align-items-center" for="cod">
-                            <i class="fas fa-money-bill-wave text-success fs-4 me-3"></i>
+                    <h4 class="font-serif mb-4 mt-5 pb-2 border-bottom"><i class="fas fa-credit-card text-primary-gold me-2"></i>2. Phương thức thanh toán</h4>
+                    <div class="form-check mb-3 p-3 border rounded shadow-sm hover-shadow transition">
+                        <input class="form-check-input ms-1 mt-2" type="radio" name="paymentMethod" value="COD" id="cod" checked>
+                        <label class="form-check-label ms-3 d-flex align-items-center w-100 cursor-pointer" for="cod">
+                            <i class="fas fa-money-bill-wave text-success fs-3 me-3"></i>
                             <div>
-                                <h6 class="mb-0">Thanh toán khi nhận hàng (COD)</h6>
-                                <small class="text-muted">Thanh toán bằng tiền mặt khi giao hàng.</small>
+                                <h6 class="mb-0 fw-bold">Thanh toán khi nhận hàng (COD)</h6>
+                                <small class="text-muted">Thanh toán bằng tiền mặt trực tiếp cho nhân viên giao hàng.</small>
                             </div>
                         </label>
                     </div>
-                    <div class="form-check mb-3 p-3 border rounded">
-                        <input class="form-check-input ms-1" type="radio" name="paymentMethod" value="BANK" id="bank">
-                        <label class="form-check-label ms-2 d-flex align-items-center" for="bank">
-                            <i class="fas fa-university text-primary fs-4 me-3"></i>
+                    <div class="form-check mb-3 p-3 border rounded shadow-sm hover-shadow transition">
+                        <input class="form-check-input ms-1 mt-2" type="radio" name="paymentMethod" value="BANK" id="bank">
+                        <label class="form-check-label ms-3 d-flex align-items-center w-100 cursor-pointer" for="bank">
+                            <i class="fas fa-university text-primary fs-3 me-3"></i>
                             <div>
-                                <h6 class="mb-0">Chuyển khoản ngân hàng</h6>
-                                <small class="text-muted">Chuyển khoản an toàn qua hệ thống NAPAS 247.</small>
+                                <h6 class="mb-0 fw-bold">Chuyển khoản ngân hàng (NAPAS 247 / QR Code)</h6>
+                                <small class="text-muted">Chuyển khoản qua mã QR ngân hàng tiện lợi & nhanh chóng.</small>
                             </div>
                         </label>
                     </div>
@@ -71,48 +90,62 @@
         <!-- Order Summary Sidebar -->
         <div class="col-lg-4">
             <div class="card border-0 shadow-sm p-4 sticky-top" style="top: 100px;">
-                <h5 class="font-serif mb-4">Đơn Hàng Của Bạn (@Model.Count sản phẩm)</h5>
+                <h5 class="font-serif mb-4 pb-2 border-bottom">Đơn Hàng Của Bạn (@(Model != null ? Model.Count : 0) sản phẩm)</h5>
                 
                 <!-- Order Items Mini -->
-                <div class="mb-4">
-                    @foreach (var item in Model)
+                <div class="mb-4" style="max-height: 280px; overflow-y: auto;">
+                    @if (Model != null && Model.Any())
                     {
-                        <div class="d-flex align-items-center mb-3">
-                            <img src="@(!string.IsNullOrEmpty(item.ImageUrl) ? Url.Content("~/" + item.ImageUrl) : "https://images.unsplash.com/photo-1605100804763-247f67b2548e?q=80&w=80")" class="rounded" style="width: 60px;" alt="@item.ProductName">
-                            <div class="ms-3 flex-grow-1">
-                                <h6 class="mb-0 fs-7 text-truncate" style="max-width: 150px;">@item.ProductName</h6>
-                                <span class="text-muted fs-8">SL: @item.Quantity</span>
+                        foreach (var item in Model)
+                        {
+                            string imgSrc = PandoraWeb.Helpers.ImageHelper.GetImageUrl(item.ImageUrl, "https://images.unsplash.com/photo-1605100804763-247f67b2548e?q=80&w=80");
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="@imgSrc" class="rounded object-fit-cover" style="width: 55px; height: 55px;" alt="@item.ProductName" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1605100804763-247f67b2548e?q=80&w=80';">
+                                <div class="ms-3 flex-grow-1">
+                                    <h6 class="mb-0 fs-7 text-truncate font-serif" style="max-width: 150px;" title="@item.ProductName">@item.ProductName</h6>
+                                    @if (!string.IsNullOrEmpty(item.Size) || !string.IsNullOrEmpty(item.Material))
+                                    {
+                                        <small class="text-muted fs-8 d-block">
+                                            @(!string.IsNullOrEmpty(item.Size) ? "Size: " + item.Size : "")
+                                            @(!string.IsNullOrEmpty(item.Material) ? " | " + item.Material : "")
+                                        </small>
+                                    }
+                                    <span class="text-muted fs-8">SL: @item.Quantity</span>
+                                </div>
+                                <div class="text-end ms-2">
+                                    <strong class="fs-7 text-dark">@item.Total.ToString("N0") ₫</strong>
+                                </div>
                             </div>
-                            <div class="text-end">
-                                <strong class="fs-7">@item.Total.ToString("N0") ₫</strong>
-                            </div>
-                        </div>
+                        }
                     }
                 </div>
                 
                 <hr>
 
-                <div class="d-flex justify-content-between mb-2">
+                <div class="d-flex justify-content-between mb-2 fs-7">
                     <span class="text-muted">Tạm tính</span>
-                    <span>@subTotal.ToString("N0") ₫</span>
+                    <span class="fw-bold">@subTotal.ToString("N0") ₫</span>
                 </div>
-                <div class="d-flex justify-content-between mb-2">
+                <div class="d-flex justify-content-between mb-2 fs-7">
                     <span class="text-muted">Phí vận chuyển</span>
-                    <span class="text-success">Miễn phí</span>
+                    <span class="text-success fw-bold">Miễn phí</span>
                 </div>
-                <div class="d-flex justify-content-between mb-2">
+                <div class="d-flex justify-content-between mb-2 fs-7">
                     <span class="text-muted">Giảm giá</span>
                     <span class="text-danger">-0 ₫</span>
                 </div>
                 <hr>
                 <div class="d-flex justify-content-between mb-4">
-                    <strong class="fs-5">Tổng cộng</strong>
+                    <strong class="fs-5">Tổng thanh toán</strong>
                     <strong class="fs-5 text-primary-gold">@subTotal.ToString("N0") ₫</strong>
                 </div>
 
-                <button type="submit" form="form-checkout" class="btn btn-gold w-100 py-3 mb-3">ĐẶT HÀNG</button>
-                <p class="text-center text-muted fs-8 mb-0">Bằng việc đặt hàng, bạn đồng ý với <a href="#" class="text-dark">Điều khoản & Điều kiện</a> của Pandora.</p>
+                <button type="submit" form="form-checkout" class="btn btn-gold w-100 py-3 mb-3 fw-bold tracking-wider fs-6 shadow-sm">
+                    <i class="fas fa-check-circle me-2"></i>ĐẶT HÀNG NGAY
+                </button>
+                <p class="text-center text-muted fs-8 mb-0">Bằng việc nhấn đặt hàng, bạn đồng ý với <a href="#" class="text-dark">Điều khoản & Điều kiện</a> dịch vụ Pandora.</p>
             </div>
         </div>
     </div>
 </div>
+
