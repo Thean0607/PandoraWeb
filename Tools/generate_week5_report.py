@@ -13,6 +13,7 @@ if str(DOCS_SCRIPTS) not in sys.path:
     sys.path.append(str(DOCS_SCRIPTS))
 
 try:
+    # pyrefly: ignore [missing-import]
     from table_geometry import apply_table_geometry
 except ImportError:
     def apply_table_geometry(table, widths_dxa, **kwargs):

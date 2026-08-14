@@ -6,7 +6,7 @@
 
     <!-- Hero Section Carousel -->
     <div class="container mb-5">
-        <div id="heroCarousel" class="carousel slide rounded-4 overflow-hidden" data-bs-ride="carousel" data-bs-interval="3000" style="box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+        <div id="heroCarousel" class="carousel slide rounded-4 overflow-hidden" data-bs-interval="5000" style="box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
             @if(Model.Banners != null && Model.Banners.Any())
             {
                 <div class="carousel-indicators">
@@ -19,14 +19,16 @@
                     @{ int j = 0; }
                     @foreach (var banner in Model.Banners)
                     {
-                        var imgUrl = banner.ImageUrl != null && banner.ImageUrl.StartsWith("http") ? banner.ImageUrl : Url.Content("~/" + banner.ImageUrl);
-                        <div class="carousel-item @(j == 0 ? "active" : "") hero-section">
-                            <img src="@imgUrl" alt="@banner.Title" class="hero-img">
-                            <div class="container-fluid h-100 d-flex align-items-center position-relative z-3">
-                                <div class="hero-content mx-3 mx-md-5">
-                                    <h1 class="hero-title">@banner.Title</h1>
-                                    <p class="hero-subtitle">Khám phá bộ sưu tập mới nhất với các thiết kế tinh xảo.</p>
-                                    <a href="@(string.IsNullOrEmpty(banner.LinkUrl) ? Url.Action("Category", "Product") : banner.LinkUrl)" class="btn btn-gold">Mua Ngay</a>
+                        var imgUrl = PandoraWeb.Helpers.ImageHelper.GetImageUrl(banner.ImageUrl, "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=2000&auto=format&fit=crop");
+                        <div class="carousel-item @(j == 0 ? "active" : "")" data-bs-interval="5000">
+                            <div class="hero-section w-100 h-100">
+                                <img src="@imgUrl" alt="@banner.Title" class="hero-img">
+                                <div class="container-fluid h-100 d-flex align-items-center position-relative z-3">
+                                    <div class="hero-content mx-3 mx-md-5">
+                                        <h1 class="hero-title">@banner.Title</h1>
+                                        <p class="hero-subtitle">Khám phá bộ sưu tập mới nhất với các thiết kế tinh xảo.</p>
+                                        <a href="@(string.IsNullOrEmpty(banner.LinkUrl) ? Url.Action("Category", "Product") : banner.LinkUrl)" class="btn btn-gold">Mua Ngay</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -42,24 +44,28 @@
                 </div>
                 <div class="carousel-inner">
                     <!-- Slide 1 -->
-                    <div class="carousel-item active hero-section">
-                        <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=2000&auto=format&fit=crop" alt="Hero Banner 1" class="hero-img">
-                        <div class="container-fluid h-100 d-flex align-items-center position-relative z-3">
-                            <div class="hero-content mx-3 mx-md-5">
-                                <h1 class="hero-title">Elegance in Every Detail</h1>
-                                <p class="hero-subtitle">Khám phá bộ sưu tập mùa xuân mới nhất với các thiết kế tinh xảo, tôn vinh vẻ đẹp vĩnh cửu.</p>
-                                <a href="@Url.Action("Category", "Product")" class="btn btn-gold">Mua Ngay</a>
+                    <div class="carousel-item active" data-bs-interval="5000">
+                        <div class="hero-section w-100 h-100">
+                            <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=2000&auto=format&fit=crop" alt="Hero Banner 1" class="hero-img">
+                            <div class="container-fluid h-100 d-flex align-items-center position-relative z-3">
+                                <div class="hero-content mx-3 mx-md-5">
+                                    <h1 class="hero-title">Elegance in Every Detail</h1>
+                                    <p class="hero-subtitle">Khám phá bộ sưu tập mùa xuân mới nhất với các thiết kế tinh xảo, tôn vinh vẻ đẹp vĩnh cửu.</p>
+                                    <a href="@Url.Action("Category", "Product")" class="btn btn-gold">Mua Ngay</a>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <!-- Slide 2 -->
-                    <div class="carousel-item hero-section">
-                        <img src="https://images.unsplash.com/photo-1599643478514-4a4e02632616?q=80&w=2000&auto=format&fit=crop" alt="Hero Banner 2" class="hero-img">
-                        <div class="container-fluid h-100 d-flex align-items-center position-relative z-3">
-                            <div class="hero-content mx-3 mx-md-5">
-                                <h1 class="hero-title">Timeless Classics</h1>
-                                <p class="hero-subtitle">Mỗi món trang sức là một câu chuyện tình yêu. Hãy để chúng tôi kể câu chuyện của bạn.</p>
-                                <a href="@Url.Action("Category", "Product")" class="btn btn-gold">Khám Phá Thêm</a>
+                    <div class="carousel-item" data-bs-interval="5000">
+                        <div class="hero-section w-100 h-100">
+                            <img src="https://images.unsplash.com/photo-1599643478514-4a4e02632616?q=80&w=2000&auto=format&fit=crop" alt="Hero Banner 2" class="hero-img">
+                            <div class="container-fluid h-100 d-flex align-items-center position-relative z-3">
+                                <div class="hero-content mx-3 mx-md-5">
+                                    <h1 class="hero-title">Timeless Classics</h1>
+                                    <p class="hero-subtitle">Mỗi món trang sức là một câu chuyện tình yêu. Hãy để chúng tôi kể câu chuyện của bạn.</p>
+                                    <a href="@Url.Action("Category", "Product")" class="btn btn-gold">Khám Phá Thêm</a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -181,13 +187,17 @@
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            var heroCarousel = document.getElementById('heroCarousel');
-            if(heroCarousel) {
-                var carousel = new bootstrap.Carousel(heroCarousel, {
-                    interval: 3000,
-                    ride: 'carousel'
-                });
-                carousel.cycle();
+            var heroCarouselEl = document.getElementById('heroCarousel');
+            if (heroCarouselEl) {
+                var carouselInstance = bootstrap.Carousel.getInstance(heroCarouselEl);
+                if (!carouselInstance) {
+                    carouselInstance = new bootstrap.Carousel(heroCarouselEl, {
+                        interval: 5000,
+                        touch: true,
+                        pause: 'hover'
+                    });
+                }
+                carouselInstance.cycle();
             }
         });
     </script>

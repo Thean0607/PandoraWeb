@@ -10,7 +10,24 @@
     string nameVal = customer != null ? customer.FullName : "";
     string phoneVal = customer != null ? customer.PhoneNumber : "";
     string emailVal = customer != null ? customer.Email : "";
-    string addrVal = address != null ? $"{address.StreetAddress}, {address.Ward}, {address.District}, {address.City}".Trim(new char[] { ',', ' ' }) : "";
+
+    string cityVal = address != null && !string.IsNullOrEmpty(address.City) && address.City != "Thành phố" ? address.City : "";
+    string distVal = address != null && !string.IsNullOrEmpty(address.District) && address.District != "Quận/Huyện" ? address.District : "";
+    string wardVal = address != null && !string.IsNullOrEmpty(address.Ward) && address.Ward != "Phường/Xã" ? address.Ward : "";
+    string streetVal = address != null ? address.StreetAddress : "";
+
+    if (streetVal.Contains(",") && string.IsNullOrEmpty(cityVal))
+    {
+        var parts = streetVal.Split(',');
+        if (parts.Length >= 4)
+        {
+            streetVal = parts[0].Trim();
+            wardVal = parts[1].Trim();
+            distVal = parts[2].Trim();
+            cityVal = parts[3].Trim();
+        }
+    }
+    string addrVal = address != null ? $"{streetVal}, {wardVal}, {distVal}, {cityVal}".Trim(new char[] { ',', ' ' }) : "";
 }
 
 <div class="container mt-5 pt-4 pb-5">
@@ -52,9 +69,28 @@
                             <label class="form-label fw-bold fs-7">Địa chỉ email <span class="text-danger">*</span></label>
                             <input type="email" class="form-control py-2" name="email" value="@emailVal" placeholder="Nhập địa chỉ email nhận thông tin đơn hàng" required>
                         </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold fs-7">Tỉnh / Thành phố <span class="text-danger">*</span></label>
+                            <select class="form-select py-2" id="citySelect" name="city" required>
+                                <option value="">-- Chọn Tỉnh / Thành phố --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold fs-7">Quận / Huyện <span class="text-danger">*</span></label>
+                            <select class="form-select py-2" id="districtSelect" name="district" required disabled>
+                                <option value="">-- Chọn Quận / Huyện --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold fs-7">Phường / Xã / Thị trấn <span class="text-danger">*</span></label>
+                            <select class="form-select py-2" id="wardSelect" name="ward" required disabled>
+                                <option value="">-- Chọn Phường / Xã / Thị trấn --</option>
+                            </select>
+                        </div>
                         <div class="col-12">
-                            <label class="form-label fw-bold fs-7">Địa chỉ nhận hàng chi tiết <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control py-2" name="address" value="@addrVal" placeholder="Số nhà, tên đường, Phường/Xã, Quận/Huyện, Tỉnh/Thành phố" required>
+                            <label class="form-label fw-bold fs-7">Địa chỉ cụ thể (Số nhà, Tên đường, Thôn / Ấp / Xóm) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control py-2" id="streetInput" name="street" value="@streetVal" placeholder="VD: Số 123 Đường Nguyễn Huệ, Thôn 1..." required minlength="4">
+                            <input type="hidden" name="address" id="fullAddressInput" value="@addrVal">
                         </div>
                         <div class="col-12">
                             <label class="form-label fw-bold fs-7">Ghi chú đơn hàng (Tùy chọn)</label>
@@ -148,4 +184,154 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var citySelect = document.getElementById('citySelect');
+        var districtSelect = document.getElementById('districtSelect');
+        var wardSelect = document.getElementById('wardSelect');
+
+        var savedCity = "@Html.Raw(cityVal)";
+        var savedDist = "@Html.Raw(distVal)";
+        var savedWard = "@Html.Raw(wardVal)";
+
+        // 1. Load 63 Tỉnh / Thành phố Việt Nam
+        fetch('https://esgoo.net/api-tinhthanh/1/0.htm')
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.error === 0) {
+                    data.data.forEach(function(item) {
+                        var opt = document.createElement('option');
+                        opt.value = item.full_name;
+                        opt.setAttribute('data-id', item.id);
+                        opt.textContent = item.full_name;
+                        if (savedCity && (item.full_name.includes(savedCity) || savedCity.includes(item.name))) {
+                            opt.selected = true;
+                        }
+                        citySelect.appendChild(opt);
+                    });
+
+                    if (citySelect.value) {
+                        var selectedOpt = citySelect.options[citySelect.selectedIndex];
+                        if (selectedOpt && selectedOpt.getAttribute('data-id')) {
+                            loadDistricts(selectedOpt.getAttribute('data-id'));
+                        }
+                    }
+                }
+            })
+            .catch(function(err) {
+                console.warn('API Tỉnh thành error:', err);
+            });
+
+        // 2. Chọn Tỉnh/Thành -> Load Quận/Huyện
+        if (citySelect) {
+            citySelect.addEventListener('change', function() {
+                var selectedOpt = citySelect.options[citySelect.selectedIndex];
+                var provinceId = selectedOpt ? selectedOpt.getAttribute('data-id') : null;
+
+                districtSelect.innerHTML = '<option value="">-- Chọn Quận / Huyện --</option>';
+                wardSelect.innerHTML = '<option value="">-- Chọn Phường / Xã / Thị trấn --</option>';
+                wardSelect.disabled = true;
+
+                if (provinceId) {
+                    loadDistricts(provinceId);
+                } else {
+                    districtSelect.disabled = true;
+                }
+            });
+        }
+
+        function loadDistricts(provinceId) {
+            districtSelect.disabled = false;
+            districtSelect.innerHTML = '<option value="">-- Đang tải Quận / Huyện... --</option>';
+
+            fetch('https://esgoo.net/api-tinhthanh/2/' + provinceId + '.htm')
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    districtSelect.innerHTML = '<option value="">-- Chọn Quận / Huyện --</option>';
+                    if (data.error === 0) {
+                        data.data.forEach(function(item) {
+                            var opt = document.createElement('option');
+                            opt.value = item.full_name;
+                            opt.setAttribute('data-id', item.id);
+                            opt.textContent = item.full_name;
+                            if (savedDist && (item.full_name.includes(savedDist) || savedDist.includes(item.name))) {
+                                opt.selected = true;
+                            }
+                            districtSelect.appendChild(opt);
+                        });
+
+                        if (districtSelect.value) {
+                            var selectedOpt = districtSelect.options[districtSelect.selectedIndex];
+                            if (selectedOpt && selectedOpt.getAttribute('data-id')) {
+                                loadWards(selectedOpt.getAttribute('data-id'));
+                            }
+                        }
+                    }
+                });
+        }
+
+        // 3. Chọn Quận/Huyện -> Load Phường/Xã
+        if (districtSelect) {
+            districtSelect.addEventListener('change', function() {
+                var selectedOpt = districtSelect.options[districtSelect.selectedIndex];
+                var districtId = selectedOpt ? selectedOpt.getAttribute('data-id') : null;
+
+                wardSelect.innerHTML = '<option value="">-- Chọn Phường / Xã / Thị trấn --</option>';
+
+                if (districtId) {
+                    loadWards(districtId);
+                } else {
+                    wardSelect.disabled = true;
+                }
+            });
+        }
+
+        function loadWards(districtId) {
+            wardSelect.disabled = false;
+            wardSelect.innerHTML = '<option value="">-- Đang tải Phường / Xã... --</option>';
+
+            fetch('https://esgoo.net/api-tinhthanh/3/' + districtId + '.htm')
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    wardSelect.innerHTML = '<option value="">-- Chọn Phường / Xã / Thị trấn --</option>';
+                    if (data.error === 0) {
+                        data.data.forEach(function(item) {
+                            var opt = document.createElement('option');
+                            opt.value = item.full_name;
+                            opt.setAttribute('data-id', item.id);
+                            opt.textContent = item.full_name;
+                            if (savedWard && (item.full_name.includes(savedWard) || savedWard.includes(item.name))) {
+                                opt.selected = true;
+                            }
+                            wardSelect.appendChild(opt);
+                        });
+                    }
+                });
+        }
+
+        // 4. Form Submit: Ghép chuỗi địa chỉ đầy đủ
+        var form = document.getElementById('form-checkout');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                var city = (citySelect ? citySelect.value : '').trim();
+                var dist = (districtSelect ? districtSelect.value : '').trim();
+                var ward = (wardSelect ? wardSelect.value : '').trim();
+                var street = (document.getElementById('streetInput') ? document.getElementById('streetInput').value : '').trim();
+
+                if (!city || !dist || !ward || street.length < 3) {
+                    e.preventDefault();
+                    alert('Vui lòng chọn đầy đủ Tỉnh/Thành phố, Quận/Huyện, Phường/Xã/Ấp và nhập Địa chỉ cụ thể.');
+                    return false;
+                }
+
+                var fullAddr = street + ', ' + ward + ', ' + dist + ', ' + city;
+                var hiddenInput = document.getElementById('fullAddressInput');
+                if (hiddenInput) {
+                    hiddenInput.value = fullAddr;
+                }
+            });
+        }
+    });
+</script>
 

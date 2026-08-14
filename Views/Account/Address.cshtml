@@ -1,6 +1,11 @@
+@model List<PandoraWeb.Models.Address>
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewBag.Title = "Address";
+    ViewBag.Title = "Sổ Địa Chỉ - Pandora";
+    var customer = ViewBag.Customer as PandoraWeb.Models.Customer;
+    string custName = customer != null ? customer.FullName : "Thành viên";
+    string defaultAvatar = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop";
+    string currentAvatar = Session["AvatarUrl"]?.ToString() ?? defaultAvatar;
 }
 
 <!-- Breadcrumb -->
@@ -37,8 +42,11 @@
                         <div class="offcanvas-body p-3 p-lg-0 flex-column">
                             <div class="card border-0 shadow-sm p-3 w-100">
                                 <div class="text-center mb-4 mt-3 d-none d-lg-block">
-                                    <h5 class="font-serif fw-bold mb-1">Nguyễn Văn A</h5>
-                                    <p class="text-muted fs-7 mb-0">Thành viên Bạc</p>
+                                    <div class="avatar-wrapper mx-auto mb-3" style="width: 80px; height: 80px;">
+                                        <img src="@currentAvatar" alt="Avatar" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;" onerror="this.onerror=null; this.src='@defaultAvatar';">
+                                    </div>
+                                    <h5 class="font-serif fw-bold mb-1">@custName</h5>
+                                    <p class="text-muted fs-7 mb-0">Thành viên Pandora</p>
                                 </div>
                                 <hr class="mt-0 mb-3 text-muted d-none d-lg-block">
                         <nav class="nav flex-column profile-sidebar">
@@ -59,21 +67,48 @@
                     <div class="card border-0 shadow-sm p-4 p-md-5">
                         <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
                             <h4 class="font-serif mb-0">Sổ Địa Chỉ</h4>
-                            <button class="btn btn-sm btn-gold"><i class="fas fa-plus me-1"></i> Thêm Địa Chỉ Mới</button>
+                            <button class="btn btn-sm btn-gold" data-bs-toggle="modal" data-bs-target="#addAddressModal"><i class="fas fa-plus me-1"></i> Thêm Địa Chỉ Mới</button>
                         </div>
-                        <div class="card border mb-3">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between">
-                                    <h6 class="mb-1 fw-bold">Nguyễn Văn A <span class="badge bg-success ms-2">Mặc định</span></h6>
-                                    <div>
-                                        <a href="#" class="text-primary-gold text-decoration-none me-3">Sửa</a>
-                                        <a href="#" class="text-danger text-decoration-none">Xóa</a>
+                        @if (TempData["SuccessMessage"] != null)
+                        {
+                            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                                <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        }
+                        @if (TempData["ErrorMessage"] != null)
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        }
+
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <div class="card border mb-3">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between">
+                                            <h6 class="mb-1 fw-bold">@custName @if (item.IsDefault) { <span class="badge bg-success ms-2">Mặc định</span> }</h6>
+                                            <div>
+                                                <a href="#" class="text-danger text-decoration-none ms-2">Xóa</a>
+                                            </div>
+                                        </div>
+                                        <p class="text-muted mb-1">@(customer?.PhoneNumber ?? "Chưa có SĐT")</p>
+                                        <p class="text-muted mb-0">@item.StreetAddress, @item.Ward, @item.District, @item.City</p>
                                     </div>
                                 </div>
-                                <p class="text-muted mb-1">0901234567</p>
-                                <p class="text-muted mb-0">123 Đường Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh</p>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <i class="far fa-address-book text-muted mb-3" style="font-size: 3rem;"></i>
+                                <p class="text-muted">Bạn chưa có địa chỉ giao hàng nào.</p>
                             </div>
-                        </div>
+                        }
 
                     </div>
                 </div>
@@ -81,5 +116,159 @@
         </div>
     </section>
 
-    <!-- Footer Minimal -->
+    <!-- Add Address Modal -->
+    <div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title font-serif fw-bold" id="addAddressModalLabel">Thêm Địa Chỉ Mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-address" method="post" action="@Url.Action("SaveAddress", "Account")">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold fs-7">Tỉnh / Thành phố <span class="text-danger">*</span></label>
+                                <select class="form-select py-2" id="citySelect" name="city" required>
+                                    <option value="">-- Chọn Tỉnh / Thành phố --</option>
+                                </select>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold fs-7">Quận / Huyện <span class="text-danger">*</span></label>
+                                <select class="form-select py-2" id="districtSelect" name="district" required disabled>
+                                    <option value="">-- Chọn Quận / Huyện --</option>
+                                </select>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold fs-7">Phường / Xã / Thị trấn <span class="text-danger">*</span></label>
+                                <select class="form-select py-2" id="wardSelect" name="ward" required disabled>
+                                    <option value="">-- Chọn Phường / Xã / Thị trấn --</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold fs-7">Địa chỉ cụ thể <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control py-2" id="streetInput" name="street" placeholder="Số nhà, Tên đường..." required minlength="4">
+                                <input type="hidden" name="fullAddress" id="fullAddressInput">
+                            </div>
+                            <div class="col-12 mt-4 text-end">
+                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
+                                <button type="submit" class="btn btn-gold px-4 fw-bold">Lưu Địa Chỉ</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
+@section Scripts {
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var citySelect = document.getElementById('citySelect');
+        var districtSelect = document.getElementById('districtSelect');
+        var wardSelect = document.getElementById('wardSelect');
+
+        // 1. Load 63 Tỉnh / Thành phố Việt Nam
+        fetch('https://esgoo.net/api-tinhthanh/1/0.htm')
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.error === 0) {
+                    data.data.forEach(function(item) {
+                        var opt = document.createElement('option');
+                        opt.value = item.full_name;
+                        opt.setAttribute('data-id', item.id);
+                        opt.textContent = item.full_name;
+                        citySelect.appendChild(opt);
+                    });
+                }
+            })
+            .catch(function(err) { console.warn('API Tỉnh thành error:', err); });
+
+        // 2. Chọn Tỉnh/Thành -> Load Quận/Huyện
+        if (citySelect) {
+            citySelect.addEventListener('change', function() {
+                var selectedOpt = citySelect.options[citySelect.selectedIndex];
+                var provinceId = selectedOpt ? selectedOpt.getAttribute('data-id') : null;
+
+                districtSelect.innerHTML = '<option value="">-- Chọn Quận / Huyện --</option>';
+                wardSelect.innerHTML = '<option value="">-- Chọn Phường / Xã / Thị trấn --</option>';
+                wardSelect.disabled = true;
+
+                if (provinceId) {
+                    districtSelect.disabled = false;
+                    districtSelect.innerHTML = '<option value="">-- Đang tải Quận / Huyện... --</option>';
+                    fetch('https://esgoo.net/api-tinhthanh/2/' + provinceId + '.htm')
+                        .then(function(res) { return res.json(); })
+                        .then(function(data) {
+                            districtSelect.innerHTML = '<option value="">-- Chọn Quận / Huyện --</option>';
+                            if (data.error === 0) {
+                                data.data.forEach(function(item) {
+                                    var opt = document.createElement('option');
+                                    opt.value = item.full_name;
+                                    opt.setAttribute('data-id', item.id);
+                                    opt.textContent = item.full_name;
+                                    districtSelect.appendChild(opt);
+                                });
+                            }
+                        });
+                } else {
+                    districtSelect.disabled = true;
+                }
+            });
+        }
+
+        // 3. Chọn Quận/Huyện -> Load Phường/Xã
+        if (districtSelect) {
+            districtSelect.addEventListener('change', function() {
+                var selectedOpt = districtSelect.options[districtSelect.selectedIndex];
+                var districtId = selectedOpt ? selectedOpt.getAttribute('data-id') : null;
+
+                wardSelect.innerHTML = '<option value="">-- Chọn Phường / Xã / Thị trấn --</option>';
+
+                if (districtId) {
+                    wardSelect.disabled = false;
+                    wardSelect.innerHTML = '<option value="">-- Đang tải Phường / Xã... --</option>';
+                    fetch('https://esgoo.net/api-tinhthanh/3/' + districtId + '.htm')
+                        .then(function(res) { return res.json(); })
+                        .then(function(data) {
+                            wardSelect.innerHTML = '<option value="">-- Chọn Phường / Xã / Thị trấn --</option>';
+                            if (data.error === 0) {
+                                data.data.forEach(function(item) {
+                                    var opt = document.createElement('option');
+                                    opt.value = item.full_name;
+                                    opt.setAttribute('data-id', item.id);
+                                    opt.textContent = item.full_name;
+                                    wardSelect.appendChild(opt);
+                                });
+                            }
+                        });
+                } else {
+                    wardSelect.disabled = true;
+                }
+            });
+        }
+
+        // 4. Form Submit
+        var form = document.getElementById('form-address');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                var city = (citySelect ? citySelect.value : '').trim();
+                var dist = (districtSelect ? districtSelect.value : '').trim();
+                var ward = (wardSelect ? wardSelect.value : '').trim();
+                var street = (document.getElementById('streetInput') ? document.getElementById('streetInput').value : '').trim();
+
+                if (!city || !dist || !ward || street.length < 3) {
+                    e.preventDefault();
+                    alert('Vui lòng chọn đầy đủ Tỉnh/Thành phố, Quận/Huyện, Phường/Xã và nhập Địa chỉ cụ thể.');
+                    return false;
+                }
+
+                var hiddenInput = document.getElementById('fullAddressInput');
+                if (hiddenInput) {
+                    hiddenInput.value = street + ', ' + ward + ', ' + dist + ', ' + city;
+                }
+            });
+        }
+    });
+</script>
+}

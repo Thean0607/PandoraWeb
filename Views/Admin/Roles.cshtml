@@ -1,3 +1,4 @@
+@model IEnumerable<PandoraWeb.Models.Data.Role>
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
@@ -42,7 +43,40 @@
                 </tr>
             </thead>
             <tbody id="roleTbody">
-                <!-- Data will be loaded here -->
+                @if(Model != null)
+                {
+                    foreach(var r in Model)
+                    {
+                        var perms = string.IsNullOrEmpty(r.Permissions) ? new string[0] : r.Permissions.Split(',');
+                        <tr>
+                            <td>#@r.RoleId</td>
+                            <td><strong>@r.RoleName</strong></td>
+                            <td>
+                                @if(perms.Contains("all")) {
+                                    <span class="status-badge status-active">Toàn quyền hệ thống</span>
+                                } else {
+                                    foreach(var p in perms) {
+                                        if(string.IsNullOrWhiteSpace(p)) { continue; }
+                                        var pName = p;
+                                        if (p == "manage_product") pName = "Quản lý Sản Phẩm";
+                                        else if (p == "read_product") pName = "Xem Sản Phẩm";
+                                        else if (p == "manage_customer") pName = "Quản lý Khách Hàng";
+                                        else if (p == "manage_employee") pName = "Quản lý Nhân Viên";
+                                        else if (p == "manage_order") pName = "Quản lý Đơn Hàng";
+                                        
+                                        <span class="status-badge status-warning me-1 mb-1 d-inline-block">@pName</span>
+                                    }
+                                }
+                            </td>
+                            <td>
+                                <button class="btn-icon btn-edit" onclick="editRole(@r.RoleId, '@r.RoleName', '@r.Permissions')"><i class="fas fa-edit"></i></button>
+                                @if (r.RoleId != 1) {
+                                    <button class="btn-icon btn-delete" onclick="deleteRole(@r.RoleId)"><i class="fas fa-trash"></i></button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
             </tbody>
         </table>
     </div>
@@ -105,19 +139,9 @@
 @section Scripts {
     <script>
         let roleModal;
-        
-        const permissionNames = {
-            'all': 'Toàn quyền',
-            'manage_product': 'Quản lý Sản Phẩm',
-            'read_product': 'Xem Sản Phẩm',
-            'manage_customer': 'Quản lý Khách Hàng',
-            'manage_employee': 'Quản lý Nhân Viên',
-            'manage_order': 'Quản lý Đơn Hàng'
-        };
 
         document.addEventListener('DOMContentLoaded', () => {
             roleModal = new bootstrap.Modal(document.getElementById('roleModal'));
-            renderRoles();
 
             // Handle 'all' checkbox logic
             document.getElementById('perm_all').addEventListener('change', function() {
@@ -131,132 +155,97 @@
             });
         });
 
-        function formatPermissions(permsArray) {
-            if (permsArray.includes('all')) {
-                return '<span class="status-badge status-active">Toàn quyền hệ thống</span>';
-            }
-            return permsArray.map(p => {
-                return `<span class="status-badge status-warning me-1 mb-1 d-inline-block">${permissionNames[p] || p}</span>`;
-            }).join('');
-        }
-
-        function renderRoles() {
-            const roles = getStorage('admin_roles');
-            const tbody = document.getElementById('roleTbody');
-            tbody.innerHTML = '';
-
-            roles.forEach(r => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>#${r.id}</td>
-                    <td><strong>${r.name}</strong></td>
-                    <td>${formatPermissions(r.permissions)}</td>
-                    <td>
-                        <button class="btn-icon btn-edit" onclick="editRole(${r.id})"><i class="fas fa-edit"></i></button>
-                        ${r.id === 1 ? '' : `<button class="btn-icon btn-delete" onclick="deleteRole(${r.id})"><i class="fas fa-trash"></i></button>`}
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function openRoleModal(id = null) {
-            const form = document.getElementById('roleForm');
-            form.reset();
-            
-            document.querySelectorAll('.perm-cb').forEach(cb => {
-                cb.checked = false;
-                cb.disabled = false;
-            });
-
+        function openRoleModal() {
+            document.getElementById('roleForm').reset();
             document.getElementById('roleId').value = '';
             document.getElementById('modalTitle').textContent = 'Thêm Nhóm Quyền Mới';
-
-            if (id) {
-                const roles = getStorage('admin_roles');
-                const role = roles.find(r => r.id === id);
-                if (role) {
-                    document.getElementById('modalTitle').textContent = 'Sửa Nhóm Quyền';
-                    document.getElementById('roleId').value = role.id;
-                    document.getElementById('roleName').value = role.name;
-                    
-                    if (role.permissions.includes('all')) {
-                        document.getElementById('perm_all').checked = true;
-                        document.querySelectorAll('.perm-cb').forEach(cb => {
-                            if (cb.id !== 'perm_all') {
-                                cb.checked = true;
-                                cb.disabled = true;
-                            }
-                        });
-                    } else {
-                        role.permissions.forEach(p => {
-                            const cb = document.querySelector(`.perm-cb[value="${p}"]`);
-                            if (cb) cb.checked = true;
-                        });
-                    }
-                }
-            }
+            
+            document.querySelectorAll('.perm-cb').forEach(cb => {
+                cb.disabled = false;
+            });
+            
             roleModal.show();
         }
 
-        function editRole(id) {
-            openRoleModal(id);
-        }
+        function editRole(id, name, perms) {
+            document.getElementById('roleForm').reset();
+            document.getElementById('roleId').value = id;
+            document.getElementById('roleName').value = name;
+            document.getElementById('modalTitle').textContent = 'Cập Nhật Nhóm Quyền';
 
-        function deleteRole(id) {
-            if (id === 1) {
-                alert('Không thể xóa quyền Admin gốc!');
-                return;
+            document.querySelectorAll('.perm-cb').forEach(cb => {
+                cb.disabled = false;
+                cb.checked = false;
+            });
+
+            if (perms) {
+                const pArray = perms.split(',');
+                if (pArray.includes('all')) {
+                    document.getElementById('perm_all').checked = true;
+                    document.getElementById('perm_all').dispatchEvent(new Event('change'));
+                } else {
+                    pArray.forEach(p => {
+                        const cb = document.querySelector(`.perm-cb[value="${p}"]`);
+                        if (cb) cb.checked = true;
+                    });
+                }
             }
-            if (confirm('Bạn có chắc chắn muốn xóa nhóm quyền này? Các nhân viên thuộc nhóm này sẽ mất quyền truy cập.')) {
-                let roles = getStorage('admin_roles');
-                roles = roles.filter(r => r.id !== id);
-                setStorage('admin_roles', roles);
-                renderRoles();
-            }
+            
+            roleModal.show();
         }
 
         function saveRole() {
-            const id = document.getElementById('roleId').value;
-            const name = document.getElementById('roleName').value;
-            
-            const perms = [];
-            const isAll = document.getElementById('perm_all').checked;
-            
-            if (isAll) {
-                perms.push('all');
-            } else {
-                document.querySelectorAll('.perm-cb:checked').forEach(cb => {
-                    perms.push(cb.value);
-                });
-            }
-
-            if (!name || perms.length === 0) {
-                alert('Vui lòng nhập tên nhóm và chọn ít nhất một quyền.');
+            const form = document.getElementById('roleForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
                 return;
             }
 
-            let roles = getStorage('admin_roles');
-
-            if (id) {
-                // Update
-                const index = roles.findIndex(r => r.id == id);
-                if (index !== -1) {
-                    roles[index] = { ...roles[index], name, permissions: perms };
-                }
+            const id = document.getElementById('roleId').value;
+            const name = document.getElementById('roleName').value;
+            
+            let permissions = [];
+            if (document.getElementById('perm_all').checked) {
+                permissions.push('all');
             } else {
-                // Add
-                const newRole = {
-                    id: generateId(roles),
-                    name,
-                    permissions: perms
-                };
-                roles.push(newRole);
+                document.querySelectorAll('.perm-cb:checked').forEach(cb => {
+                    if (cb.id !== 'perm_all') permissions.push(cb.value);
+                });
             }
 
-            setStorage('admin_roles', roles);
-            roleModal.hide();
-            renderRoles();
+            const formData = new FormData();
+            if (id) formData.append('id', id);
+            formData.append('name', name);
+            formData.append('permissions', permissions.join(','));
+
+            fetch('@Url.Action("SaveRole", "Admin")', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            })
+            .catch(err => alert('Lỗi mạng: ' + err));
+        }
+
+        function deleteRole(id) {
+            if (confirm('Bạn có chắc chắn muốn xóa nhóm quyền này?')) {
+                fetch('@Url.Action("DeleteRole", "Admin")', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'id=' + id
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) location.reload();
+                    else alert('Lỗi: ' + data.message);
+                });
+            }
         }
     </script>
 }

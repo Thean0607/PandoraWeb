@@ -38,8 +38,11 @@
                         <div class="offcanvas-body p-3 p-lg-0 flex-column">
                             <div class="card border-0 shadow-sm p-3 w-100">
                                 <div class="text-center mb-4 mt-3 d-none d-lg-block">
-                                    <h5 class="font-serif fw-bold mb-1">Nguyễn Văn A</h5>
-                                    <p class="text-muted fs-7 mb-0">Thành viên Bạc</p>
+                                    <div class="avatar-wrapper mx-auto mb-3" style="width: 80px; height: 80px;">
+                                        <img src="@(Session["AvatarUrl"] ?? "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop")" alt="Avatar" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop';">
+                                    </div>
+                                    <h5 class="font-serif fw-bold mb-1">@(ViewBag.Customer != null ? ViewBag.Customer.FullName : "Thành viên")</h5>
+                                    <p class="text-muted fs-7 mb-0">Thành viên Pandora</p>
                                 </div>
                                 <hr class="mt-0 mb-3 text-muted d-none d-lg-block">
                         <nav class="nav flex-column profile-sidebar">
@@ -60,17 +63,40 @@
                     <div class="card border-0 shadow-sm p-4 p-md-5">
                         <h4 class="font-serif mb-4 pb-2 border-bottom">Sản Phẩm Yêu Thích</h4>
                         <div class="row g-3">
-                            <div class="col-md-4 col-sm-6">
-                                <div class="card border-0 shadow-sm h-100 position-relative">
-                                    <button class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 rounded-circle" style="z-index: 5;" title="Xóa"><i class="fas fa-times"></i></button>
-                                    <img src="https://images.unsplash.com/photo-1605100804763-247f67b2548e?q=80&w=300&auto=format&fit=crop" class="card-img-top" alt="Sản phẩm">
-                                    <div class="card-body text-center p-3">
-                                        <h6 class="font-serif mb-1">Nhẫn Kim Cương</h6>
-                                        <p class="text-primary-gold fw-bold mb-2">12,500,000 ₫</p>
-                                        <button class="btn btn-sm btn-gold w-100">Thêm Giỏ Hàng</button>
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var item in Model)
+                                {
+                                    string rawImg = item.ImageUrl;
+                                    string prodImg = PandoraWeb.Helpers.ImageHelper.GetImageUrl(rawImg, "https://images.unsplash.com/photo-1605100804763-247f67b2548e?q=80&w=300");
+
+                                    <div class="col-md-4 col-sm-6" id="wishlist-item-@item.ProductId">
+                                        <div class="card border-0 shadow-sm h-100 position-relative">
+                                            <button class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 rounded-circle" style="z-index: 5;" title="Xóa" onclick="removeFromWishlist(@item.ProductId)">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                            <a href="@Url.Action("ProductDetail", "Product", new { id = item.ProductId })">
+                                                <img src="@prodImg" class="card-img-top object-fit-cover" style="height: 200px;" alt="@item.ProductName" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1605100804763-247f67b2548e?q=80&w=300';">
+                                            </a>
+                                            <div class="card-body text-center p-3 d-flex flex-column">
+                                                <a href="@Url.Action("ProductDetail", "Product", new { id = item.ProductId })" class="text-decoration-none text-dark">
+                                                    <h6 class="font-serif mb-1 text-truncate" title="@item.ProductName">@item.ProductName</h6>
+                                                </a>
+                                                <p class="text-primary-gold fw-bold mb-3 mt-auto">@item.BasePrice.ToString("N0") ₫</p>
+                                                <button class="btn btn-sm btn-gold w-100" onclick="location.href='@Url.Action("ProductDetail", "Product", new { id = item.ProductId })'">Xem Chi Tiết</button>
+                                            </div>
+                                        </div>
                                     </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="col-12 text-center py-5">
+                                    <i class="far fa-heart text-muted mb-3" style="font-size: 3rem;"></i>
+                                    <p class="text-muted">Chưa có sản phẩm nào trong danh sách yêu thích.</p>
+                                    <a href="@Url.Action("Category", "Product")" class="btn btn-outline-gold mt-2">Tiếp Tục Mua Sắm</a>
                                 </div>
-                            </div>
+                            }
                         </div>
 
                     </div>
@@ -81,4 +107,27 @@
 
     <!-- Footer Minimal -->
 
-
+@section Scripts {
+    <script>
+        function removeFromWishlist(productId) {
+            fetch('@Url.Action("RemoveFromWishlist", "Order")', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'productId=' + productId
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    var item = document.getElementById('wishlist-item-' + productId);
+                    if (item) item.remove();
+                    
+                    // Check if empty
+                    if (document.querySelectorAll('[id^="wishlist-item-"]').length === 0) {
+                        location.reload(); // Reload to show empty message
+                    }
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+}

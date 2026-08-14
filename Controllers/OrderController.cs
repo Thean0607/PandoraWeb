@@ -238,7 +238,7 @@ namespace PandoraWeb.Controllers
         }
 
         [HttpPost]
-        public ActionResult Checkout(string fullName, string phone, string email, string address, string notes, string paymentMethod)
+        public ActionResult Checkout(string fullName, string phone, string email, string address, string notes, string paymentMethod, string city = null, string district = null, string ward = null, string street = null)
         {
             var cart = Session["Cart"] as List<CartItemVM>;
             if (cart == null || !cart.Any())
@@ -247,10 +247,18 @@ namespace PandoraWeb.Controllers
                 return RedirectToAction("Cart");
             }
 
-            // Input Validation
-            if (string.IsNullOrWhiteSpace(fullName) || string.IsNullOrWhiteSpace(phone) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(address))
+            // Construct & Validate Address
+            string fullAddress = address != null ? address.Trim() : "";
+
+            if (!string.IsNullOrWhiteSpace(street) && !string.IsNullOrWhiteSpace(ward) && !string.IsNullOrWhiteSpace(district) && !string.IsNullOrWhiteSpace(city))
             {
-                TempData["ErrorMessage"] = "Vui lòng điền đầy đủ các thông tin bắt buộc (Họ tên, SĐT, Email, Địa chỉ).";
+                fullAddress = $"{street.Trim()}, {ward.Trim()}, {district.Trim()}, {city.Trim()}";
+            }
+
+            // Strict Validation: Full name, Phone, Email, and Complete Address (must have minimum length and contain components)
+            if (string.IsNullOrWhiteSpace(fullName) || string.IsNullOrWhiteSpace(phone) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(fullAddress) || fullAddress.Length < 12 || !fullAddress.Contains(","))
+            {
+                TempData["ErrorMessage"] = "Vui lòng nhập đầy đủ các cấp địa chỉ bắt buộc (Số nhà/Đường/Thôn/Ấp, Phường/Xã, Quận/Huyện, Tỉnh/Thành phố).";
                 return RedirectToAction("Checkout");
             }
 
@@ -289,15 +297,27 @@ namespace PandoraWeb.Controllers
                 }
             }
 
+            string finalCity = !string.IsNullOrWhiteSpace(city) ? city.Trim() : "Thành phố";
+            string finalDistrict = !string.IsNullOrWhiteSpace(district) ? district.Trim() : "Quận/Huyện";
+            string finalWard = !string.IsNullOrWhiteSpace(ward) ? ward.Trim() : "Phường/Xã";
+
+            var parts = fullAddress.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length >= 4)
+            {
+                if (string.IsNullOrWhiteSpace(city)) finalCity = parts[parts.Length - 1].Trim();
+                if (string.IsNullOrWhiteSpace(district)) finalDistrict = parts[parts.Length - 2].Trim();
+                if (string.IsNullOrWhiteSpace(ward)) finalWard = parts[parts.Length - 3].Trim();
+            }
+
             var newAddress = new Address
             {
                 CustomerId = customer.CustomerId,
                 ReceiverName = fullName.Trim(),
                 PhoneNumber = phone.Trim(),
-                StreetAddress = address.Trim(),
-                City = "Thành phố",
-                District = "Quận/Huyện",
-                Ward = "Phường/Xã",
+                StreetAddress = fullAddress,
+                City = finalCity,
+                District = finalDistrict,
+                Ward = finalWard,
                 IsDefault = true
             };
             db.Addresses.Add(newAddress);
@@ -382,10 +402,13 @@ namespace PandoraWeb.Controllers
                     Session["Cart"] = null;
                     SaveCartToDb(customer.CustomerId, new List<CartItemVM>());
 
-                    // Send order confirmation email asynchronously to the buyer's email
-                    if (customer != null && !string.IsNullOrEmpty(customer.Email))
+                    // Send order confirmation email asynchronously to the email address specified at checkout
+                    string recipientEmail = !string.IsNullOrWhiteSpace(email) ? email.Trim() : customer?.Email;
+                    string recipientName = !string.IsNullOrWhiteSpace(fullName) ? fullName.Trim() : customer?.FullName;
+
+                    if (!string.IsNullOrEmpty(recipientEmail))
                     {
-                        PandoraWeb.Helpers.EmailHelper.SendOrderConfirmationEmail(order, customer.Email, customer.FullName);
+                        PandoraWeb.Helpers.EmailHelper.SendOrderConfirmationEmail(order, recipientEmail, recipientName);
                     }
 
                     return RedirectToAction("OrderSuccess", new { id = order.OrderId });

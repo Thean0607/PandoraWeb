@@ -23,7 +23,7 @@ namespace PandoraWeb.Helpers
                 int port = int.TryParse(ConfigurationManager.AppSettings["Smtp:Port"], out int p) ? p : 587;
                 bool enableSsl = bool.TryParse(ConfigurationManager.AppSettings["Smtp:EnableSsl"], out bool ssl) ? ssl : true;
                 string username = ConfigurationManager.AppSettings["Smtp:Username"] ?? "";
-                string password = ConfigurationManager.AppSettings["Smtp:Password"] ?? "";
+                string password = (ConfigurationManager.AppSettings["Smtp:Password"] ?? "").Replace(" ", "");
                 string senderName = ConfigurationManager.AppSettings["Smtp:SenderName"] ?? "PANDORA Trang Sức";
 
                 string subject = $"[PANDORA] Xác nhận đơn hàng thành công #PAN{order.OrderId}";
@@ -161,6 +161,150 @@ namespace PandoraWeb.Helpers
 
             sb.Append("</div></body></html>");
             return sb.ToString();
+        }
+
+        public static bool SendPasswordResetEmail(string recipientEmail, string recipientName)
+        {
+            if (string.IsNullOrWhiteSpace(recipientEmail))
+                return false;
+
+            try
+            {
+                string host = ConfigurationManager.AppSettings["Smtp:Host"] ?? "smtp.gmail.com";
+                int port = int.TryParse(ConfigurationManager.AppSettings["Smtp:Port"], out int p) ? p : 587;
+                bool enableSsl = bool.TryParse(ConfigurationManager.AppSettings["Smtp:EnableSsl"], out bool ssl) ? ssl : true;
+                string username = ConfigurationManager.AppSettings["Smtp:Username"] ?? "";
+                string password = (ConfigurationManager.AppSettings["Smtp:Password"] ?? "").Replace(" ", "");
+                string senderName = ConfigurationManager.AppSettings["Smtp:SenderName"] ?? "PANDORA Trang Sức";
+
+                string subject = "[PANDORA] Thông báo thay đổi mật khẩu thành công";
+                string body = $@"<!DOCTYPE html><html><head><meta charset='utf-8'></head><body style='font-family: Arial, sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px;'>
+<div style='max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 30px; border-radius: 8px; border: 1px solid #eeeeee;'>
+<div style='text-align: center; border-bottom: 2px solid #d4af37; padding-bottom: 15px; margin-bottom: 20px;'>
+<h1 style='color: #000; font-family: Georgia, serif; margin: 0; letter-spacing: 2px;'>PANDORA</h1>
+<p style='color: #888; margin: 5px 0 0 0; font-size: 14px;'>THÔNG BÁO TÀI KHOẢN</p>
+</div>
+<p>Xin chào <strong>{HttpUtility.HtmlEncode(recipientName)}</strong>,</p>
+<p>Mật khẩu cho tài khoản <strong>{HttpUtility.HtmlEncode(recipientEmail)}</strong> tại website <strong>PANDORA Trang Sức</strong> vừa được thay đổi thành công vào lúc {DateTime.Now:HH:mm dd/MM/yyyy}.</p>
+<p style='background-color: #fff3cd; color: #856404; padding: 12px; border-radius: 5px; border-left: 4px solid #ffeba6;'>
+⚠️ Nếu bạn không thực hiện yêu cầu này, vui lòng liên hệ ngay bộ phận hỗ trợ khách hàng Pandora qua hotline <strong>1900 1234</strong> để bảo vệ tài khoản.
+</p>
+<div style='margin-top: 30px; padding-top: 15px; border-top: 1px solid #eee; text-align: center; color: #777; font-size: 12px;'>
+<p style='margin: 5px 0;'>PANDORA Jewelry © {DateTime.Now.Year} - Mọi quyền được bảo lưu.</p>
+</div>
+</div></body></html>";
+
+                if (!string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password) && username != "your_email@gmail.com")
+                {
+                    Task.Run(() =>
+                    {
+                        try
+                        {
+                            using (MailMessage mail = new MailMessage())
+                            {
+                                mail.From = new MailAddress(username, senderName, Encoding.UTF8);
+                                mail.To.Add(new MailAddress(recipientEmail.Trim(), recipientName));
+                                mail.Subject = subject;
+                                mail.Body = body;
+                                mail.IsBodyHtml = true;
+                                mail.BodyEncoding = Encoding.UTF8;
+                                mail.SubjectEncoding = Encoding.UTF8;
+
+                                using (SmtpClient smtp = new SmtpClient(host, port))
+                                {
+                                    smtp.Credentials = new NetworkCredential(username, password);
+                                    smtp.EnableSsl = enableSsl;
+                                    smtp.Send(mail);
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine("SMTP PasswordReset Exception: " + ex.Message);
+                        }
+                    });
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("SendPasswordResetEmail error: " + ex.Message);
+                return false;
+            }
+        }
+
+        public static bool SendOtpEmail(string recipientEmail, string recipientName, string otpCode)
+        {
+            if (string.IsNullOrWhiteSpace(recipientEmail) || string.IsNullOrWhiteSpace(otpCode))
+                return false;
+
+            try
+            {
+                string host = ConfigurationManager.AppSettings["Smtp:Host"] ?? "smtp.gmail.com";
+                int port = int.TryParse(ConfigurationManager.AppSettings["Smtp:Port"], out int p) ? p : 587;
+                bool enableSsl = bool.TryParse(ConfigurationManager.AppSettings["Smtp:EnableSsl"], out bool ssl) ? ssl : true;
+                string username = ConfigurationManager.AppSettings["Smtp:Username"] ?? "";
+                string password = (ConfigurationManager.AppSettings["Smtp:Password"] ?? "").Replace(" ", "");
+                string senderName = ConfigurationManager.AppSettings["Smtp:SenderName"] ?? "PANDORA Trang Sức";
+
+                string subject = $"[PANDORA] Mã xác thực OTP đặt lại mật khẩu: {otpCode}";
+                string body = $@"<!DOCTYPE html><html><head><meta charset='utf-8'></head><body style='font-family: Arial, sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px;'>
+<div style='max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 30px; border-radius: 8px; border: 1px solid #eeeeee;'>
+<div style='text-align: center; border-bottom: 2px solid #d4af37; padding-bottom: 15px; margin-bottom: 20px;'>
+<h1 style='color: #000; font-family: Georgia, serif; margin: 0; letter-spacing: 2px;'>PANDORA</h1>
+<p style='color: #888; margin: 5px 0 0 0; font-size: 14px;'>MÃ XÁC THỰC ĐẶT LẠI MẬT KHẨU</p>
+</div>
+<p>Xin chào <strong>{HttpUtility.HtmlEncode(recipientName)}</strong>,</p>
+<p>Bạn đã gửi yêu cầu đặt lại mật khẩu cho tài khoản <strong>{HttpUtility.HtmlEncode(recipientEmail)}</strong> tại Pandora Trang Sức.</p>
+<p style='margin-top: 20px; font-weight: bold;'>Mã xác thực OTP 6 số của bạn là:</p>
+<div style='text-align: center; margin: 25px 0;'>
+<span style='font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #d4af37; background-color: #fdfbf7; padding: 12px 30px; border: 2px dashed #d4af37; border-radius: 8px; display: inline-block;'>{otpCode}</span>
+</div>
+<p style='color: #777; font-size: 13px;'>Mã OTP này có hiệu lực trong vòng <strong>10 phút</strong>. Vì lý do bảo mật, tuyệt đối không chia sẻ mã này cho bất kỳ ai.</p>
+<div style='margin-top: 30px; padding-top: 15px; border-top: 1px solid #eee; text-align: center; color: #777; font-size: 12px;'>
+<p style='margin: 5px 0;'>PANDORA Jewelry © {DateTime.Now.Year} - Mọi quyền được bảo lưu.</p>
+</div>
+</div></body></html>";
+
+                SaveLocalEmailCopy(9999, recipientEmail, subject, body);
+
+                if (!string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password) && username != "your_email@gmail.com")
+                {
+                    Task.Run(() =>
+                    {
+                        try
+                        {
+                            using (MailMessage mail = new MailMessage())
+                            {
+                                mail.From = new MailAddress(username, senderName, Encoding.UTF8);
+                                mail.To.Add(new MailAddress(recipientEmail.Trim(), recipientName));
+                                mail.Subject = subject;
+                                mail.Body = body;
+                                mail.IsBodyHtml = true;
+                                mail.BodyEncoding = Encoding.UTF8;
+                                mail.SubjectEncoding = Encoding.UTF8;
+
+                                using (SmtpClient smtp = new SmtpClient(host, port))
+                                {
+                                    smtp.Credentials = new NetworkCredential(username, password);
+                                    smtp.EnableSsl = enableSsl;
+                                    smtp.Send(mail);
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine("SMTP Otp Exception: " + ex.Message);
+                        }
+                    });
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("SendOtpEmail error: " + ex.Message);
+                return false;
+            }
         }
     }
 }

@@ -244,23 +244,102 @@
                 });
             }
 
-            @if (Session["CustomerId"] == null)
-            {
-                <text>
-                if (!localStorage.getItem('promoPopupShown')) {
-                    setTimeout(function() {
-                        var pModal = document.getElementById('promoModal');
-                        if (pModal) {
-                            var promoModal = new bootstrap.Modal(pModal);
-                            promoModal.show();
-                            localStorage.setItem('promoPopupShown', 'true');
+    @{
+        var promoSettings = PandoraWeb.Helpers.PromoPopupHelper.GetSettings();
+    }
+
+    @if (promoSettings != null && promoSettings.IsEnabled)
+    {
+        <!-- Promotional Popup Modal -->
+        <div class="modal fade" id="promoPopupModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden position-relative" style="background-color: #121212; color: #ffffff;">
+                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 z-3 bg-dark p-2 rounded-circle shadow" data-bs-dismiss="modal" aria-label="Close"></button>
+                    
+                    <div class="row g-0">
+                        @if (!string.IsNullOrEmpty(promoSettings.ImageUrl))
+                        {
+                            <div class="col-md-5 d-none d-md-block bg-dark">
+                                <img src="@promoSettings.ImageUrl" class="img-fluid h-100 w-100" style="object-fit: cover; min-height: 380px;" alt="Pandora Promotion">
+                            </div>
                         }
-                    }, 2000);
+                        <div class="@(!string.IsNullOrEmpty(promoSettings.ImageUrl) ? "col-md-7" : "col-12") p-4 p-lg-5 text-center d-flex flex-column justify-content-center">
+                            <span class="badge bg-warning text-dark align-self-center mb-2 px-3 py-2 text-uppercase font-serif tracking-wider" style="font-size: 0.75rem;">QUÀ TẶNG ĐẶC BIỆT</span>
+                            
+                            <h3 class="font-serif fw-bold text-warning mb-2" style="letter-spacing: 1px;">@promoSettings.Title</h3>
+                            @if (!string.IsNullOrEmpty(promoSettings.Subtitle))
+                            {
+                                <p class="text-white-50 fs-6 mb-3">@promoSettings.Subtitle</p>
+                            }
+                            
+                            @if (!string.IsNullOrEmpty(promoSettings.Content))
+                            {
+                                <p class="text-muted fs-7 mb-3">@promoSettings.Content</p>
+                            }
+
+                            @if (!string.IsNullOrEmpty(promoSettings.CouponCode))
+                            {
+                                <div class="p-3 my-3 border border-warning border-dashed rounded-3 bg-dark d-flex align-items-center justify-content-between">
+                                    <div class="text-start">
+                                        <small class="text-muted d-block fs-8">MÃ GIẢM GIÁ CỦA BẠN</small>
+                                        <strong class="fs-5 text-warning font-monospace" id="promoCouponText">@promoSettings.CouponCode</strong>
+                                    </div>
+                                    <button type="button" class="btn btn-outline-warning btn-sm px-3 rounded-pill" onclick="copyPromoCoupon('@promoSettings.CouponCode')">
+                                        <i class="far fa-copy me-1"></i><span id="copyBtnText">Sao Chép</span>
+                                    </button>
+                                </div>
+                            }
+
+                            <div class="mt-3">
+                                <a href="@promoSettings.ButtonLink" class="btn btn-gold w-100 py-3 fw-bold tracking-wider rounded-pill shadow-sm">
+                                    <i class="fas fa-shopping-bag me-2"></i>@promoSettings.ButtonText
+                                </a>
+                                <div class="d-flex justify-content-center gap-3 mt-3">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-4" data-bs-dismiss="modal">Đóng</button>
+                                    <button type="button" class="btn btn-secondary btn-sm rounded-pill px-4" data-bs-dismiss="modal" onclick="closePromoFor2Hours()">Đóng trong 2 tiếng</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                var expiry = localStorage.getItem("pandora_promo_expiry");
+                var now = new Date().getTime();
+                
+                if (!expiry || now > parseInt(expiry)) {
+                    // if expired, clear it
+                    if (expiry) localStorage.removeItem("pandora_promo_expiry");
+                    
+                    setTimeout(function () {
+                        var myModalEl = document.getElementById('promoPopupModal');
+                        if (myModalEl) {
+                            var myModal = new bootstrap.Modal(myModalEl);
+                            myModal.show();
+                        }
+                    }, 1000);
                 }
-                </text>
+            });
+
+            function closePromoFor2Hours() {
+                var expiryTime = new Date().getTime() + (2 * 60 * 60 * 1000); // 2 hours
+                localStorage.setItem("pandora_promo_expiry", expiryTime);
             }
-        });
-    </script>
+
+            function copyPromoCoupon(code) {
+                navigator.clipboard.writeText(code);
+                var btnText = document.getElementById("copyBtnText");
+                if (btnText) {
+                    btnText.innerText = "Đã Chép!";
+                    setTimeout(function () { btnText.innerText = "Sao Chép"; }, 2000);
+                }
+            }
+        </script>
+    }
+
     @RenderSection("Scripts", required: false)
 </body>
 </html>

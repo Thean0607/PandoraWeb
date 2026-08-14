@@ -1,0 +1,155 @@
+@model PandoraWeb.Helpers.PromoPopupSettings
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-1 text-white">@ViewBag.Title</h1>
+        <p class="text-muted mb-0 fs-7">Cấu hình hiển thị và nội dung Popup thông báo ưu đãi xuất hiện khi khách hàng truy cập website.</p>
+    </div>
+    <div>
+        @if (Model.IsEnabled)
+        {
+            <span class="badge bg-success px-3 py-2 fs-7"><i class="fas fa-eye me-1"></i> Đang Bật Hiển Thị</span>
+        }
+        else
+        {
+            <span class="badge bg-secondary px-3 py-2 fs-7"><i class="fas fa-eye-slash me-1"></i> Đang Tắt Popup</span>
+        }
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+        <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<form action="@Url.Action("SavePromoPopup", "Admin")" method="post" enctype="multipart/form-data">
+    <div class="row">
+        <!-- Settings Form Column -->
+        <div class="col-lg-7 mb-4">
+            <div class="admin-card p-4 shadow-sm">
+                <h5 class="text-white mb-4 pb-2 border-bottom border-secondary"><i class="fas fa-cog text-warning me-2"></i>Cấu Hình Popup</h5>
+                
+                <!-- Toggle Switch -->
+                <div class="p-3 mb-4 rounded bg-dark border border-secondary d-flex align-items-center justify-content-between">
+                    <div>
+                        <strong class="d-block text-white">Trạng thái Bật/Tắt Popup</strong>
+                        <small class="text-muted">Khi bật, popup sẽ tự động xuất hiện 1 lần khi khách mở trang web.</small>
+                    </div>
+                    <div class="form-check form-switch fs-4 mb-0">
+                        <input class="form-check-input cursor-pointer" type="checkbox" name="isEnabled" value="true" id="isEnabled" @(Model.IsEnabled ? "checked" : "")>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-muted fw-semibold">Tiêu Đề Ưu Đãi <span class="text-danger">*</span></label>
+                    <input type="text" name="title" class="form-control bg-dark text-white border-secondary" value="@Model.Title" placeholder="VD: ƯU ĐÃI ĐẶC BIỆT THÁNG NÀY" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-muted fw-semibold">Phụ Đề (Subtitle)</label>
+                    <input type="text" name="subtitle" class="form-control bg-dark text-white border-secondary" value="@Model.Subtitle" placeholder="VD: Giảm ngay 20% cho đơn hàng Pandora">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-muted fw-semibold">Nội Dung Chi Tiết</label>
+                    <textarea name="content" class="form-control bg-dark text-white border-secondary" rows="3" placeholder="Mô tả chương trình khuyến mãi...">@Model.Content</textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-muted fw-semibold">Mã Giảm Giá (Coupon Code)</label>
+                    <input type="text" name="couponCode" class="form-control bg-dark text-warning fw-bold border-secondary text-uppercase" value="@Model.CouponCode" placeholder="VD: PANDORA20">
+                    <small class="text-muted">Khách hàng có thể bấm nút 1-click để Sao chép mã này trên Popup.</small>
+                </div>
+
+                <!-- Image Upload & URL -->
+                <div class="mb-4">
+                    <label class="form-label text-muted fw-semibold">Hình Ảnh Banner Popup</label>
+                    <div class="input-group mb-2">
+                        <span class="input-group-text bg-secondary border-secondary text-white"><i class="fas fa-link"></i></span>
+                        <input type="text" name="imageUrl" class="form-control bg-dark text-white border-secondary" value="@Model.ImageUrl" placeholder="Nhập đường dẫn URL ảnh hoặc chọn file bên dưới">
+                    </div>
+                    <div class="input-group">
+                        <input type="file" name="imageFile" class="form-control bg-dark text-white border-secondary" accept="image/*">
+                        <span class="input-group-text bg-secondary border-secondary text-white"><i class="fas fa-upload me-1"></i> Tải ảnh lên</span>
+                    </div>
+                    <small class="text-muted">Khuyên dùng ảnh tỷ lệ đứng hoặc vuông (kích thước ~ 600x800 px).</small>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted fw-semibold">Tên Nút Hành Động</label>
+                        <input type="text" name="buttonText" class="form-control bg-dark text-white border-secondary" value="@Model.ButtonText" placeholder="VD: KHÁM PHÁ NGAY">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted fw-semibold">Đường Dẫn Khi Bấm Nút</label>
+                        <input type="text" name="buttonLink" class="form-control bg-dark text-white border-secondary" value="@Model.ButtonLink" placeholder="VD: /Product/Category">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-admin btn-lg w-100 py-3 font-semibold">
+                    <i class="fas fa-save me-2"></i> LƯU THAY ĐỔI POPUP
+                </button>
+            </div>
+        </div>
+
+        <!-- Live Preview Column -->
+        <div class="col-lg-5 mb-4">
+            <div class="admin-card p-4 shadow-sm sticky-top" style="top: 100px;">
+                <h5 class="text-white mb-3 pb-2 border-bottom border-secondary"><i class="fas fa-desktop text-info me-2"></i>Xem Trước Giao Diện (Preview)</h5>
+                
+                <div class="border border-secondary rounded-4 overflow-hidden shadow-lg p-3" style="background-color: #121212; color: #ffffff;">
+                    <div class="text-center position-relative p-3">
+                        <span class="badge bg-warning text-dark mb-2 px-3 py-1 font-serif">QUÀ TẶNG ĐẶC BIỆT</span>
+                        
+                        <h4 class="font-serif fw-bold text-warning mb-2">@(string.IsNullOrEmpty(Model.Title) ? "TIÊU ĐỀ KHUYẾN MÃI" : Model.Title)</h4>
+                        
+                        @if (!string.IsNullOrEmpty(Model.Subtitle))
+                        {
+                            <p class="text-white-50 fs-7 mb-2">@Model.Subtitle</p>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                        {
+                            <div class="my-3 rounded overflow-hidden" style="max-height: 200px;">
+                                <img src="@Model.ImageUrl" class="img-fluid w-100" style="object-fit: cover; max-height: 200px;" alt="Preview">
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.Content))
+                        {
+                            <p class="text-muted fs-8 mb-3">@Model.Content</p>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.CouponCode))
+                        {
+                            <div class="p-2 mb-3 border border-warning border-dashed rounded bg-dark d-flex align-items-center justify-content-between">
+                                <div class="text-start">
+                                    <small class="text-muted d-block fs-8">MÃ GIẢM GIÁ</small>
+                                    <strong class="fs-6 text-warning font-monospace">@Model.CouponCode</strong>
+                                </div>
+                                <button type="button" class="btn btn-outline-warning btn-sm py-1 px-2 fs-8 rounded-pill" disabled>Sao Chép</button>
+                            </div>
+                        }
+
+                        <button type="button" class="btn btn-warning w-100 py-2 fw-bold text-dark rounded-pill fs-7" disabled>
+                            <i class="fas fa-shopping-bag me-1"></i>@(string.IsNullOrEmpty(Model.ButtonText) ? "MUA NGAY" : Model.ButtonText)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

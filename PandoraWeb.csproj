@@ -183,15 +183,18 @@
     </Compile>
     <Compile Include="Helpers\CloudinaryHelper.cs" />
     <Compile Include="Helpers\EmailHelper.cs" />
+    <Compile Include="Helpers\SecurityHelper.cs" />
     <Compile Include="Helpers\ImageHelper.cs" />
+    <Compile Include="Helpers\PromoPopupHelper.cs" />
     <Compile Include="ViewModels\HomeViewModel.cs" />
+    <Compile Include="ViewModels\CartItemVM.cs" />
+    <Compile Include="ViewModels\CustomerSegmentVM.cs" />
     <Compile Include="Migrations\202607040217415_AddCMSModels.cs" />
     <Compile Include="Migrations\202607040217415_AddCMSModels.Designer.cs">
       <DependentUpon>202607040217415_AddCMSModels.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Address.cs" />
-    <Compile Include="ViewModels\CartItemVM.cs" />
     <Compile Include="Models\Cart.cs" />
     <Compile Include="Models\CartItem.cs" />
     <Compile Include="Models\Category.cs" />

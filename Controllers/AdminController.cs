@@ -19,7 +19,15 @@ namespace PandoraWeb.Controllers
         {
             ViewBag.ActiveMenu = "Dashboard";
             ViewBag.Title = "Tổng Quan";
-            return View();
+
+            ViewBag.TotalRevenue = db.Orders.Where(o => o.PaymentStatus == "Paid").Sum(o => (decimal?)o.TotalAmount) ?? 0m;
+            ViewBag.TotalProducts = db.Products.Count();
+            ViewBag.TotalCustomers = db.Customers.Count();
+            ViewBag.TotalNewOrders = db.Orders.Count(o => o.OrderStatus == "Pending");
+
+            var recentOrders = db.Orders.Include(o => o.Customer).OrderByDescending(o => o.OrderDate).Take(10).ToList();
+            
+            return View(recentOrders);
         }
 
         // GET: Admin/Products
@@ -268,7 +276,68 @@ namespace PandoraWeb.Controllers
             ViewBag.ActiveMenu = "Settings";
             ViewBag.ActiveSubMenu = "Employees";
             ViewBag.Title = "Quản lý Nhân Viên";
-            return View();
+            var employees = db.Employees.Include(e => e.Role).OrderByDescending(e => e.EmployeeId).ToList();
+            ViewBag.Roles = db.Roles.ToList();
+            return View(employees);
+        }
+
+        [HttpPost]
+        public ActionResult SaveEmployee(int? id, string fullName, string email, int roleId, string status)
+        {
+            if (string.IsNullOrEmpty(fullName) || string.IsNullOrEmpty(email)) 
+                return Json(new { success = false, message = "Thiếu thông tin bắt buộc" });
+            
+            try
+            {
+                if (id.HasValue && id.Value > 0)
+                {
+                    var emp = db.Employees.Find(id.Value);
+                    if (emp != null)
+                    {
+                        emp.FullName = fullName;
+                        emp.Email = email;
+                        emp.RoleId = roleId;
+                        emp.Status = status;
+                    }
+                }
+                else
+                {
+                    db.Employees.Add(new Employee
+                    {
+                        FullName = fullName,
+                        Email = email,
+                        PasswordHash = PandoraWeb.Helpers.SecurityHelper.HashSHA256("123456"), // Default password
+                        RoleId = roleId,
+                        Status = status
+                    });
+                }
+                db.SaveChanges();
+                return Json(new { success = true, message = "Lưu thành công!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public ActionResult DeleteEmployee(int id)
+        {
+            try
+            {
+                var emp = db.Employees.Find(id);
+                if (emp != null)
+                {
+                    db.Employees.Remove(emp);
+                    db.SaveChanges();
+                    return Json(new { success = true });
+                }
+                return Json(new { success = false, message = "Không tìm thấy" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
 
         // GET: Admin/Roles
@@ -277,7 +346,65 @@ namespace PandoraWeb.Controllers
             ViewBag.ActiveMenu = "Settings";
             ViewBag.ActiveSubMenu = "Roles";
             ViewBag.Title = "Phân Quyền";
-            return View();
+            var roles = db.Roles.OrderBy(r => r.RoleId).ToList();
+            return View(roles);
+        }
+
+        [HttpPost]
+        public ActionResult SaveRole(int? id, string name, string description, string permissions)
+        {
+            if (string.IsNullOrEmpty(name)) 
+                return Json(new { success = false, message = "Tên không được để trống" });
+
+            try
+            {
+                if (id.HasValue && id.Value > 0)
+                {
+                    var role = db.Roles.Find(id.Value);
+                    if (role != null)
+                    {
+                        role.RoleName = name;
+                        role.Permissions = permissions;
+                    }
+                }
+                else
+                {
+                    db.Roles.Add(new Role
+                    {
+                        RoleName = name,
+                        Permissions = permissions
+                    });
+                }
+                db.SaveChanges();
+                return Json(new { success = true, message = "Lưu thành công!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public ActionResult DeleteRole(int id)
+        {
+            try
+            {
+                var role = db.Roles.Find(id);
+                if (role != null)
+                {
+                    if (db.Employees.Any(e => e.RoleId == id))
+                        return Json(new { success = false, message = "Không thể xóa Role đang có nhân viên" });
+
+                    db.Roles.Remove(role);
+                    db.SaveChanges();
+                    return Json(new { success = true });
+                }
+                return Json(new { success = false, message = "Không tìm thấy" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
 
         // --- NEW CATALOG ACTIONS ---
@@ -588,80 +715,7 @@ namespace PandoraWeb.Controllers
             return View(sales);
         }
 
-        public ActionResult Banners()
-        {
-            ViewBag.ActiveMenu = "Marketing";
-            ViewBag.ActiveSubMenu = "Banners";
-            ViewBag.Title = "Quản lý Banners";
-            var banners = db.Banners.OrderBy(b => b.DisplayOrder).ToList();
-            return View(banners);
-        }
 
-        [HttpPost]
-        public ActionResult SaveBanner(int? bannerId, string title, string linkUrl, int displayOrder, bool isActive, System.Web.HttpPostedFileBase imageFile)
-        {
-            if (string.IsNullOrEmpty(title))
-            {
-                TempData["Error"] = "Tiêu đề không được để trống!";
-                return RedirectToAction("Banners");
-            }
-
-            string imageUrl = null;
-            if (imageFile != null && imageFile.ContentLength > 0)
-            {
-                var cloudinaryHelper = new PandoraWeb.Helpers.CloudinaryHelper();
-                imageUrl = cloudinaryHelper.UploadImage(imageFile);
-            }
-
-            if (bannerId.HasValue && bannerId.Value > 0)
-            {
-                var b = db.Banners.Find(bannerId.Value);
-                if (b != null)
-                {
-                    b.Title = title;
-                    b.LinkUrl = linkUrl;
-                    b.DisplayOrder = displayOrder;
-                    b.IsActive = isActive;
-                    if (imageUrl != null) b.ImageUrl = imageUrl;
-                }
-            }
-            else
-            {
-                var b = new Banner
-                {
-                    Title = title,
-                    LinkUrl = linkUrl,
-                    DisplayOrder = displayOrder,
-                    IsActive = isActive,
-                    ImageUrl = imageUrl ?? "assets/img/hero/default.jpg",
-                    CreatedAt = DateTime.Now
-                };
-                db.Banners.Add(b);
-            }
-            db.SaveChanges();
-            TempData["Success"] = "Đã lưu banner thành công!";
-            return RedirectToAction("Banners");
-        }
-
-        [HttpPost]
-        public ActionResult DeleteBanner(int id)
-        {
-            try
-            {
-                var b = db.Banners.Find(id);
-                if (b != null)
-                {
-                    db.Banners.Remove(b);
-                    db.SaveChanges();
-                    return Json(new { success = true, message = "Đã xóa banner." });
-                }
-                return Json(new { success = false, message = "Không tìm thấy banner." });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = ex.Message });
-            }
-        }
 
         // --- NEW CMS ACTIONS ---
         public ActionResult Pages()
@@ -722,6 +776,7 @@ namespace PandoraWeb.Controllers
             ViewBag.Title = "Cài Đặt Chung";
             return View();
         }
+
         public ActionResult Payments()
         {
             ViewBag.ActiveMenu = "Settings";
@@ -729,12 +784,129 @@ namespace PandoraWeb.Controllers
             ViewBag.Title = "Thanh Toán";
             return View();
         }
+
         public ActionResult Shipping()
         {
             ViewBag.ActiveMenu = "Settings";
             ViewBag.ActiveSubMenu = "Shipping";
             ViewBag.Title = "Vận Chuyển";
             return View();
+        }
+
+        // --- PROMO POPUP MANAGEMENT ---
+        public ActionResult PromoPopup()
+        {
+            ViewBag.ActiveMenu = "Marketing";
+            ViewBag.ActiveSubMenu = "PromoPopup";
+            ViewBag.Title = "Quản Lý Popup Thông Báo Ưu Đãi";
+            var settings = PandoraWeb.Helpers.PromoPopupHelper.GetSettings();
+            return View(settings);
+        }
+
+        [HttpPost]
+        public ActionResult SavePromoPopup(bool isEnabled = false, string title = null, string subtitle = null, string content = null, string couponCode = null, string imageUrl = null, string buttonText = null, string buttonLink = null, System.Web.HttpPostedFileBase imageFile = null)
+        {
+            var settings = PandoraWeb.Helpers.PromoPopupHelper.GetSettings();
+            settings.IsEnabled = isEnabled;
+            settings.Title = !string.IsNullOrWhiteSpace(title) ? title.Trim() : settings.Title;
+            settings.Subtitle = !string.IsNullOrWhiteSpace(subtitle) ? subtitle.Trim() : "";
+            settings.Content = !string.IsNullOrWhiteSpace(content) ? content.Trim() : "";
+            settings.CouponCode = !string.IsNullOrWhiteSpace(couponCode) ? couponCode.Trim() : "";
+            settings.ButtonText = !string.IsNullOrWhiteSpace(buttonText) ? buttonText.Trim() : "KHÁM PHÁ NGAY";
+            settings.ButtonLink = !string.IsNullOrWhiteSpace(buttonLink) ? buttonLink.Trim() : "/Product/Category";
+
+            if (imageFile != null && imageFile.ContentLength > 0)
+            {
+                try
+                {
+                    var cloudinaryHelper = new PandoraWeb.Helpers.CloudinaryHelper();
+                    string uploadedUrl = cloudinaryHelper.UploadImage(imageFile);
+                    if (!string.IsNullOrEmpty(uploadedUrl))
+                    {
+                        settings.ImageUrl = uploadedUrl;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    TempData["Error"] = "Lỗi khi tải ảnh lên Cloudinary: " + ex.Message;
+                }
+            }
+            else if (!string.IsNullOrWhiteSpace(imageUrl))
+            {
+                settings.ImageUrl = imageUrl.Trim();
+            }
+
+            PandoraWeb.Helpers.PromoPopupHelper.SaveSettings(settings);
+            TempData["Success"] = "Cập nhật Popup Thông Báo Ưu Đãi thành công!";
+            return RedirectToAction("PromoPopup");
+        }
+
+        // --- BANNERS MANAGEMENT ---
+        public ActionResult Banners()
+        {
+            ViewBag.ActiveMenu = "Marketing";
+            ViewBag.ActiveSubMenu = "Banners";
+            ViewBag.Title = "Quản Lý Banners";
+            var banners = db.Banners.OrderBy(b => b.DisplayOrder).ToList();
+            return View(banners);
+        }
+
+        [HttpPost]
+        public ActionResult SaveBanner(int? bannerId, string title, string linkUrl, int displayOrder = 0, bool isActive = true, System.Web.HttpPostedFileBase imageFile = null)
+        {
+            Banner banner = null;
+            if (bannerId.HasValue && bannerId.Value > 0)
+            {
+                banner = db.Banners.Find(bannerId.Value);
+            }
+
+            if (banner == null)
+            {
+                banner = new Banner
+                {
+                    CreatedAt = DateTime.Now
+                };
+                db.Banners.Add(banner);
+            }
+
+            banner.Title = string.IsNullOrWhiteSpace(title) ? "Banner" : title.Trim();
+            banner.LinkUrl = string.IsNullOrWhiteSpace(linkUrl) ? "/Product/Category" : linkUrl.Trim();
+            banner.DisplayOrder = displayOrder;
+            banner.IsActive = isActive;
+
+            if (imageFile != null && imageFile.ContentLength > 0)
+            {
+                try
+                {
+                    var cloudinaryHelper = new PandoraWeb.Helpers.CloudinaryHelper();
+                    string uploadedUrl = cloudinaryHelper.UploadImage(imageFile);
+                    if (!string.IsNullOrEmpty(uploadedUrl))
+                    {
+                        banner.ImageUrl = uploadedUrl;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    TempData["Error"] = "Lỗi khi tải ảnh banner lên Cloudinary: " + ex.Message;
+                }
+            }
+
+            db.SaveChanges();
+            TempData["Success"] = "Đã lưu thông tin Banner thành công!";
+            return RedirectToAction("Banners");
+        }
+
+        [HttpPost]
+        public JsonResult DeleteBanner(int id)
+        {
+            var banner = db.Banners.Find(id);
+            if (banner != null)
+            {
+                db.Banners.Remove(banner);
+                db.SaveChanges();
+                return Json(new { success = true, message = "Xóa banner thành công!" });
+            }
+            return Json(new { success = false, message = "Không tìm thấy banner." });
         }
     }
 }

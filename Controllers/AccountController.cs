@@ -28,8 +28,10 @@ namespace PandoraWeb.Controllers
         [HttpPost]
         public ActionResult Login(string loginId, string password)
         {
+            string hashedPassword = PandoraWeb.Helpers.SecurityHelper.HashSHA256(password);
+
             // Kiểm tra trong bảng Employees trước (Admin/Manager)
-            var emp = db.Employees.Include("Role").FirstOrDefault(e => e.Email == loginId && e.PasswordHash == password);
+            var emp = db.Employees.Include("Role").FirstOrDefault(e => e.Email == loginId && e.PasswordHash == hashedPassword);
             if (emp != null)
             {
                 Session["EmployeeId"] = emp.EmployeeId;
@@ -39,7 +41,7 @@ namespace PandoraWeb.Controllers
             }
 
             // Kiểm tra trong bảng Customers (Khách hàng)
-            var cus = db.Customers.FirstOrDefault(c => (c.Email == loginId || c.PhoneNumber == loginId) && c.PasswordHash == password);
+            var cus = db.Customers.FirstOrDefault(c => (c.Email == loginId || c.PhoneNumber == loginId) && c.PasswordHash == hashedPassword);
             if (cus != null)
             {
                 Session["CustomerId"] = cus.CustomerId;
@@ -229,7 +231,7 @@ namespace PandoraWeb.Controllers
                 FullName = (lastName + " " + firstName).Trim(),
                 Email = email,
                 PhoneNumber = phone,
-                PasswordHash = password,
+                PasswordHash = PandoraWeb.Helpers.SecurityHelper.HashSHA256(password),
                 Status = "active",
                 CreatedAt = System.DateTime.Now
             };
@@ -292,13 +294,15 @@ namespace PandoraWeb.Controllers
                 var customer = db.Customers.Find(customerId);
                 if (customer != null)
                 {
-                    if (customer.PasswordHash != currentPassword)
+                    string hashedCurrent = PandoraWeb.Helpers.SecurityHelper.HashSHA256(currentPassword);
+                    if (customer.PasswordHash != hashedCurrent)
                     {
                         ViewBag.Error = "Mật khẩu hiện tại không chính xác.";
                         return View();
                     }
-                    customer.PasswordHash = newPassword;
+                    customer.PasswordHash = PandoraWeb.Helpers.SecurityHelper.HashSHA256(newPassword);
                     db.SaveChanges();
+                    PandoraWeb.Helpers.EmailHelper.SendPasswordResetEmail(customer.Email, customer.FullName);
                     ViewBag.Success = "Đổi mật khẩu tài khoản thành công!";
                     return View();
                 }
@@ -309,13 +313,15 @@ namespace PandoraWeb.Controllers
                 var emp = db.Employees.Find(empId);
                 if (emp != null)
                 {
-                    if (emp.PasswordHash != currentPassword)
+                    string hashedCurrent = PandoraWeb.Helpers.SecurityHelper.HashSHA256(currentPassword);
+                    if (emp.PasswordHash != hashedCurrent)
                     {
                         ViewBag.Error = "Mật khẩu hiện tại không chính xác.";
                         return View();
                     }
-                    emp.PasswordHash = newPassword;
+                    emp.PasswordHash = PandoraWeb.Helpers.SecurityHelper.HashSHA256(newPassword);
                     db.SaveChanges();
+                    PandoraWeb.Helpers.EmailHelper.SendPasswordResetEmail(emp.Email, emp.FullName);
                     ViewBag.Success = "Đổi mật khẩu tài khoản quản trị thành công!";
                     return View();
                 }
@@ -324,77 +330,273 @@ namespace PandoraWeb.Controllers
             return RedirectToAction("Login");
         }
 
-        public ActionResult ForgotPassword()
+        public ActionResult ForgotPassword(int? step = null)
         {
             ViewBag.ActiveMenu = "ForgotPassword";
             ViewBag.Title = "Quên Mật Khẩu";
+
+            int currentStep = 1;
+            if (Session["Reset_Verified"] != null && (bool)Session["Reset_Verified"] == true)
+            {
+                currentStep = 3;
+            }
+            else if (Session["Reset_OTP"] != null && Session["Reset_Email"] != null)
+            {
+                currentStep = 2;
+            }
+
+            if (step.HasValue && step.Value == 1)
+            {
+                Session["Reset_Email"] = null;
+                Session["Reset_AccountName"] = null;
+                Session["Reset_OTP"] = null;
+                Session["Reset_OTP_Expiry"] = null;
+                Session["Reset_Verified"] = null;
+                currentStep = 1;
+            }
+
+            ViewBag.Step = currentStep;
+            ViewBag.Email = Session["Reset_Email"]?.ToString() ?? "";
+            ViewBag.AccountName = Session["Reset_AccountName"]?.ToString() ?? "";
+
             return View();
         }
 
         [HttpPost]
-        public ActionResult ForgotPassword(string loginId, string newPassword, string confirmPassword)
+        public ActionResult ForgotPassword(string actionStep, string loginId, string otpCode, string newPassword, string confirmPassword)
         {
             ViewBag.ActiveMenu = "ForgotPassword";
             ViewBag.Title = "Quên Mật Khẩu";
 
-            if (string.IsNullOrWhiteSpace(loginId))
+            try
             {
-                ViewBag.Error = "Vui lòng nhập Email hoặc Số điện thoại tài khoản của bạn.";
+                // STEP 1: Enter Email -> Generate 6-digit OTP & Send Email
+                if (actionStep == "send_otp" || (string.IsNullOrEmpty(actionStep) && !string.IsNullOrWhiteSpace(loginId)))
+                {
+                    if (string.IsNullOrWhiteSpace(loginId))
+                    {
+                        ViewBag.Error = "Vui lòng nhập Email hoặc Số điện thoại tài khoản của bạn.";
+                        ViewBag.Step = 1;
+                        return View();
+                    }
+
+                    string target = loginId.Trim();
+
+                    // Safe query to prevent NullReferenceException on null Email columns
+                    var customer = db.Customers.FirstOrDefault(c => c.Email == target || c.PhoneNumber == target);
+                    if (customer == null)
+                    {
+                        customer = db.Customers.ToList().FirstOrDefault(c =>
+                            (c.Email != null && c.Email.Equals(target, StringComparison.OrdinalIgnoreCase)) ||
+                            (c.PhoneNumber != null && c.PhoneNumber.Equals(target, StringComparison.OrdinalIgnoreCase)));
+                    }
+
+                    var employee = db.Employees.FirstOrDefault(e => e.Email == target);
+                    if (employee == null)
+                    {
+                        employee = db.Employees.ToList().FirstOrDefault(e =>
+                            e.Email != null && e.Email.Equals(target, StringComparison.OrdinalIgnoreCase));
+                    }
+
+                    if (customer == null && employee == null)
+                    {
+                        ViewBag.Error = "Không tìm thấy tài khoản tương ứng với Email/SĐT bạn đã nhập.";
+                        ViewBag.Step = 1;
+                        ViewBag.LoginId = loginId;
+                        return View();
+                    }
+
+                    string email = customer != null ? customer.Email : employee.Email;
+                    string name = customer != null ? customer.FullName : employee.FullName;
+
+                    if (string.IsNullOrWhiteSpace(email))
+                    {
+                        ViewBag.Error = "Tài khoản này chưa cập nhật Email để nhận mã OTP. Vui lòng liên hệ quản trị viên.";
+                        ViewBag.Step = 1;
+                        ViewBag.LoginId = loginId;
+                        return View();
+                    }
+
+                    // Generate 6-digit random OTP
+                    Random rnd = new Random();
+                    string otp = rnd.Next(100000, 999999).ToString();
+
+                    // Store in Session
+                    Session["Reset_Email"] = email;
+                    Session["Reset_AccountName"] = name;
+                    Session["Reset_OTP"] = otp;
+                    Session["Reset_OTP_Expiry"] = DateTime.Now.AddMinutes(10);
+                    Session["Reset_Verified"] = false;
+
+                    // Send Email OTP
+                    PandoraWeb.Helpers.EmailHelper.SendOtpEmail(email, name, otp);
+
+                    ViewBag.SuccessMessage = $"Mã xác thực OTP 6 số đã được gửi đến email {email}. Vui lòng kiểm tra hộp thư!";
+                    ViewBag.Step = 2;
+                    ViewBag.Email = email;
+                    ViewBag.AccountName = name;
+                    return View();
+                }
+
+                // STEP 2: Verify 6-digit OTP
+                if (actionStep == "verify_otp")
+                {
+                    string sessionOtp = Session["Reset_OTP"]?.ToString();
+                    DateTime? expiry = Session["Reset_OTP_Expiry"] as DateTime?;
+                    string email = Session["Reset_Email"]?.ToString();
+                    string name = Session["Reset_AccountName"]?.ToString();
+
+                    if (string.IsNullOrEmpty(sessionOtp) || string.IsNullOrEmpty(email))
+                    {
+                        ViewBag.Error = "Phiên làm việc đã hết hạn. Vui lòng bắt đầu lại từ bước 1.";
+                        ViewBag.Step = 1;
+                        return View();
+                    }
+
+                    if (expiry.HasValue && DateTime.Now > expiry.Value)
+                    {
+                        ViewBag.Error = "Mã OTP đã hết hạn sử dụng (10 phút). Vui lòng nhấn 'Gửi lại mã OTP'.";
+                        ViewBag.Step = 2;
+                        ViewBag.Email = email;
+                        ViewBag.AccountName = name;
+                        return View();
+                    }
+
+                    if (string.IsNullOrWhiteSpace(otpCode) || otpCode.Trim() != sessionOtp)
+                    {
+                        ViewBag.Error = "Mã OTP 6 số bạn nhập không chính xác. Vui lòng kiểm tra lại!";
+                        ViewBag.Step = 2;
+                        ViewBag.Email = email;
+                        ViewBag.AccountName = name;
+                        return View();
+                    }
+
+                    // OTP Verified!
+                    Session["Reset_Verified"] = true;
+                    ViewBag.Step = 3;
+                    ViewBag.Email = email;
+                    ViewBag.AccountName = name;
+                    ViewBag.SuccessMessage = "Xác thực mã OTP thành công! Vui lòng nhập mật khẩu mới của bạn.";
+                    return View();
+                }
+
+                // STEP 3: Set New Password
+                if (actionStep == "reset_password")
+                {
+                    bool isVerified = Session["Reset_Verified"] != null && (bool)Session["Reset_Verified"] == true;
+                    string email = Session["Reset_Email"]?.ToString();
+                    string name = Session["Reset_AccountName"]?.ToString();
+
+                    if (!isVerified || string.IsNullOrEmpty(email))
+                    {
+                        ViewBag.Error = "Bạn chưa xác thực mã OTP. Vui lòng thực hiện từ bước 1.";
+                        ViewBag.Step = 1;
+                        return View();
+                    }
+
+                    if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < 6)
+                    {
+                        ViewBag.Error = "Mật khẩu mới phải có ít nhất 6 ký tự.";
+                        ViewBag.Step = 3;
+                        ViewBag.Email = email;
+                        ViewBag.AccountName = name;
+                        return View();
+                    }
+
+                    if (newPassword != confirmPassword)
+                    {
+                        ViewBag.Error = "Mật khẩu xác nhận không khớp.";
+                        ViewBag.Step = 3;
+                        ViewBag.Email = email;
+                        ViewBag.AccountName = name;
+                        return View();
+                    }
+
+                    var customer = db.Customers.FirstOrDefault(c => c.Email.ToLower() == email.ToLower());
+                    var employee = db.Employees.FirstOrDefault(e => e.Email.ToLower() == email.ToLower());
+
+                    if (customer != null)
+                    {
+                        customer.PasswordHash = PandoraWeb.Helpers.SecurityHelper.HashSHA256(newPassword);
+                        db.SaveChanges();
+                        PandoraWeb.Helpers.EmailHelper.SendPasswordResetEmail(customer.Email, customer.FullName);
+                    }
+                    else if (employee != null)
+                    {
+                        employee.PasswordHash = PandoraWeb.Helpers.SecurityHelper.HashSHA256(newPassword);
+                        db.SaveChanges();
+                        PandoraWeb.Helpers.EmailHelper.SendPasswordResetEmail(employee.Email, employee.FullName);
+                    }
+
+                    // Clear Session
+                    Session["Reset_Email"] = null;
+                    Session["Reset_AccountName"] = null;
+                    Session["Reset_OTP"] = null;
+                    Session["Reset_OTP_Expiry"] = null;
+                    Session["Reset_Verified"] = null;
+
+                    TempData["SuccessMessage"] = "Đặt lại mật khẩu thành công! Vui lòng đăng nhập với mật khẩu mới.";
+                    return RedirectToAction("Login");
+                }
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = "Có lỗi xảy ra trong quá trình xử lý: " + ex.Message;
+                ViewBag.Step = 1;
                 return View();
             }
 
-            string target = loginId.Trim();
-            var customer = db.Customers.FirstOrDefault(c => c.Email == target || c.PhoneNumber == target);
-            var employee = db.Employees.FirstOrDefault(e => e.Email == target);
-
-            if (customer == null && employee == null)
-            {
-                ViewBag.Error = "Không tìm thấy tài khoản tương ứng với thông tin bạn đã nhập.";
-                ViewBag.LoginId = target;
-                return View();
-            }
-
-            string accName = customer != null ? customer.FullName : employee.FullName;
-            ViewBag.AccountFound = true;
-            ViewBag.LoginId = target;
-            ViewBag.AccountName = accName;
-
-            if (string.IsNullOrWhiteSpace(newPassword))
-            {
-                return View();
-            }
-
-            if (newPassword.Length < 6)
-            {
-                ViewBag.Error = "Mật khẩu mới phải có ít nhất 6 ký tự.";
-                return View();
-            }
-
-            if (newPassword != confirmPassword)
-            {
-                ViewBag.Error = "Mật khẩu xác nhận không khớp.";
-                return View();
-            }
-
-            if (customer != null)
-            {
-                customer.PasswordHash = newPassword;
-            }
-            else if (employee != null)
-            {
-                employee.PasswordHash = newPassword;
-            }
-
-            db.SaveChanges();
-            TempData["SuccessMessage"] = "Đặt lại mật khẩu thành công! Vui lòng đăng nhập với mật khẩu mới.";
-            return RedirectToAction("Login");
+            ViewBag.Step = 1;
+            return View();
         }
 
         public ActionResult Address()
         {
+            if (Session["CustomerId"] == null) return RedirectToAction("Login");
+            
             ViewBag.ActiveMenu = "Address";
             ViewBag.Title = "Địa Chỉ Giao Hàng";
-            return View();
+            
+            int customerId = (int)Session["CustomerId"];
+            var addresses = db.Addresses.Where(a => a.CustomerId == customerId).ToList();
+            
+            var customer = db.Customers.Find(customerId);
+            ViewBag.Customer = customer;
+            if (customer != null && !string.IsNullOrEmpty(customer.AvatarUrl))
+            {
+                Session["AvatarUrl"] = PandoraWeb.Helpers.ImageHelper.GetImageUrl(customer.AvatarUrl, "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop");
+            }
+            
+            return View(addresses);
+        }
+
+        [HttpPost]
+        public ActionResult SaveAddress(string fullAddress, string city, string district, string ward, string street)
+        {
+            if (Session["CustomerId"] == null) return RedirectToAction("Login");
+            int customerId = (int)Session["CustomerId"];
+
+            if (string.IsNullOrWhiteSpace(city) || string.IsNullOrWhiteSpace(district) || string.IsNullOrWhiteSpace(ward) || string.IsNullOrWhiteSpace(street))
+            {
+                TempData["ErrorMessage"] = "Vui lòng chọn đầy đủ địa chỉ.";
+                return RedirectToAction("Address");
+            }
+
+            var addr = new Address
+            {
+                CustomerId = customerId,
+                City = city.Trim(),
+                District = district.Trim(),
+                Ward = ward.Trim(),
+                StreetAddress = street.Trim(),
+                IsDefault = !db.Addresses.Any(a => a.CustomerId == customerId)
+            };
+
+            db.Addresses.Add(addr);
+            db.SaveChanges();
+
+            TempData["SuccessMessage"] = "Thêm địa chỉ thành công!";
+            return RedirectToAction("Address");
         }
 
         private void SyncDbCartToSession(int customerId)
