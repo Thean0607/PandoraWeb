@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const params = new URLSearchParams({ productId: pid, quantity: qty });
             if (vid) params.append('variantId', vid);
 
-            fetch('/Order/AddToCart', {
+            fetch('/Cart/AddToCart', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: params
@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const vid = this.getAttribute('data-vid');
             const row = this.closest('tr');
 
-            fetch('/Order/RemoveFromCart', {
+            fetch('/Cart/RemoveFromCart', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ productId: pid, variantId: vid })
@@ -249,7 +249,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (action === 'minus') qty = Math.max(0, qty - 1);
             else qty += 1;
             
-            fetch('/Order/UpdateQuantity', {
+            fetch('/Cart/UpdateQuantity', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ productId: pid, variantId: vid, quantity: qty })
@@ -296,7 +296,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 icon.style.color = '#d4af37';
             }
 
-            fetch(isAdded ? '/Order/RemoveFromWishlist' : '/Order/AddToWishlist', {
+            fetch(isAdded ? '/Wishlist/RemoveFromWishlist' : '/Wishlist/AddToWishlist', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ productId: pid })
@@ -331,7 +331,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.btn-remove-wishlist').forEach(function(btn) {
         btn.addEventListener('click', function() {
             const pid = this.getAttribute('data-pid');
-            fetch('/Order/RemoveFromWishlist', {
+            fetch('/Wishlist/RemoveFromWishlist', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ productId: pid })

@@ -74,6 +74,10 @@
                         <input type="email" class="form-control" id="employeeEmail" name="email" required>
                     </div>
                     <div class="mb-3">
+                        <label class="form-label">Mật khẩu <small class="text-muted fw-normal">(Bỏ trống nếu không muốn đổi khi cập nhật)</small></label>
+                        <input type="password" class="form-control" id="employeePassword" name="password" placeholder="Mặc định: 123456 nếu bỏ trống khi thêm mới">
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label">Vai Trò (Role)</label>
                         <select class="form-select" id="employeeRole" name="roleId" required>
                             @if(roles != null) {
@@ -111,6 +115,7 @@
         function openEmployeeModal() {
             document.getElementById('employeeForm').reset();
             document.getElementById('employeeId').value = '';
+            document.getElementById('employeePassword').value = '';
             document.getElementById('modalTitle').textContent = 'Thêm Nhân Viên Mới';
             employeeModal.show();
         }
@@ -120,6 +125,7 @@
             document.getElementById('employeeId').value = id;
             document.getElementById('employeeName').value = name;
             document.getElementById('employeeEmail').value = email;
+            document.getElementById('employeePassword').value = '';
             document.getElementById('employeeRole').value = roleId;
             document.getElementById('employeeStatus').value = status;
             document.getElementById('modalTitle').textContent = 'Sửa Nhân Viên';

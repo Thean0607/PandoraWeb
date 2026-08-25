@@ -29,7 +29,7 @@
 <body>
 
     <!-- Header / Navbar -->
-    <nav class="navbar navbar-expand-lg fixed-top navbar-dark">
+    <nav class="navbar navbar-expand-xl fixed-top navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="@Url.Action("Index", "Home")">PANDORA</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,7 +41,10 @@
                         <a class="nav-link @(ViewBag.ActiveMenu == "Home" ? "active" : "")" href="@Url.Action("Index", "Home")">Trang Chủ</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link @(ViewBag.ActiveMenu == "Category" ? "active" : "")" href="@Url.Action("Category", "Product")">Bộ Sưu Tập</a>
+                        <a class="nav-link @(ViewBag.ActiveMenu == "Category" ? "active" : "")" href="@Url.Action("Category", "Product")">Sản Phẩm</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewBag.ActiveMenu == "Blog" ? "active" : "")" href="@Url.Action("Blog", "Home")">Tin Tức</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(ViewBag.ActiveMenu == "Stores" ? "active" : "")" href="@Url.Action("Stores", "Home")">Cửa Hàng</a>
@@ -55,18 +58,21 @@
 
                 </ul>
                 <div class="d-flex align-items-center mt-3 mt-lg-0">
-                    <form class="d-flex align-items-center me-3 position-relative" action="@Url.Action("Category", "Product")" method="get" style="max-width: 200px;">
-                        <div class="input-group input-group-sm">
-                            <input type="text" id="searchInput" class="form-control rounded-start-pill border-end-0 bg-transparent text-white" name="search" placeholder="Tìm kiếm..." aria-label="Search" style="box-shadow: none; border-color: rgba(255,255,255,0.2);" autocomplete="off">
-                            <button class="btn btn-outline-secondary bg-transparent border-start-0 rounded-end-pill" type="submit" style="border-color: rgba(255,255,255,0.2);">
-                                <i class="fas fa-search text-white"></i>
-                            </button>
-                        </div>
-                        <div id="searchSuggestions" class="dropdown-menu w-100 mt-1 shadow-lg border-0" style="display: none; position: absolute; top: 100%; left: 0; max-height: 400px; overflow-y: auto;">
-                        </div>
-                    </form>
+                    @if (ViewBag.ActiveMenu != "Home")
+                    {
+                        <form class="d-flex align-items-center me-3 position-relative" action="@Url.Action("Category", "Product")" method="get" style="max-width: 200px;">
+                            <div class="input-group input-group-sm">
+                                <input type="text" id="searchInput" class="form-control rounded-start-pill border-end-0 bg-transparent text-white" name="search" placeholder="Tìm kiếm..." aria-label="Search" style="box-shadow: none; border-color: rgba(255,255,255,0.2);" autocomplete="off">
+                                <button class="btn btn-outline-secondary bg-transparent border-start-0 rounded-end-pill" type="submit" style="border-color: rgba(255,255,255,0.2);">
+                                    <i class="fas fa-search text-white"></i>
+                                </button>
+                            </div>
+                            <div id="searchSuggestions" class="dropdown-menu w-100 mt-1 shadow-lg border-0" style="display: none; position: absolute; top: 100%; left: 0; max-height: 400px; overflow-y: auto;">
+                            </div>
+                        </form>
+                    }
                     
-                    <a href="@Url.Action("Cart", "Order")" class="nav-icon position-relative me-3">
+                    <a href="@Url.Action("Index", "Cart")" class="nav-icon position-relative me-3">
                         <i class="fas fa-shopping-bag"></i>
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cart-badge" style="font-size: 0.6rem;">@cartCount</span>
                     </a>
@@ -126,6 +132,7 @@
                     <h5 class="footer-heading">Liên Kết Nhỏ</h5>
                     <a href="@Url.Action("Index", "Home")" class="footer-link">Trang Chủ</a>
                     <a href="@Url.Action("Category", "Product")" class="footer-link">Sản Phẩm</a>
+                    <a href="@Url.Action("Blog", "Home")" class="footer-link">Tin Tức</a>
                     <a href="@Url.Action("About", "Home")" class="footer-link">Về Chúng Tôi</a>
                     <a href="@Url.Action("Stores", "Home")" class="footer-link">Hệ Thống Cửa Hàng</a>
                     <a href="@Url.Action("Contact", "Home")" class="footer-link">Liên Hệ</a>

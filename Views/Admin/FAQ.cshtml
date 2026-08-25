@@ -5,7 +5,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h3 mb-0 text-white">@ViewBag.Title</h1>
-    <button class="btn btn-admin">
+    <button class="btn btn-admin" onclick="openFaqModal()">
         <i class="fas fa-plus"></i> Thêm Câu Hỏi
     </button>
 </div>
@@ -29,14 +29,25 @@
                     <tr>
                         <td>@item.DisplayOrder</td>
                         <td class="fw-bold text-warning">@item.Question</td>
-                        <td><small class="text-muted">@(item.Answer.Length > 100 ? item.Answer.Substring(0, 100) + "..." : item.Answer)</small></td>
+                        <td>
+                            <small class="text-muted">
+                                @(item.Answer.Length > 100 ? System.Text.RegularExpressions.Regex.Replace(item.Answer, "<.*?>", string.Empty).Substring(0, Math.Min(100, item.Answer.Length)) + "..." : System.Text.RegularExpressions.Regex.Replace(item.Answer, "<.*?>", string.Empty))
+                            </small>
+                        </td>
                         <td>
                             @if(item.IsActive) { <span class="badge bg-success">Hiện</span> }
                             else { <span class="badge bg-secondary">Ẩn</span> }
                         </td>
                         <td class="text-end">
-                            <button class="btn btn-icon btn-edit"><i class="fas fa-edit"></i></button>
-                            <button class="btn btn-icon btn-delete"><i class="fas fa-trash"></i></button>
+                            <button class="btn btn-icon btn-edit" onclick="editFaq(this)"
+                                    data-id="@item.FaqId"
+                                    data-question="@item.Question"
+                                    data-order="@item.DisplayOrder"
+                                    data-active="@(item.IsActive ? "true" : "false")">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <textarea class="d-none raw-answer">@item.Answer</textarea>
+                            <button class="btn btn-icon btn-delete" onclick="deleteFaq(@item.FaqId)"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
                 }
@@ -48,3 +59,123 @@
         </tbody>
     </table>
 </div>
+
+<!-- FAQ Modal -->
+<div class="modal fade" id="faqModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content admin-form">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Thêm Câu Hỏi Mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="faqForm">
+                    <input type="hidden" id="faqId">
+                    <div class="mb-3">
+                        <label class="form-label">Câu Hỏi</label>
+                        <input type="text" class="form-control" id="faqQuestion" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Câu Trả Lời (Hỗ trợ HTML)</label>
+                        <textarea class="form-control" id="faqAnswer" rows="5" required></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Thứ Tự Hiển Thị</label>
+                            <input type="number" class="form-control" id="faqOrder" value="0">
+                        </div>
+                        <div class="col-md-6 mb-3 d-flex align-items-end">
+                            <div class="form-check pb-2">
+                                <input class="form-check-input" type="checkbox" id="faqActive" checked>
+                                <label class="form-check-label text-white">Hiển thị ra ngoài trang chủ</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-admin" onclick="saveFaq()">Lưu Thay Đổi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let faqModal;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            faqModal = new bootstrap.Modal(document.getElementById('faqModal'));
+        });
+
+        function openFaqModal() {
+            document.getElementById('faqForm').reset();
+            document.getElementById('faqId').value = '';
+            document.getElementById('modalTitle').textContent = 'Thêm Câu Hỏi Mới';
+            document.getElementById('faqActive').checked = true;
+            document.getElementById('faqOrder').value = '0';
+            faqModal.show();
+        }
+
+        function editFaq(btn) {
+            document.getElementById('faqForm').reset();
+            document.getElementById('faqId').value = btn.getAttribute('data-id');
+            document.getElementById('faqQuestion').value = btn.getAttribute('data-question');
+            
+            // Get raw answer from the hidden textarea right after the edit button
+            document.getElementById('faqAnswer').value = btn.nextElementSibling.value;
+            
+            document.getElementById('faqOrder').value = btn.getAttribute('data-order');
+            document.getElementById('faqActive').checked = btn.getAttribute('data-active') === 'true';
+            
+            document.getElementById('modalTitle').textContent = 'Cập Nhật Câu Hỏi';
+            faqModal.show();
+        }
+
+        function saveFaq() {
+            const form = document.getElementById('faqForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const id = document.getElementById('faqId').value;
+            const formData = new FormData();
+            if (id) formData.append('id', id);
+            formData.append('question', document.getElementById('faqQuestion').value);
+            formData.append('answer', document.getElementById('faqAnswer').value);
+            formData.append('displayOrder', document.getElementById('faqOrder').value || 0);
+            formData.append('isActive', document.getElementById('faqActive').checked);
+
+            fetch('@Url.Action("SaveFaq", "Admin")', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            })
+            .catch(err => alert('Lỗi mạng: ' + err));
+        }
+
+        function deleteFaq(id) {
+            if (confirm('Bạn có chắc chắn muốn xóa câu hỏi này?')) {
+                fetch('@Url.Action("DeleteFaq", "Admin")', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'id=' + id
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) location.reload();
+                    else alert('Lỗi: ' + data.message);
+                });
+            }
+        }
+    </script>
+}

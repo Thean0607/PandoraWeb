@@ -1,4 +1,16 @@
 <!DOCTYPE html>
+@{
+    var perms = Session["Permissions"]?.ToString() ?? "";
+    var permsArray = perms.Split(',');
+    bool hasAll = permsArray.Contains("all");
+    bool canManageProduct = hasAll || permsArray.Contains("manage_product");
+    bool canManageOrder = hasAll || permsArray.Contains("manage_order");
+    bool canManageCustomer = hasAll || permsArray.Contains("manage_customer");
+    bool canManageMarketing = hasAll || permsArray.Contains("manage_marketing");
+    bool canManageCms = hasAll || permsArray.Contains("manage_cms");
+    bool canReadReport = hasAll || permsArray.Contains("read_report");
+    bool canManageSetting = hasAll || permsArray.Contains("manage_setting") || permsArray.Contains("manage_employee");
+}
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -34,6 +46,7 @@
             </div>
 
             <!-- 2. Catalog Management -->
+            @if (canManageProduct) {
             <div class="sidebar-nav-item">
                 <a href="#menuCatalog" data-bs-toggle="collapse" class="sidebar-nav-link @(ViewBag.ActiveMenu == "Catalog" ? "active" : "")" aria-expanded="@(ViewBag.ActiveMenu == "Catalog" ? "true" : "false")">
                     <span class="sidebar-nav-link-content">
@@ -60,8 +73,10 @@
                     </li>
                 </ul>
             </div>
+            }
 
             <!-- 3. Order Management -->
+            @if (canManageOrder) {
             <div class="sidebar-nav-item">
                 <a href="#menuOrders" data-bs-toggle="collapse" class="sidebar-nav-link @(ViewBag.ActiveMenu == "Orders" ? "active" : "")" aria-expanded="@(ViewBag.ActiveMenu == "Orders" ? "true" : "false")">
                     <span class="sidebar-nav-link-content">
@@ -79,8 +94,10 @@
                     </li>
                 </ul>
             </div>
+            }
 
             <!-- 4. Customer Management -->
+            @if (canManageCustomer) {
             <div class="sidebar-nav-item">
                 <a href="#menuCustomers" data-bs-toggle="collapse" class="sidebar-nav-link @(ViewBag.ActiveMenu == "Customers" ? "active" : "")" aria-expanded="@(ViewBag.ActiveMenu == "Customers" ? "true" : "false")">
                     <span class="sidebar-nav-link-content">
@@ -101,8 +118,10 @@
                     </li>
                 </ul>
             </div>
+            }
 
             <!-- 5. Marketing & Promotions -->
+            @if (canManageMarketing) {
             <div class="sidebar-nav-item">
                 <a href="#menuMarketing" data-bs-toggle="collapse" class="sidebar-nav-link @(ViewBag.ActiveMenu == "Marketing" ? "active" : "")" aria-expanded="@(ViewBag.ActiveMenu == "Marketing" ? "true" : "false")">
                     <span class="sidebar-nav-link-content">
@@ -126,8 +145,10 @@
                     </li>
                 </ul>
             </div>
+            }
 
             <!-- 6. CMS -->
+            @if (canManageCms) {
             <div class="sidebar-nav-item">
                 <a href="#menuCMS" data-bs-toggle="collapse" class="sidebar-nav-link @(ViewBag.ActiveMenu == "CMS" ? "active" : "")" aria-expanded="@(ViewBag.ActiveMenu == "CMS" ? "true" : "false")">
                     <span class="sidebar-nav-link-content">
@@ -148,8 +169,10 @@
                     </li>
                 </ul>
             </div>
+            }
 
             <!-- 7. Reports -->
+            @if (canReadReport) {
             <div class="sidebar-nav-item">
                 <a href="#menuReports" data-bs-toggle="collapse" class="sidebar-nav-link @(ViewBag.ActiveMenu == "Reports" ? "active" : "")" aria-expanded="@(ViewBag.ActiveMenu == "Reports" ? "true" : "false")">
                     <span class="sidebar-nav-link-content">
@@ -167,8 +190,10 @@
                     </li>
                 </ul>
             </div>
+            }
 
             <!-- 8. Settings -->
+            @if (canManageSetting) {
             <div class="sidebar-nav-item">
                 <a href="#menuSettings" data-bs-toggle="collapse" class="sidebar-nav-link @(ViewBag.ActiveMenu == "Settings" ? "active" : "")" aria-expanded="@(ViewBag.ActiveMenu == "Settings" ? "true" : "false")">
                     <span class="sidebar-nav-link-content">
@@ -195,6 +220,7 @@
                     </li>
                 </ul>
             </div>
+            }
 
             <div class="sidebar-nav-item mt-4">
                 <a href="@Url.Action("Index", "Home")" class="sidebar-nav-link">

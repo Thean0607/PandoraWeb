@@ -48,9 +48,27 @@
                 <h1 class="font-serif display-5 mb-3">@Model.ProductName</h1>
                 <div class="d-flex align-items-center mb-4">
                     <div class="text-warning me-2">
-                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                        @{ 
+                            var reviews = ViewBag.Reviews as List<PandoraWeb.Models.Review>;
+                            int totalReviews = reviews != null ? reviews.Count : 0;
+                            double avgRating = totalReviews > 0 ? reviews.Average(r => r.Rating) : 5.0;
+                            int fullStars = (int)avgRating;
+                            bool hasHalfStar = (avgRating - fullStars) >= 0.5;
+                            for (int i = 0; i < fullStars; i++)
+                            {
+                                <i class="fas fa-star"></i>
+                            }
+                            if (hasHalfStar)
+                            {
+                                <i class="fas fa-star-half-alt"></i>
+                            }
+                            for (int i = fullStars + (hasHalfStar ? 1 : 0); i < 5; i++)
+                            {
+                                <i class="far fa-star"></i>
+                            }
+                        }
                     </div>
-                    <span class="text-muted fs-7">(24 đánh giá)</span>
+                    <span class="text-muted fs-7">(@totalReviews đánh giá)</span>
                 </div>
                 <h2 class="text-primary-gold fw-bold mb-4">@Model.BasePrice.ToString("N0") ₫</h2>
                 
@@ -119,6 +137,9 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link text-dark fw-bold" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">Thông Tin Chi Tiết</button>
             </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link text-dark fw-bold" id="review-tab" data-bs-toggle="tab" data-bs-target="#review" type="button" role="tab">Đánh Giá Sản Phẩm</button>
+            </li>
         </ul>
         <div class="tab-content" id="myTabContent">
             <div class="tab-pane fade show active text-center w-75 mx-auto text-muted" id="desc" role="tabpanel">
@@ -130,6 +151,73 @@
                     <li class="list-group-item d-flex justify-content-between"><span>Bảo hành:</span> <strong>Trọn đời</strong></li>
                     <li class="list-group-item d-flex justify-content-between"><span>Xuất xứ:</span> <strong>Chính hãng Pandora</strong></li>
                 </ul>
+            </div>
+            <div class="tab-pane fade w-75 mx-auto" id="review" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <h5 class="fw-bold mb-3">Viết Đánh Giá</h5>
+                        @if (Session["CustomerId"] != null)
+                        {
+                            <form id="reviewForm">
+                                <input type="hidden" id="reviewProductId" value="@Model.ProductId" />
+                                <div class="mb-3">
+                                    <label class="form-label">Chọn số sao:</label>
+                                    <div class="text-warning fs-4" id="starSelection">
+                                        <i class="far fa-star cursor-pointer" data-rating="1"></i>
+                                        <i class="far fa-star cursor-pointer" data-rating="2"></i>
+                                        <i class="far fa-star cursor-pointer" data-rating="3"></i>
+                                        <i class="far fa-star cursor-pointer" data-rating="4"></i>
+                                        <i class="far fa-star cursor-pointer" data-rating="5"></i>
+                                    </div>
+                                    <input type="hidden" id="reviewRating" value="0" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label for="reviewComment" class="form-label">Bình luận của bạn:</label>
+                                    <textarea class="form-control" id="reviewComment" rows="4" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-dark">Gửi Đánh Giá</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning">
+                                Bạn cần <a href="@Url.Action("Login", "Account")" class="alert-link">đăng nhập</a> để viết đánh giá.
+                            </div>
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="fw-bold mb-3">Các Đánh Giá Khác</h5>
+                        @if (reviews != null && reviews.Any())
+                        {
+                            <div class="list-group list-group-flush" style="max-height: 400px; overflow-y: auto;">
+                                @foreach (var r in reviews)
+                                {
+                                    <div class="list-group-item px-0 py-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <strong class="text-dark">@(r.Customer != null ? r.Customer.FullName : "Khách hàng")</strong>
+                                            <span class="text-muted fs-7">@r.ReviewDate.ToString("dd/MM/yyyy")</span>
+                                        </div>
+                                        <div class="text-warning mb-2 fs-7">
+                                            @for (int i = 0; i < r.Rating; i++)
+                                            {
+                                                <i class="fas fa-star"></i>
+                                            }
+                                            @for (int i = r.Rating; i < 5; i++)
+                                            {
+                                                <i class="far fa-star"></i>
+                                            }
+                                        </div>
+                                        <p class="mb-0 text-muted fs-7">@r.Comment</p>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted">Chưa có đánh giá nào cho sản phẩm này.</p>
+                        }
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -151,7 +239,7 @@
                     let bodyData = `productId=${pid}&quantity=${quantity}`;
                     if (variantId) bodyData += `&variantId=${variantId}`;
 
-                    fetch('@Url.Action("AddToCart", "Order")', {
+                    fetch('@Url.Action("AddToCart", "Cart")', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
@@ -161,9 +249,66 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            window.location.href = '@Url.Action("Checkout", "Order")';
+                            window.location.href = '@Url.Action("Index", "Checkout")';
                         } else {
                             alert(data.message || 'Có lỗi xảy ra');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                });
+            }
+
+            // Review Stars Selection
+            const starIcons = document.querySelectorAll('#starSelection i');
+            const ratingInput = document.getElementById('reviewRating');
+            if (starIcons.length > 0) {
+                starIcons.forEach(star => {
+                    star.addEventListener('click', function() {
+                        const rating = this.getAttribute('data-rating');
+                        ratingInput.value = rating;
+                        starIcons.forEach(s => {
+                            if (parseInt(s.getAttribute('data-rating')) <= parseInt(rating)) {
+                                s.classList.remove('far');
+                                s.classList.add('fas');
+                            } else {
+                                s.classList.remove('fas');
+                                s.classList.add('far');
+                            }
+                        });
+                    });
+                });
+            }
+
+            // Review Form Submit
+            const reviewForm = document.getElementById('reviewForm');
+            if (reviewForm) {
+                reviewForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const productId = document.getElementById('reviewProductId').value;
+                    const rating = document.getElementById('reviewRating').value;
+                    const comment = document.getElementById('reviewComment').value;
+
+                    if (rating == 0) {
+                        alert('Vui lòng chọn số sao đánh giá!');
+                        return;
+                    }
+
+                    fetch('@Url.Action("SubmitReview", "Product")', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `productId=${productId}&rating=${rating}&comment=${encodeURIComponent(comment)}`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                            window.location.reload();
+                        } else {
+                            alert(data.message);
                         }
                     })
                     .catch(error => {

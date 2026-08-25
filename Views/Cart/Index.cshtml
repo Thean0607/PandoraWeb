@@ -111,7 +111,7 @@
                 
                 @if (Model != null && Model.Count > 0 && ViewBag.HasOutOfStock != true)
                 {
-                    <a href="@Url.Action("Checkout", "Order")" class="btn btn-gold w-100 py-3 mb-3">TIẾN HÀNH THANH TOÁN</a>
+                    <a href="@Url.Action("Index", "Checkout")" class="btn btn-gold w-100 py-3 mb-3">TIẾN HÀNH THANH TOÁN</a>
                 }
                 else if (ViewBag.HasOutOfStock == true)
                 {

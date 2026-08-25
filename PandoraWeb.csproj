@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
   <Import Project="packages\EntityFramework.6.5.2\build\EntityFramework.props" Condition="Exists('packages\EntityFramework.6.5.2\build\EntityFramework.props')" />
@@ -194,29 +194,29 @@
       <DependentUpon>202607040217415_AddCMSModels.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="Models\Address.cs" />
-    <Compile Include="Models\Cart.cs" />
-    <Compile Include="Models\CartItem.cs" />
-    <Compile Include="Models\Category.cs" />
-    <Compile Include="Models\Collection.cs" />
-    <Compile Include="Models\Customer.cs" />
+    <Compile Include="Models\Entities\Address.cs" />
+    <Compile Include="Models\Entities\Cart.cs" />
+    <Compile Include="Models\Entities\CartItem.cs" />
+    <Compile Include="Models\Entities\Category.cs" />
+    <Compile Include="Models\Entities\Collection.cs" />
+    <Compile Include="Models\Entities\Customer.cs" />
     <Compile Include="Models\Data\PandoraDbContext.cs" />
-    <Compile Include="Models\Employee.cs" />
-    <Compile Include="Models\Material.cs" />
-    <Compile Include="Models\Order.cs" />
-    <Compile Include="Models\OrderItem.cs" />
-    <Compile Include="Models\Product.cs" />
-    <Compile Include="Models\ProductImage.cs" />
-    <Compile Include="Models\ProductVariant.cs" />
-    <Compile Include="Models\Promotion.cs" />
-    <Compile Include="Models\Banner.cs" />
-    <Compile Include="Models\Page.cs" />
-    <Compile Include="Models\BlogPost.cs" />
-    <Compile Include="Models\Faq.cs" />
-    <Compile Include="Models\Review.cs" />
-    <Compile Include="Models\Role.cs" />
-    <Compile Include="Models\Size.cs" />
-    <Compile Include="Models\Wishlist.cs" />
+    <Compile Include="Models\Entities\Employee.cs" />
+    <Compile Include="Models\Entities\Material.cs" />
+    <Compile Include="Models\Entities\Order.cs" />
+    <Compile Include="Models\Entities\OrderItem.cs" />
+    <Compile Include="Models\Entities\Product.cs" />
+    <Compile Include="Models\Entities\ProductImage.cs" />
+    <Compile Include="Models\Entities\ProductVariant.cs" />
+    <Compile Include="Models\Entities\Promotion.cs" />
+    <Compile Include="Models\Entities\Banner.cs" />
+    <Compile Include="Models\Entities\Page.cs" />
+    <Compile Include="Models\Entities\BlogPost.cs" />
+    <Compile Include="Models\Entities\Faq.cs" />
+    <Compile Include="Models\Entities\Review.cs" />
+    <Compile Include="Models\Entities\Role.cs" />
+    <Compile Include="Models\Entities\Size.cs" />
+    <Compile Include="Models\Entities\Wishlist.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

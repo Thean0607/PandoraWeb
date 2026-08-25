@@ -8,5 +8,7 @@ namespace PandoraWeb.ViewModels
         public IEnumerable<Banner> Banners { get; set; }
         public IEnumerable<Collection> Collections { get; set; }
         public IEnumerable<Product> TrendingProducts { get; set; }
+        public IEnumerable<Product> FlashSaleProducts { get; set; }
+        public IEnumerable<BlogPost> LatestBlogs { get; set; }
     }
 }

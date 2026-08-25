@@ -1,0 +1,50 @@
+@model PandoraWeb.Models.BlogPost
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Page Header -->
+<div class="breadcrumb-wrap mt-5 pt-5 pb-5 bg-light" style="background: url('@PandoraWeb.Helpers.ImageHelper.GetImageUrl(Model.ImageUrl, "https://images.unsplash.com/photo-1512413914436-1c2552886f7f?q=80&w=1200")') center/cover no-repeat; position: relative;">
+    <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-75"></div>
+    <div class="container mt-4 position-relative z-1 text-center text-white">
+        <span class="badge bg-gold text-dark py-2 px-3 rounded-pill shadow mb-3">Tin Tức</span>
+        <h1 class="breadcrumb-title font-serif text-white mx-auto" style="max-width: 800px; line-height: 1.3;">@Model.Title</h1>
+        <div class="d-flex align-items-center justify-content-center mt-4 text-white-50">
+            <span class="me-4"><i class="far fa-calendar-alt me-2 text-primary-gold"></i> @Model.PublishedDate.ToString("dd MMMM yyyy")</span>
+            <span><i class="far fa-user me-2 text-primary-gold"></i> Bởi @Model.Author</span>
+        </div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb justify-content-center mt-4">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")" class="text-white text-decoration-none">Trang Chủ</a></li>
+                <li class="breadcrumb-item"><a href="@Url.Action("Blog", "Home")" class="text-white text-decoration-none">Tin Tức</a></li>
+                <li class="breadcrumb-item active text-white-50" aria-current="page">Chi tiết bài viết</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- Blog Detail Content -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="blog-content bg-white p-md-5 p-4 rounded-4 shadow-sm" style="font-size: 1.1rem; line-height: 1.8; color: #444;">
+                    @Html.Raw(Model.Content)
+                </div>
+
+                <!-- Share Action -->
+                <div class="d-flex align-items-center justify-content-between mt-5 pt-4 border-top">
+                    <div class="d-flex align-items-center">
+                        <span class="fw-bold me-3">Chia sẻ bài viết:</span>
+                        <a href="#" class="btn btn-sm btn-outline-dark rounded-circle me-2" style="width: 35px; height: 35px; display: inline-flex; align-items: center; justify-content: center;"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="btn btn-sm btn-outline-dark rounded-circle me-2" style="width: 35px; height: 35px; display: inline-flex; align-items: center; justify-content: center;"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="btn btn-sm btn-outline-dark rounded-circle" style="width: 35px; height: 35px; display: inline-flex; align-items: center; justify-content: center;"><i class="fab fa-pinterest-p"></i></a>
+                    </div>
+                    <a href="@Url.Action("Blog", "Home")" class="btn btn-outline-secondary rounded-pill px-4">
+                        <i class="fas fa-arrow-left me-2"></i> Quay lại
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

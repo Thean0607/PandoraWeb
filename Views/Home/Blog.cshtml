@@ -1,0 +1,86 @@
+@model IEnumerable<PandoraWeb.Models.BlogPost>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Page Header -->
+<div class="breadcrumb-wrap mt-5 pt-5 pb-5 bg-light" style="background: url('https://images.unsplash.com/photo-1512413914436-1c2552886f7f?q=80&w=1200') center/cover no-repeat; position: relative;">
+    <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-50"></div>
+    <div class="container mt-4 position-relative z-1 text-center text-white">
+        <h1 class="breadcrumb-title font-serif text-white">Tin Tức & Khuyến Mãi</h1>
+        <p class="lead mt-3 mx-auto" style="max-width: 600px;">Cập nhật những xu hướng thời trang trang sức mới nhất và các chương trình ưu đãi đặc biệt.</p>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb justify-content-center mt-3">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")" class="text-white">Trang Chủ</a></li>
+                <li class="breadcrumb-item active text-white-50" aria-current="page">Tin Tức</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- Blog Content -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            @if (Model != null && Model.Any())
+            {
+                foreach (var post in Model)
+                {
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                            <div class="position-relative overflow-hidden">
+                                <a href="@Url.Action("BlogDetail", "Home", new { id = post.PostId })">
+                                    <img src="@PandoraWeb.Helpers.ImageHelper.GetImageUrl(post.ImageUrl, "https://images.unsplash.com/photo-1512413914436-1c2552886f7f?q=80&w=600")" class="card-img-top w-100 object-fit-cover transition-scale" style="height: 250px;" alt="@post.Title" onerror="this.src='https://images.unsplash.com/photo-1512413914436-1c2552886f7f?q=80&w=600'">
+                                </a>
+                                <div class="position-absolute top-0 end-0 m-3">
+                                    <span class="badge bg-gold text-dark py-2 px-3 rounded-pill shadow">Tin Tức</span>
+                                </div>
+                            </div>
+                            <div class="card-body p-4 d-flex flex-column">
+                                <div class="d-flex align-items-center mb-3 text-muted small">
+                                    <span class="me-3"><i class="far fa-calendar-alt me-1 text-primary-gold"></i> @post.PublishedDate.ToString("dd/MM/yyyy")</span>
+                                    <span><i class="far fa-user me-1 text-primary-gold"></i> @post.Author</span>
+                                </div>
+                                <h4 class="card-title font-serif mb-3">
+                                    <a href="@Url.Action("BlogDetail", "Home", new { id = post.PostId })" class="text-dark text-decoration-none">@post.Title</a>
+                                </h4>
+                                <p class="card-text text-muted mb-4" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                                    @(System.Text.RegularExpressions.Regex.Replace(post.Content, "<.*?>", string.Empty))
+                                </p>
+                                <div class="mt-auto">
+                                    <a href="@Url.Action("BlogDetail", "Home", new { id = post.PostId })" class="btn btn-outline-dark rounded-pill fw-medium px-4">Đọc tiếp <i class="fas fa-arrow-right ms-2 small"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center py-5">
+                    <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" alt="No Posts" width="120" class="mb-4 opacity-50">
+                    <h3 class="font-serif text-muted">Chưa có bài viết nào</h3>
+                    <p class="text-muted">Đang cập nhật thêm thông tin. Vui lòng quay lại sau!</p>
+                </div>
+            }
+        </div>
+
+        @if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
+        {
+            <div class="row mt-5">
+                <div class="col-12">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                            {
+                                <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                                    <a class="page-link" href="@Url.Action("Blog", "Home", new { page = i })">@i</a>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        }
+    </div>
+</section>

@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
 
@@ -5,6 +6,8 @@ namespace PandoraWeb.Filters
 {
     public class AdminAuthorizeAttribute : ActionFilterAttribute
     {
+        public string Permission { get; set; }
+
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             var session = filterContext.HttpContext.Session;
@@ -19,20 +22,34 @@ namespace PandoraWeb.Filters
                         { "controller", "Account" },
                         { "action", "Login" }
                     });
+                return;
             }
-            else
+
+            // Lấy chuỗi permissions từ Session
+            string permissions = session["Permissions"]?.ToString() ?? "";
+            var permsArray = permissions.Split(',');
+
+            // Nếu người dùng có quyền "all", bỏ qua tất cả kiểm tra và cho phép
+            if (permsArray.Contains("all"))
             {
-                // Kiểm tra phân quyền cụ thể hơn nếu cần (ví dụ: chỉ Admin/Manager mới được vào)
-                string role = session["Role"].ToString();
-                if (role != "Admin" && role != "Manager")
+                base.OnActionExecuting(filterContext);
+                return;
+            }
+
+            // Nếu Action/Controller có yêu cầu quyền cụ thể
+            if (!string.IsNullOrEmpty(Permission))
+            {
+                if (!permsArray.Contains(Permission))
                 {
-                    // Nếu là nhân viên nhưng không có quyền quản lý, đẩy về trang báo lỗi hoặc trang chủ
+                    // Chuyển hướng về trang chủ Admin kèm thông báo lỗi truy cập
+                    filterContext.Controller.TempData["Error"] = "Bạn không có quyền thực hiện chức năng này.";
                     filterContext.Result = new RedirectToRouteResult(
                         new RouteValueDictionary
                         {
-                            { "controller", "Home" },
+                            { "controller", "Admin" },
                             { "action", "Index" }
                         });
+                    return;
                 }
             }
 

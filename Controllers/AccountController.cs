@@ -37,6 +37,7 @@ namespace PandoraWeb.Controllers
                 Session["EmployeeId"] = emp.EmployeeId;
                 Session["FullName"] = emp.FullName;
                 Session["Role"] = emp.Role.RoleName;
+                Session["Permissions"] = emp.Role.Permissions;
                 return RedirectToAction("Index", "Admin");
             }
 
@@ -49,6 +50,7 @@ namespace PandoraWeb.Controllers
                 Session["Role"] = "Customer";
                 
                 SyncDbCartToSession(cus.CustomerId);
+                SyncWishlist(cus.CustomerId);
                 
                 return RedirectToAction("Index", "Home");
             }
@@ -245,6 +247,7 @@ namespace PandoraWeb.Controllers
             Session["Role"] = "Customer";
             
             SyncDbCartToSession(customer.CustomerId);
+            SyncWishlist(customer.CustomerId);
 
             return RedirectToAction("Index", "Home");
         }
@@ -655,6 +658,23 @@ namespace PandoraWeb.Controllers
                 });
             }
             db.SaveChanges();
+        }
+
+        private void SyncWishlist(int customerId)
+        {
+            var sessionWishlist = Session["Wishlist"] as List<int>;
+            if (sessionWishlist != null && sessionWishlist.Any())
+            {
+                var existingWishlist = db.Wishlists.Where(w => w.CustomerId == customerId).Select(w => w.ProductId).ToList();
+                foreach (var productId in sessionWishlist)
+                {
+                    if (!existingWishlist.Contains(productId))
+                    {
+                        db.Wishlists.Add(new Models.Wishlist { CustomerId = customerId, ProductId = productId, AddedDate = System.DateTime.Now });
+                    }
+                }
+                db.SaveChanges();
+            }
         }
     }
 }

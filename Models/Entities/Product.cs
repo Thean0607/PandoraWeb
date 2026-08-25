@@ -24,6 +24,9 @@ namespace PandoraWeb.Models
         [Column(TypeName = "decimal")]
         public decimal BasePrice { get; set; }
 
+        [Column(TypeName = "decimal")]
+        public decimal? OldPrice { get; set; }
+
         [StringLength(500)]
         public string ImageUrl { get; set; }
 

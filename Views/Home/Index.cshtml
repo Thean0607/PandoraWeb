@@ -4,9 +4,28 @@
     ViewBag.Title = "Trang Chủ";
 }
 
+    <!-- Global Search Bar (Above Banner) -->
+    <div class="container mb-4 mt-5 pt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <form class="d-flex align-items-center position-relative w-100" action="@Url.Action("Category", "Product")" method="get">
+                    <div class="input-group input-group-lg shadow-sm border rounded-pill overflow-hidden bg-white">
+                        <input type="text" id="searchInput" class="form-control border-0 px-4" name="search" placeholder="Tìm kiếm trang sức, bộ sưu tập..." aria-label="Search" style="box-shadow: none;" autocomplete="off">
+                        <button class="btn btn-gold px-4 text-dark fw-bold border-0" type="submit">
+                            <i class="fas fa-search me-2"></i> Tìm kiếm
+                        </button>
+                    </div>
+                    <div id="searchSuggestions" class="dropdown-menu w-100 mt-2 shadow-lg border-0 rounded-4 overflow-hidden" style="display: none; position: absolute; top: 100%; left: 0; max-height: 400px; overflow-y: auto; z-index: 1050;">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Hero Section Carousel -->
     <div class="container mb-5">
         <div id="heroCarousel" class="carousel slide rounded-4 overflow-hidden" data-bs-interval="5000" style="box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+
             @if(Model.Banners != null && Model.Banners.Any())
             {
                 <div class="carousel-indicators">
@@ -82,6 +101,53 @@
         </div>
     </div>
 
+    <!-- Flash Sale -->
+    <section class="py-5" style="background-color: #fffaf0;">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h2 class="mb-0 text-danger font-serif fw-bold"><i class="fas fa-bolt me-2"></i>Flash Sale / Khuyến Mãi</h2>
+                <a href="@Url.Action("Category", "Product")" class="text-danger text-decoration-none">Xem tất cả <i class="fas fa-arrow-right ms-1"></i></a>
+            </div>
+            <div class="row">
+            @if(Model.FlashSaleProducts != null && Model.FlashSaleProducts.Any())
+            {
+                foreach (var item in Model.FlashSaleProducts)
+                {
+                    var imgUrl = item.ImageUrl != null && item.ImageUrl.StartsWith("http") ? item.ImageUrl : Url.Content("~/" + item.ImageUrl);
+                    <div class="col-lg-3 col-md-4 col-sm-6 col-6">
+                        <div class="product-card border border-danger-subtle shadow-sm position-relative">
+                            <div class="position-absolute top-0 start-0 m-2 z-1">
+                                <span class="badge bg-danger rounded-pill px-2 py-1">-@(item.OldPrice.HasValue && item.OldPrice.Value > 0 ? Math.Round((item.OldPrice.Value - item.BasePrice) / item.OldPrice.Value * 100) : 0)%</span>
+                            </div>
+                            <div class="product-img-wrapper">
+                                <img src="@imgUrl" onerror="this.src='https://images.unsplash.com/photo-1605100804763-247f67b2548e?q=80&w=600'" alt="@item.ProductName">
+                                <div class="product-action">
+                                    <a href="javascript:void(0);" class="action-btn btn-add-cart" data-pid="@item.ProductId" data-bs-toggle="tooltip" title="Thêm vào giỏ hàng"><i class="fas fa-shopping-cart"></i></a>
+                                    <a href="@Url.Action("ProductDetail", "Product", new { id = item.ProductId })" class="action-btn" data-bs-toggle="tooltip" title="Xem chi tiết"><i class="fas fa-eye"></i></a>
+                                </div>
+                            </div>
+                            <div class="product-info bg-white">
+                                <div class="product-category text-danger fw-bold">Khuyến Mãi Hot</div>
+                                <h3 class="product-title"><a href="@Url.Action("ProductDetail", "Product", new { id = item.ProductId })">@item.ProductName</a></h3>
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <div class="product-price text-danger fs-5">@item.BasePrice.ToString("N0") ₫</div>
+                                    <div class="text-muted text-decoration-line-through small">@item.OldPrice.Value.ToString("N0") ₫</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center py-4">
+                    <p class="text-muted">Hiện chưa có chương trình khuyến mãi nào.</p>
+                </div>
+            }
+            </div>
+        </div>
+    </section>
+
     <!-- Featured Categories -->
     <section class="py-5 mt-5">
         <div class="container">
@@ -100,7 +166,7 @@
                             <img src="@imgUrl" class="w-100 h-100 object-fit-cover transition" alt="@item.CollectionName" onerror="this.src='https://images.unsplash.com/photo-1605100804763-247f67b6348e?q=80&w=600'">
                             <div class="position-absolute bottom-0 start-0 w-100 p-4 bg-gradient-dark">
                                 <h3 class="text-white mb-0 font-serif fs-4">@item.CollectionName</h3>
-                                <a href="@Url.Action("Category", "Product")" class="text-white text-decoration-none small">Khám phá <i class="fas fa-arrow-right ms-2"></i></a>
+                                <a href="@Url.Action("CollectionDetail", "Product", new { id = item.CollectionId })" class="text-white text-decoration-none small">Khám phá <i class="fas fa-arrow-right ms-2"></i></a>
                             </div>
                         </div>
                     </div>
@@ -157,6 +223,47 @@
             </div>
             <div class="text-center mt-4">
                 <a href="@Url.Action("Category", "Product")" class="btn btn-outline-gold">Xem Tất Cả Sản Phẩm</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Latest Blog Posts -->
+    <section class="py-5">
+        <div class="container">
+            <div class="section-title">
+                <h2>Tin Tức Mới Nhất</h2>
+                <div class="title-separator"></div>
+            </div>
+            <div class="row">
+            @if(Model.LatestBlogs != null && Model.LatestBlogs.Any())
+            {
+                foreach (var post in Model.LatestBlogs)
+                {
+                    <div class="col-md-4 mb-4 mb-md-0">
+                        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden group-hover">
+                            <a href="@Url.Action("BlogDetail", "Home", new { id = post.PostId })" class="overflow-hidden d-block" style="height: 200px;">
+                                <img src="@PandoraWeb.Helpers.ImageHelper.GetImageUrl(post.ImageUrl, "https://images.unsplash.com/photo-1512413914436-1c2552886f7f?q=80&w=600")" class="w-100 h-100 object-fit-cover transition-scale" alt="@post.Title" onerror="this.src='https://images.unsplash.com/photo-1512413914436-1c2552886f7f?q=80&w=600'">
+                            </a>
+                            <div class="card-body p-4">
+                                <div class="text-muted small mb-2"><i class="far fa-calendar-alt me-1 text-primary-gold"></i> @post.PublishedDate.ToString("dd/MM/yyyy")</div>
+                                <h4 class="card-title font-serif fs-5 mb-3">
+                                    <a href="@Url.Action("BlogDetail", "Home", new { id = post.PostId })" class="text-dark text-decoration-none">@post.Title</a>
+                                </h4>
+                                <a href="@Url.Action("BlogDetail", "Home", new { id = post.PostId })" class="text-primary-gold text-decoration-none fw-medium small text-uppercase tracking-wider">Đọc Thêm <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center py-4">
+                    <p class="text-muted">Chưa có bài viết mới.</p>
+                </div>
+            }
+            </div>
+            <div class="text-center mt-5">
+                <a href="@Url.Action("Blog", "Home")" class="btn btn-outline-dark rounded-pill px-4">Xem Tất Cả Tin Tức</a>
             </div>
         </div>
     </section>

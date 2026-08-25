@@ -58,12 +58,15 @@
                                     foreach(var p in perms) {
                                         if(string.IsNullOrWhiteSpace(p)) { continue; }
                                         var pName = p;
-                                        if (p == "manage_product") pName = "Quản lý Sản Phẩm";
-                                        else if (p == "read_product") pName = "Xem Sản Phẩm";
-                                        else if (p == "manage_customer") pName = "Quản lý Khách Hàng";
-                                        else if (p == "manage_employee") pName = "Quản lý Nhân Viên";
-                                        else if (p == "manage_order") pName = "Quản lý Đơn Hàng";
-                                        
+                                        if (p == "manage_product") { pName = "Quản lý Sản Phẩm"; }
+                                        else if (p == "read_product") { pName = "Xem Sản Phẩm"; }
+                                        else if (p == "manage_customer") { pName = "Quản lý Khách Hàng"; }
+                                        else if (p == "manage_employee") { pName = "Quản lý Nhân Viên"; }
+                                        else if (p == "manage_order") { pName = "Quản lý Đơn Hàng"; }
+                                        else if (p == "manage_marketing") { pName = "Quản lý Khuyến Mãi"; }
+                                        else if (p == "manage_cms") { pName = "Quản lý Nội Dung (Blog/FAQ)"; }
+                                        else if (p == "manage_setting") { pName = "Quản lý Cài Đặt"; }
+                                        else if (p == "read_report") { pName = "Xem Báo Cáo"; }
                                         <span class="status-badge status-warning me-1 mb-1 d-inline-block">@pName</span>
                                     }
                                 }
@@ -123,6 +126,22 @@
                             <div class="permission-item form-check">
                                 <input class="form-check-input perm-cb" type="checkbox" value="manage_order" id="perm_order">
                                 <label class="form-check-label text-white" for="perm_order">Quản lý Đơn Hàng</label>
+                            </div>
+                            <div class="permission-item form-check">
+                                <input class="form-check-input perm-cb" type="checkbox" value="manage_marketing" id="perm_marketing">
+                                <label class="form-check-label text-white" for="perm_marketing">Quản lý Khuyến Mãi</label>
+                            </div>
+                            <div class="permission-item form-check">
+                                <input class="form-check-input perm-cb" type="checkbox" value="manage_cms" id="perm_cms">
+                                <label class="form-check-label text-white" for="perm_cms">Quản lý Nội Dung (Blog/FAQ)</label>
+                            </div>
+                            <div class="permission-item form-check">
+                                <input class="form-check-input perm-cb" type="checkbox" value="read_report" id="perm_report">
+                                <label class="form-check-label text-white" for="perm_report">Xem Báo Cáo</label>
+                            </div>
+                            <div class="permission-item form-check">
+                                <input class="form-check-input perm-cb" type="checkbox" value="manage_setting" id="perm_setting">
+                                <label class="form-check-label text-white" for="perm_setting">Quản lý Cài Đặt HT</label>
                             </div>
                         </div>
                     </div>

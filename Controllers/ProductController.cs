@@ -107,6 +107,8 @@ namespace PandoraWeb.Controllers
                     .Include(p => p.ProductImages)
                     .FirstOrDefault();
                 if (defaultProduct == null) return HttpNotFound();
+                
+                ViewBag.Reviews = db.Reviews.Include(r => r.Customer).Where(r => r.ProductId == defaultProduct.ProductId && r.Status == "Approved").OrderByDescending(r => r.ReviewDate).ToList();
                 return View(defaultProduct);
             }
 
@@ -122,7 +124,81 @@ namespace PandoraWeb.Controllers
                 return HttpNotFound();
             }
 
+            ViewBag.Reviews = db.Reviews.Include(r => r.Customer).Where(r => r.ProductId == id && r.Status == "Approved").OrderByDescending(r => r.ReviewDate).ToList();
+
             return View(product);
+        }
+
+        [HttpPost]
+        public ActionResult SubmitReview(int productId, int rating, string comment)
+        {
+            if (Session["CustomerId"] == null)
+            {
+                return Json(new { success = false, message = "Bạn cần đăng nhập để đánh giá." });
+            }
+
+            if (rating < 1 || rating > 5)
+            {
+                return Json(new { success = false, message = "Đánh giá sao không hợp lệ." });
+            }
+
+            int customerId = (int)Session["CustomerId"];
+
+            // Check if user already reviewed
+            bool alreadyReviewed = db.Reviews.Any(r => r.ProductId == productId && r.CustomerId == customerId);
+            if (alreadyReviewed)
+            {
+                return Json(new { success = false, message = "Bạn đã đánh giá sản phẩm này rồi." });
+            }
+
+            var review = new Models.Review
+            {
+                ProductId = productId,
+                CustomerId = customerId,
+                Rating = rating,
+                Comment = comment,
+                ReviewDate = System.DateTime.Now,
+                Status = "Approved" // Or "Pending" if you want manual approval
+            };
+
+            db.Reviews.Add(review);
+            db.SaveChanges();
+
+            return Json(new { success = true, message = "Đánh giá của bạn đã được gửi thành công!" });
+        }
+
+        public ActionResult CollectionDetail(int id, string sort)
+        {
+            var collection = db.Collections
+                               .Include(c => c.Products)
+                               .Include("Products.Category")
+                               .FirstOrDefault(c => c.CollectionId == id);
+            
+            if (collection == null) return HttpNotFound();
+
+            ViewBag.ActiveMenu = "Collection";
+            ViewBag.Title = collection.CollectionName;
+
+            var productsQuery = collection.Products.AsQueryable();
+
+            switch (sort)
+            {
+                case "price_asc":
+                    productsQuery = productsQuery.OrderBy(p => p.BasePrice);
+                    break;
+                case "price_desc":
+                    productsQuery = productsQuery.OrderByDescending(p => p.BasePrice);
+                    break;
+                case "newest":
+                default:
+                    productsQuery = productsQuery.OrderByDescending(p => p.CreatedAt);
+                    break;
+            }
+            ViewBag.Sort = sort;
+
+            collection.Products = productsQuery.ToList();
+
+            return View(collection);
         }
 
         protected override void Dispose(bool disposing)

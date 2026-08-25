@@ -31,6 +31,7 @@ namespace PandoraWeb.Controllers
         }
 
         // GET: Admin/Products
+        [AdminAuthorize(Permission = "manage_product")]
         public ActionResult Products()
         {
             ViewBag.ActiveMenu = "Catalog";
@@ -42,12 +43,30 @@ namespace PandoraWeb.Controllers
             return View(products);
         }
 
+        [AdminAuthorize(Permission = "manage_product")]
         [HttpPost]
         public ActionResult SaveProduct(int? productId, string productName, int categoryId, int? collectionId, string price, int stock, string status, string description, System.Web.HttpPostedFileBase imageFile, System.Collections.Generic.IEnumerable<System.Web.HttpPostedFileBase> extraImages)
         {
             if (string.IsNullOrEmpty(productName))
             {
                 TempData["Error"] = "Tên sản phẩm không được để trống!";
+                return RedirectToAction("Products");
+            }
+
+            var productNameLower = productName.Trim().ToLower();
+            bool isDuplicate = false;
+            if (productId.HasValue && productId.Value > 0)
+            {
+                isDuplicate = db.Products.Any(p => p.ProductName.Trim().ToLower() == productNameLower && p.ProductId != productId.Value);
+            }
+            else
+            {
+                isDuplicate = db.Products.Any(p => p.ProductName.Trim().ToLower() == productNameLower);
+            }
+            
+            if (isDuplicate)
+            {
+                TempData["Error"] = "Tên sản phẩm đã tồn tại!";
                 return RedirectToAction("Products");
             }
             
@@ -163,6 +182,7 @@ namespace PandoraWeb.Controllers
         }
 
         // GET: Admin/Collections
+        [AdminAuthorize(Permission = "manage_product")]
         public ActionResult Collections()
         {
             ViewBag.ActiveMenu = "Catalog";
@@ -172,12 +192,30 @@ namespace PandoraWeb.Controllers
             return View(collections);
         }
 
+        [AdminAuthorize(Permission = "manage_product")]
         [HttpPost]
         public ActionResult SaveCollection(int? collectionId, string collectionName, string description, System.Web.HttpPostedFileBase imageFile)
         {
             if (string.IsNullOrEmpty(collectionName))
             {
                 TempData["Error"] = "Tên bộ sưu tập không được để trống!";
+                return RedirectToAction("Collections");
+            }
+
+            var collectionNameLower = collectionName.Trim().ToLower();
+            bool isDuplicate = false;
+            if (collectionId.HasValue && collectionId.Value > 0)
+            {
+                isDuplicate = db.Collections.Any(c => c.CollectionName.Trim().ToLower() == collectionNameLower && c.CollectionId != collectionId.Value);
+            }
+            else
+            {
+                isDuplicate = db.Collections.Any(c => c.CollectionName.Trim().ToLower() == collectionNameLower);
+            }
+
+            if (isDuplicate)
+            {
+                TempData["Error"] = "Tên bộ sưu tập đã tồn tại!";
                 return RedirectToAction("Collections");
             }
 
@@ -213,6 +251,7 @@ namespace PandoraWeb.Controllers
             return RedirectToAction("Collections");
         }
 
+        [AdminAuthorize(Permission = "manage_product")]
         [HttpPost]
         public ActionResult DeleteCollection(int id)
         {
@@ -236,6 +275,7 @@ namespace PandoraWeb.Controllers
             }
         }
 
+        [AdminAuthorize(Permission = "manage_product")]
         [HttpPost]
         public ActionResult DeleteProduct(int id)
         {
@@ -261,6 +301,7 @@ namespace PandoraWeb.Controllers
         }
 
         // GET: Admin/Customers
+        [AdminAuthorize(Permission = "manage_customer")]
         public ActionResult Customers()
         {
             ViewBag.ActiveMenu = "Customers";
@@ -271,6 +312,7 @@ namespace PandoraWeb.Controllers
         }
 
         // GET: Admin/Employees
+        [AdminAuthorize(Permission = "manage_employee")]
         public ActionResult Employees()
         {
             ViewBag.ActiveMenu = "Settings";
@@ -281,8 +323,9 @@ namespace PandoraWeb.Controllers
             return View(employees);
         }
 
+        [AdminAuthorize(Permission = "manage_employee")]
         [HttpPost]
-        public ActionResult SaveEmployee(int? id, string fullName, string email, int roleId, string status)
+        public ActionResult SaveEmployee(int? id, string fullName, string email, int roleId, string status, string password)
         {
             if (string.IsNullOrEmpty(fullName) || string.IsNullOrEmpty(email)) 
                 return Json(new { success = false, message = "Thiếu thông tin bắt buộc" });
@@ -298,15 +341,20 @@ namespace PandoraWeb.Controllers
                         emp.Email = email;
                         emp.RoleId = roleId;
                         emp.Status = status;
+                        if (!string.IsNullOrEmpty(password))
+                        {
+                            emp.PasswordHash = PandoraWeb.Helpers.SecurityHelper.HashSHA256(password);
+                        }
                     }
                 }
                 else
                 {
+                    string finalPass = !string.IsNullOrEmpty(password) ? password : "123456";
                     db.Employees.Add(new Employee
                     {
                         FullName = fullName,
                         Email = email,
-                        PasswordHash = PandoraWeb.Helpers.SecurityHelper.HashSHA256("123456"), // Default password
+                        PasswordHash = PandoraWeb.Helpers.SecurityHelper.HashSHA256(finalPass),
                         RoleId = roleId,
                         Status = status
                     });
@@ -320,6 +368,7 @@ namespace PandoraWeb.Controllers
             }
         }
 
+        [AdminAuthorize(Permission = "manage_employee")]
         [HttpPost]
         public ActionResult DeleteEmployee(int id)
         {
@@ -341,6 +390,7 @@ namespace PandoraWeb.Controllers
         }
 
         // GET: Admin/Roles
+        [AdminAuthorize(Permission = "manage_employee")]
         public ActionResult Roles()
         {
             ViewBag.ActiveMenu = "Settings";
@@ -350,6 +400,7 @@ namespace PandoraWeb.Controllers
             return View(roles);
         }
 
+        [AdminAuthorize(Permission = "manage_employee")]
         [HttpPost]
         public ActionResult SaveRole(int? id, string name, string description, string permissions)
         {
@@ -384,6 +435,7 @@ namespace PandoraWeb.Controllers
             }
         }
 
+        [AdminAuthorize(Permission = "manage_employee")]
         [HttpPost]
         public ActionResult DeleteRole(int id)
         {
@@ -408,6 +460,7 @@ namespace PandoraWeb.Controllers
         }
 
         // --- NEW CATALOG ACTIONS ---
+        [AdminAuthorize(Permission = "manage_product")]
         public ActionResult Categories()
         {
             ViewBag.ActiveMenu = "Catalog";
@@ -417,10 +470,28 @@ namespace PandoraWeb.Controllers
             return View(categories);
         }
 
+        [AdminAuthorize(Permission = "manage_product")]
         [HttpPost]
         public ActionResult SaveCategory(int? id, string name)
         {
             if (string.IsNullOrEmpty(name)) return Json(new { success = false, message = "Tên không được để trống" });
+
+            var nameLower = name.Trim().ToLower();
+            bool isDuplicate = false;
+            if (id.HasValue && id.Value > 0)
+            {
+                isDuplicate = db.Categories.Any(c => c.CategoryName.Trim().ToLower() == nameLower && c.CategoryId != id.Value);
+            }
+            else
+            {
+                isDuplicate = db.Categories.Any(c => c.CategoryName.Trim().ToLower() == nameLower);
+            }
+
+            if (isDuplicate)
+            {
+                return Json(new { success = false, message = "Tên danh mục đã tồn tại!" });
+            }
+
             if (id.HasValue && id.Value > 0)
             {
                 var cat = db.Categories.Find(id.Value);
@@ -434,6 +505,7 @@ namespace PandoraWeb.Controllers
             return Json(new { success = true });
         }
 
+        [AdminAuthorize(Permission = "manage_product")]
         [HttpPost]
         public ActionResult DeleteCategory(int id)
         {
@@ -455,6 +527,7 @@ namespace PandoraWeb.Controllers
             }
         }
 
+        [AdminAuthorize(Permission = "manage_product")]
         public ActionResult Brands()
         {
             ViewBag.ActiveMenu = "Catalog";
@@ -464,10 +537,29 @@ namespace PandoraWeb.Controllers
             return View(brands);
         }
 
+        [AdminAuthorize(Permission = "manage_product")]
         [HttpPost]
         public ActionResult SaveBrand(int? id, string name, string description, System.Web.HttpPostedFileBase imageFile)
         {
             if (string.IsNullOrEmpty(name)) return RedirectToAction("Brands");
+
+            var nameLower = name.Trim().ToLower();
+            bool isDuplicate = false;
+            if (id.HasValue && id.Value > 0)
+            {
+                isDuplicate = db.Collections.Any(c => c.CollectionName.Trim().ToLower() == nameLower && c.CollectionId != id.Value);
+            }
+            else
+            {
+                isDuplicate = db.Collections.Any(c => c.CollectionName.Trim().ToLower() == nameLower);
+            }
+
+            if (isDuplicate)
+            {
+                TempData["Error"] = "Tên nhãn hiệu đã tồn tại!";
+                return RedirectToAction("Brands");
+            }
+
             string imageUrl = null;
             if (imageFile != null && imageFile.ContentLength > 0)
             {
@@ -493,6 +585,7 @@ namespace PandoraWeb.Controllers
             return RedirectToAction("Brands");
         }
 
+        [AdminAuthorize(Permission = "manage_product")]
         [HttpPost]
         public ActionResult DeleteBrand(int id)
         {
@@ -514,6 +607,7 @@ namespace PandoraWeb.Controllers
             }
         }
 
+        [AdminAuthorize(Permission = "manage_product")]
         public ActionResult Attributes()
         {
             ViewBag.ActiveMenu = "Catalog";
@@ -524,6 +618,7 @@ namespace PandoraWeb.Controllers
             return View();
         }
 
+        [AdminAuthorize(Permission = "manage_product")]
         [HttpPost]
         public ActionResult SaveMaterial(int? id, string name)
         {
@@ -538,6 +633,7 @@ namespace PandoraWeb.Controllers
             return Json(new { success = true });
         }
         
+        [AdminAuthorize(Permission = "manage_product")]
         [HttpPost]
         public ActionResult DeleteMaterial(int id)
         {
@@ -553,6 +649,7 @@ namespace PandoraWeb.Controllers
             } catch(Exception e) { return Json(new { success = false, message = e.Message }); }
         }
 
+        [AdminAuthorize(Permission = "manage_product")]
         [HttpPost]
         public ActionResult SaveSize(int? id, string name)
         {
@@ -567,6 +664,7 @@ namespace PandoraWeb.Controllers
             return Json(new { success = true });
         }
         
+        [AdminAuthorize(Permission = "manage_product")]
         [HttpPost]
         public ActionResult DeleteSize(int id)
         {
@@ -583,6 +681,7 @@ namespace PandoraWeb.Controllers
         }
 
         // --- NEW ORDERS ACTIONS ---
+        [AdminAuthorize(Permission = "manage_order")]
         public ActionResult Orders()
         {
             ViewBag.ActiveMenu = "Orders";
@@ -592,6 +691,7 @@ namespace PandoraWeb.Controllers
             return View(orders);
         }
 
+        [AdminAuthorize(Permission = "manage_order")]
         [HttpPost]
         public ActionResult UpdateOrderStatus(int id, string status)
         {
@@ -606,6 +706,7 @@ namespace PandoraWeb.Controllers
             } catch(Exception e) { return Json(new { success = false, message = e.Message }); }
         }
 
+        [AdminAuthorize(Permission = "manage_order")]
         public ActionResult Refunds()
         {
             ViewBag.ActiveMenu = "Orders";
@@ -618,6 +719,7 @@ namespace PandoraWeb.Controllers
         }
 
         // --- NEW CUSTOMERS ACTIONS ---
+        [AdminAuthorize(Permission = "manage_customer")]
         public ActionResult CustomerSegments()
         {
             ViewBag.ActiveMenu = "Customers";
@@ -633,6 +735,7 @@ namespace PandoraWeb.Controllers
             return View();
         }
         
+        [AdminAuthorize(Permission = "manage_customer")]
         public ActionResult Reviews()
         {
             ViewBag.ActiveMenu = "Customers";
@@ -642,6 +745,7 @@ namespace PandoraWeb.Controllers
             return View(reviews);
         }
 
+        [AdminAuthorize(Permission = "manage_customer")]
         [HttpPost]
         public ActionResult UpdateReviewStatus(int id, string status)
         {
@@ -656,6 +760,7 @@ namespace PandoraWeb.Controllers
             } catch(Exception e) { return Json(new { success = false, message = e.Message }); }
         }
 
+        [AdminAuthorize(Permission = "manage_customer")]
         [HttpPost]
         public ActionResult DeleteReview(int id)
         {
@@ -671,6 +776,7 @@ namespace PandoraWeb.Controllers
         }
 
         // --- NEW MARKETING ACTIONS ---
+        [AdminAuthorize(Permission = "manage_marketing")]
         public ActionResult Coupons()
         {
             ViewBag.ActiveMenu = "Marketing";
@@ -680,6 +786,7 @@ namespace PandoraWeb.Controllers
             return View(coupons);
         }
 
+        [AdminAuthorize(Permission = "manage_marketing")]
         [HttpPost]
         public ActionResult SaveCoupon(int? id, string code, int? percent, decimal? amount, DateTime start, DateTime end, bool active)
         {
@@ -698,6 +805,7 @@ namespace PandoraWeb.Controllers
             return RedirectToAction("Coupons");
         }
         
+        [AdminAuthorize(Permission = "manage_marketing")]
         [HttpPost]
         public ActionResult DeleteCoupon(int id)
         {
@@ -706,6 +814,7 @@ namespace PandoraWeb.Controllers
             return Json(new { success = false });
         }
 
+        [AdminAuthorize(Permission = "manage_marketing")]
         public ActionResult FlashSales()
         {
             ViewBag.ActiveMenu = "Marketing";
@@ -718,6 +827,7 @@ namespace PandoraWeb.Controllers
 
 
         // --- NEW CMS ACTIONS ---
+        [AdminAuthorize(Permission = "manage_cms")]
         public ActionResult Pages()
         {
             ViewBag.ActiveMenu = "CMS";
@@ -727,6 +837,7 @@ namespace PandoraWeb.Controllers
             return View(pages);
         }
         
+        [AdminAuthorize(Permission = "manage_cms")]
         public ActionResult Blog()
         {
             ViewBag.ActiveMenu = "CMS";
@@ -736,6 +847,7 @@ namespace PandoraWeb.Controllers
             return View(posts);
         }
         
+        [AdminAuthorize(Permission = "manage_cms")]
         public ActionResult FAQ()
         {
             ViewBag.ActiveMenu = "CMS";
@@ -745,7 +857,68 @@ namespace PandoraWeb.Controllers
             return View(faqs);
         }
 
+        [AdminAuthorize(Permission = "manage_cms")]
+        [HttpPost]
+        public ActionResult SaveFaq(int? id, string question, string answer, int displayOrder, bool isActive)
+        {
+            if (string.IsNullOrEmpty(question) || string.IsNullOrEmpty(answer))
+                return Json(new { success = false, message = "Thiếu thông tin" });
+
+            try
+            {
+                if (id.HasValue && id.Value > 0)
+                {
+                    var faq = db.Faqs.Find(id.Value);
+                    if (faq != null)
+                    {
+                        faq.Question = question;
+                        faq.Answer = answer;
+                        faq.DisplayOrder = displayOrder;
+                        faq.IsActive = isActive;
+                    }
+                }
+                else
+                {
+                    db.Faqs.Add(new Faq
+                    {
+                        Question = question,
+                        Answer = answer,
+                        DisplayOrder = displayOrder,
+                        IsActive = isActive
+                    });
+                }
+                db.SaveChanges();
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [AdminAuthorize(Permission = "manage_cms")]
+        [HttpPost]
+        public ActionResult DeleteFaq(int id)
+        {
+            try
+            {
+                var faq = db.Faqs.Find(id);
+                if (faq != null)
+                {
+                    db.Faqs.Remove(faq);
+                    db.SaveChanges();
+                    return Json(new { success = true });
+                }
+                return Json(new { success = false, message = "Không tìm thấy" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
         // --- NEW REPORTS ACTIONS ---
+        [AdminAuthorize(Permission = "read_report")]
         public ActionResult SalesReports()
         {
             ViewBag.ActiveMenu = "Reports";
@@ -759,6 +932,7 @@ namespace PandoraWeb.Controllers
             return View(recentOrders);
         }
 
+        [AdminAuthorize(Permission = "read_report")]
         public ActionResult InventoryReports()
         {
             ViewBag.ActiveMenu = "Reports";
@@ -769,6 +943,7 @@ namespace PandoraWeb.Controllers
         }
 
         // --- NEW SETTINGS ACTIONS ---
+        [AdminAuthorize(Permission = "manage_setting")]
         public ActionResult Settings()
         {
             ViewBag.ActiveMenu = "Settings";
@@ -777,6 +952,7 @@ namespace PandoraWeb.Controllers
             return View();
         }
 
+        [AdminAuthorize(Permission = "manage_setting")]
         public ActionResult Payments()
         {
             ViewBag.ActiveMenu = "Settings";
@@ -785,6 +961,7 @@ namespace PandoraWeb.Controllers
             return View();
         }
 
+        [AdminAuthorize(Permission = "manage_setting")]
         public ActionResult Shipping()
         {
             ViewBag.ActiveMenu = "Settings";
@@ -794,6 +971,7 @@ namespace PandoraWeb.Controllers
         }
 
         // --- PROMO POPUP MANAGEMENT ---
+        [AdminAuthorize(Permission = "manage_marketing")]
         public ActionResult PromoPopup()
         {
             ViewBag.ActiveMenu = "Marketing";
@@ -803,6 +981,7 @@ namespace PandoraWeb.Controllers
             return View(settings);
         }
 
+        [AdminAuthorize(Permission = "manage_marketing")]
         [HttpPost]
         public ActionResult SavePromoPopup(bool isEnabled = false, string title = null, string subtitle = null, string content = null, string couponCode = null, string imageUrl = null, string buttonText = null, string buttonLink = null, System.Web.HttpPostedFileBase imageFile = null)
         {
@@ -842,6 +1021,7 @@ namespace PandoraWeb.Controllers
         }
 
         // --- BANNERS MANAGEMENT ---
+        [AdminAuthorize(Permission = "manage_marketing")]
         public ActionResult Banners()
         {
             ViewBag.ActiveMenu = "Marketing";
@@ -851,6 +1031,7 @@ namespace PandoraWeb.Controllers
             return View(banners);
         }
 
+        [AdminAuthorize(Permission = "manage_marketing")]
         [HttpPost]
         public ActionResult SaveBanner(int? bannerId, string title, string linkUrl, int displayOrder = 0, bool isActive = true, System.Web.HttpPostedFileBase imageFile = null)
         {
@@ -896,6 +1077,7 @@ namespace PandoraWeb.Controllers
             return RedirectToAction("Banners");
         }
 
+        [AdminAuthorize(Permission = "manage_marketing")]
         [HttpPost]
         public JsonResult DeleteBanner(int id)
         {
