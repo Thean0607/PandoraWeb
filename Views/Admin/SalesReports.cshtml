@@ -1,4 +1,4 @@
-@model IEnumerable<PandoraWeb.Models.Order>
+﻿@model IEnumerable<PandoraWeb.Models.Order>
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     decimal totalRev = ViewBag.TotalRevenue ?? 0;
@@ -6,7 +6,7 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0 text-white">@ViewBag.Title</h1>
+    <h1 class="h3 mb-0">@ViewBag.Title</h1>
     <button class="btn btn-admin">
         <i class="fas fa-file-export"></i> Tải Báo Cáo PDF
     </button>
@@ -28,7 +28,7 @@
 </div>
 
 <div class="admin-card">
-    <h5 class="text-white mb-4">Giao Dịch Gần Đây (Đã thanh toán)</h5>
+    <h5 class="mb-4">Giao Dịch Gần Đây (Đã thanh toán)</h5>
     <div class="table-responsive">
         <table class="table admin-table table-hover">
             <thead>
@@ -60,3 +60,4 @@
         </table>
     </div>
 </div>
+

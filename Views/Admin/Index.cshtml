@@ -1,4 +1,4 @@
-@model IEnumerable<PandoraWeb.Models.Order>
+﻿@model IEnumerable<PandoraWeb.Models.Order>
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     string FormatCurrency(decimal? value) {
@@ -66,7 +66,7 @@
 <div class="row g-4">
     <div class="col-lg-8">
         <div class="admin-card">
-            <h4 class="mb-4 text-white">Đơn hàng gần đây</h4>
+            <h4 class="mb-4">Đơn hàng gần đây</h4>
             <div class="table-responsive table-wrapper">
                 <table class="table admin-table">
                     <thead>
@@ -104,14 +104,15 @@
     </div>
     <div class="col-lg-4">
         <div class="admin-card">
-            <h4 class="mb-4 text-white">Hoạt động gần đây</h4>
+            <h4 class="mb-4">Hoạt động gần đây</h4>
             <ul class="list-unstyled">
-                <li class="mb-3 border-bottom border-secondary pb-3">
-                    <p class="mb-1 text-white"><i class="fas fa-info-circle text-info me-2"></i>Tính năng lịch sử đang được phát triển</p>
+                <li class="mb-3 border-bottom pb-3">
+                    <p class="mb-1"><i class="fas fa-info-circle text-info me-2"></i>Tính năng lịch sử đang được phát triển</p>
                     <small class="text-muted">Vừa xong</small>
                 </li>
             </ul>
         </div>
     </div>
 </div>
+
 

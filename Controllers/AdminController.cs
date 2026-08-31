@@ -99,7 +99,11 @@ namespace PandoraWeb.Controllers
                     p.Status = status;
                     p.UpdatedAt = DateTime.Now;
                     
-                    if (imageUrl != null)
+                    if (Request.Form["removeMainImage"] == "true")
+                    {
+                        p.ImageUrl = "assets/img/products/default.jpg";
+                    }
+                    else if (imageUrl != null)
                     {
                         p.ImageUrl = imageUrl;
                     }
@@ -983,7 +987,7 @@ namespace PandoraWeb.Controllers
 
         [AdminAuthorize(Permission = "manage_marketing")]
         [HttpPost]
-        public ActionResult SavePromoPopup(bool isEnabled = false, string title = null, string subtitle = null, string content = null, string couponCode = null, string imageUrl = null, string buttonText = null, string buttonLink = null, System.Web.HttpPostedFileBase imageFile = null)
+        public ActionResult SavePromoPopup(bool isEnabled = false, string title = null, string subtitle = null, string content = null, string couponCode = null, string imageUrl = null, string buttonText = null, string buttonLink = null, string backgroundColor = null, string popupLayout = null, System.Web.HttpPostedFileBase imageFile = null)
         {
             var settings = PandoraWeb.Helpers.PromoPopupHelper.GetSettings();
             settings.IsEnabled = isEnabled;
@@ -993,6 +997,8 @@ namespace PandoraWeb.Controllers
             settings.CouponCode = !string.IsNullOrWhiteSpace(couponCode) ? couponCode.Trim() : "";
             settings.ButtonText = !string.IsNullOrWhiteSpace(buttonText) ? buttonText.Trim() : "KHÁM PHÁ NGAY";
             settings.ButtonLink = !string.IsNullOrWhiteSpace(buttonLink) ? buttonLink.Trim() : "/Product/Category";
+            settings.BackgroundColor = !string.IsNullOrWhiteSpace(backgroundColor) ? backgroundColor.Trim() : "#121212";
+            settings.PopupLayout = !string.IsNullOrWhiteSpace(popupLayout) ? popupLayout.Trim() : "horizontal";
 
             if (imageFile != null && imageFile.ContentLength > 0)
             {
@@ -1089,6 +1095,77 @@ namespace PandoraWeb.Controllers
                 return Json(new { success = true, message = "Xóa banner thành công!" });
             }
             return Json(new { success = false, message = "Không tìm thấy banner." });
+        }
+
+
+        [AdminAuthorize(Permission = "manage_cms")]
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult SaveBlog(int? postId, string title, string author, bool isPublished, string content, System.Web.HttpPostedFileBase imageFile)
+        {
+            if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(content))
+            {
+                TempData["Error"] = "Tiêu đề và Nội dung không được để trống!";
+                return RedirectToAction("Blog");
+            }
+
+            BlogPost post;
+            if (postId.HasValue && postId.Value > 0)
+            {
+                post = db.BlogPosts.Find(postId.Value);
+                if (post == null)
+                {
+                    TempData["Error"] = "Không tìm thấy bài viết!";
+                    return RedirectToAction("Blog");
+                }
+            }
+            else
+            {
+                post = new BlogPost();
+                post.PublishedDate = DateTime.Now;
+                db.BlogPosts.Add(post);
+            }
+
+            post.Title = title.Trim();
+            post.Author = string.IsNullOrWhiteSpace(author) ? "Admin" : author.Trim();
+            post.IsPublished = isPublished;
+            post.Content = content;
+
+            if (imageFile != null && imageFile.ContentLength > 0)
+            {
+                try
+                {
+                    var cloudinaryHelper = new PandoraWeb.Helpers.CloudinaryHelper();
+                    string uploadedUrl = cloudinaryHelper.UploadImage(imageFile);
+                    if (!string.IsNullOrEmpty(uploadedUrl))
+                    {
+                        post.ImageUrl = uploadedUrl;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    TempData["Error"] = "Lỗi khi tải ảnh lên Cloudinary: " + ex.Message;
+                    return RedirectToAction("Blog");
+                }
+            }
+
+            db.SaveChanges();
+            TempData["Success"] = "Đã lưu bài viết thành công!";
+            return RedirectToAction("Blog");
+        }
+
+        [AdminAuthorize(Permission = "manage_cms")]
+        [HttpPost]
+        public JsonResult DeleteBlog(int id)
+        {
+            var post = db.BlogPosts.Find(id);
+            if (post != null)
+            {
+                db.BlogPosts.Remove(post);
+                db.SaveChanges();
+                return Json(new { success = true, message = "Xóa bài viết thành công!" });
+            }
+            return Json(new { success = false, message = "Không tìm thấy bài viết." });
         }
     }
 }

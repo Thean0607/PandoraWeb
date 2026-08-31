@@ -1,11 +1,11 @@
-@{
+﻿@{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     // Using dynamic since we passed anonymous type
     var segments = ViewBag.Segments as IEnumerable<dynamic>;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0 text-white">@ViewBag.Title</h1>
+    <h1 class="h3 mb-0">@ViewBag.Title</h1>
 </div>
 
 <div class="table-wrapper">
@@ -57,3 +57,4 @@
         </tbody>
     </table>
 </div>
+

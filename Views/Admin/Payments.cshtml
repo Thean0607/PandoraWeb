@@ -1,9 +1,9 @@
-@{
+﻿@{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0 text-white">@ViewBag.Title</h1>
+    <h1 class="h3 mb-0">@ViewBag.Title</h1>
 </div>
 
 <div class="row">
@@ -29,13 +29,14 @@
             <p class="text-muted small">Cổng thanh toán thẻ ATM, Visa, MasterCard.</p>
             <div class="mb-3 mt-4">
                 <label class="form-label text-muted fs-7">VNPay TmnCode</label>
-                <input type="text" class="form-control form-control-sm bg-dark text-white border-secondary" value="QWERTY1234" />
+                <input type="text" class="form-control form-control-sm" value="QWERTY1234" />
             </div>
             <div class="mb-3">
                 <label class="form-label text-muted fs-7">VNPay HashSecret</label>
-                <input type="password" class="form-control form-control-sm bg-dark text-white border-secondary" value="****************" />
+                <input type="password" class="form-control form-control-sm" value="****************" />
             </div>
             <button class="btn btn-sm btn-outline-warning">Cập nhật cấu hình</button>
         </div>
     </div>
 </div>
+

@@ -4,8 +4,8 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0 text-white">@ViewBag.Title</h1>
-    <button class="btn btn-admin">
+    <h1 class="h3 mb-0">@ViewBag.Title</h1>
+    <button class="btn btn-admin" onclick="openBlogModal()">
         <i class="fas fa-plus"></i> Viết Bài Mới
     </button>
 </div>
@@ -14,6 +14,7 @@
     <table class="table admin-table table-hover">
         <thead>
             <tr>
+                <th>Ảnh</th>
                 <th>Tiêu Đề</th>
                 <th>Tác Giả</th>
                 <th>Ngày Đăng</th>
@@ -27,24 +28,212 @@
                 foreach (var item in Model)
                 {
                     <tr>
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.ImageUrl))
+                            {
+                                <img src="@PandoraWeb.Helpers.ImageHelper.GetImageUrl(item.ImageUrl)" alt="@item.Title" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px;" />
+                            }
+                            else
+                            {
+                                <div style="width: 60px; height: 60px; border-radius: 6px; background: #e9ecef; display: flex; align-items: center; justify-content: center; color: #adb5bd;">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                            }
+                        </td>
                         <td class="fw-bold">@item.Title</td>
                         <td>@item.Author</td>
-                        <td>@item.PublishedDate.ToString("dd/MM/yyyy")</td>
+                        <td>@item.PublishedDate.ToString("dd/MM/yyyy HH:mm")</td>
                         <td>
                             @if(item.IsPublished) { <span class="badge bg-success">Đã đăng</span> }
                             else { <span class="badge bg-secondary">Bản nháp</span> }
                         </td>
                         <td class="text-end">
-                            <button class="btn btn-icon btn-edit"><i class="fas fa-edit"></i></button>
-                            <button class="btn btn-icon btn-delete"><i class="fas fa-trash"></i></button>
+                            <div class="d-none" id="blog-content-@item.PostId">@Html.Raw(item.Content)</div>
+                            <button class="btn btn-icon btn-edit" onclick="editBlog(@item.PostId, '@Html.Raw(HttpUtility.JavaScriptStringEncode(item.Title))', '@Html.Raw(HttpUtility.JavaScriptStringEncode(item.Author ?? ""))', @item.IsPublished.ToString().ToLower(), '@item.ImageUrl')"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-icon btn-delete" onclick="deleteBlog(@item.PostId)"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
                 }
             }
             else
             {
-                <tr><td colspan="5" class="text-center py-4 text-muted">Chưa có bài viết nào.</td></tr>
+                <tr><td colspan="6" class="text-center py-4 text-muted">Chưa có bài viết nào.</td></tr>
             }
         </tbody>
     </table>
 </div>
+
+<!-- Blog Modal -->
+<div class="modal fade" id="blogModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="blogModalTitle">Viết Bài Mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="blogForm" action="@Url.Action("SaveBlog", "Admin")" method="post" enctype="multipart/form-data" class="admin-form">
+                <div class="modal-body">
+                    <input type="hidden" id="postId" name="postId" value="" />
+                    
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label class="form-label">Tiêu Đề <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="title" name="title" required placeholder="Nhập tiêu đề bài viết...">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Nội Dung Bài Viết <span class="text-danger">*</span></label>
+                                <textarea id="contentEditor" name="content"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Tác Giả</label>
+                                <input type="text" class="form-control" id="author" name="author" placeholder="VD: Admin">
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label">Trạng Thái</label>
+                                <div class="form-check form-switch mt-2">
+                                    <input class="form-check-input" type="checkbox" id="isPublished" name="isPublished" value="true" checked>
+                                    <label class="form-check-label" for="isPublished">Xuất bản ngay</label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Ảnh Bìa Bài Viết</label>
+                                <div class="card bg-light border-0 text-center p-3 mb-2" style="border: 2px dashed #dee2e6 !important;">
+                                    <img id="imagePreview" src="" alt="Preview" style="max-width: 100%; max-height: 200px; display: none; margin: 0 auto; border-radius: 8px;" />
+                                    <div id="imagePlaceholder" class="text-muted py-4">
+                                        <i class="fas fa-image fa-3x mb-2"></i>
+                                        <p class="mb-0 small">Chưa có ảnh</p>
+                                    </div>
+                                </div>
+                                <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*" onchange="previewImage(this)">
+                                <small class="text-muted d-block mt-1">Nên dùng ảnh ngang (tỷ lệ 16:9)</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-admin"><i class="fas fa-save me-2"></i> Lưu Bài Viết</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- CKEditor 5 Rich Text Editor -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+    <script>
+        let blogModal;
+        let editorInstance;
+        
+        document.addEventListener('DOMContentLoaded', function () {
+            blogModal = new bootstrap.Modal(document.getElementById('blogModal'));
+            
+            // Initialize CKEditor
+            ClassicEditor
+                .create(document.querySelector('#contentEditor'), {
+                    toolbar: [ 'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|', 'undo', 'redo' ]
+                })
+                .then(editor => {
+                    editorInstance = editor;
+                    // Fix CKEditor height
+                    editor.editing.view.change(writer => {
+                        writer.setStyle('height', '300px', editor.editing.view.document.getRoot());
+                    });
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        });
+
+        function previewImage(input) {
+            const preview = document.getElementById('imagePreview');
+            const placeholder = document.getElementById('imagePlaceholder');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    placeholder.style.display = 'none';
+                }
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.src = '';
+                preview.style.display = 'none';
+                placeholder.style.display = 'block';
+            }
+        }
+
+        function openBlogModal() {
+            document.getElementById('blogForm').reset();
+            document.getElementById('postId').value = '';
+            document.getElementById('blogModalTitle').innerText = 'Viết Bài Mới';
+            
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('imagePlaceholder').style.display = 'block';
+            
+            if (editorInstance) {
+                editorInstance.setData('');
+            }
+            
+            blogModal.show();
+        }
+
+        function editBlog(id, title, author, isPublished, imageUrl) {
+            document.getElementById('blogForm').reset();
+            document.getElementById('postId').value = id;
+            document.getElementById('title').value = title;
+            document.getElementById('author').value = author;
+            document.getElementById('isPublished').checked = isPublished;
+            document.getElementById('blogModalTitle').innerText = 'Sửa Bài Viết';
+            
+            const preview = document.getElementById('imagePreview');
+            const placeholder = document.getElementById('imagePlaceholder');
+            if (imageUrl) {
+                // If it's not an absolute URL, prefix it with '/' if needed. But usually Cloudinary URLs are absolute
+                preview.src = imageUrl.startsWith('http') ? imageUrl : '/' + imageUrl;
+                preview.style.display = 'block';
+                placeholder.style.display = 'none';
+            } else {
+                preview.style.display = 'none';
+                placeholder.style.display = 'block';
+            }
+            
+            const content = document.getElementById('blog-content-' + id).innerHTML;
+            if (editorInstance) {
+                editorInstance.setData(content);
+            }
+            
+            blogModal.show();
+        }
+
+        function deleteBlog(id) {
+            if (confirm('Bạn có chắc chắn muốn xóa bài viết này không? Hành động này không thể hoàn tác.')) {
+                fetch('@Url.Action("DeleteBlog", "Admin")/' + id, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Lỗi: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Đã xảy ra lỗi khi xóa bài viết.');
+                });
+            }
+        }
+    </script>
+}

@@ -1,17 +1,17 @@
-@{
+﻿@{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     var materials = ViewBag.Materials as IEnumerable<PandoraWeb.Models.Material>;
     var sizes = ViewBag.Sizes as IEnumerable<PandoraWeb.Models.Size>;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0 text-white">@ViewBag.Title</h1>
+    <h1 class="h3 mb-0">@ViewBag.Title</h1>
 </div>
 
 <div class="admin-card">
-    <ul class="nav nav-tabs mb-4 border-secondary" id="attributeTabs" role="tablist">
+    <ul class="nav nav-tabs mb-4" id="attributeTabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active bg-transparent text-white border-0 border-bottom border-warning" id="material-tab" data-bs-toggle="tab" data-bs-target="#material" type="button" role="tab">Chất liệu (Materials)</button>
+            <button class="nav-link active bg-transparent border-0 border-bottom border-warning" id="material-tab" data-bs-toggle="tab" data-bs-target="#material" type="button" role="tab">Chất liệu (Materials)</button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link bg-transparent text-muted border-0" id="size-tab" data-bs-toggle="tab" data-bs-target="#size" type="button" role="tab">Kích thước (Sizes)</button>
@@ -220,3 +220,4 @@
         }
     </script>
 }
+

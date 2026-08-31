@@ -15,6 +15,8 @@ namespace PandoraWeb.Helpers
         public string ImageUrl { get; set; } = "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=800&auto=format&fit=crop";
         public string ButtonText { get; set; } = "KHÁM PHÁ NGAY";
         public string ButtonLink { get; set; } = "/Product/Category";
+        public string BackgroundColor { get; set; } = "#121212";
+        public string PopupLayout { get; set; } = "horizontal";
     }
 
     public static class PromoPopupHelper

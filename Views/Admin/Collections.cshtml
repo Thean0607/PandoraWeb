@@ -1,10 +1,10 @@
-@model IEnumerable<PandoraWeb.Models.Collection>
+﻿@model IEnumerable<PandoraWeb.Models.Collection>
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0 text-white">@ViewBag.Title</h1>
+    <h1 class="h3 mb-0">@ViewBag.Title</h1>
     <button class="btn btn-admin" onclick="openCollectionModal()">
         <i class="fas fa-plus"></i> Thêm Bộ Sưu Tập
     </button>
@@ -186,3 +186,4 @@
         }
     </script>
 }
+

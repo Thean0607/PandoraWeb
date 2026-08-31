@@ -1,4 +1,4 @@
-@model IEnumerable<PandoraWeb.Models.Data.Role>
+﻿@model IEnumerable<PandoraWeb.Models.Data.Role>
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
@@ -105,43 +105,43 @@
                         <div class="permission-checkboxes">
                             <div class="permission-item form-check">
                                 <input class="form-check-input perm-cb" type="checkbox" value="all" id="perm_all">
-                                <label class="form-check-label text-white" for="perm_all">Toàn quyền (Admin)</label>
+                                <label class="form-check-label" for="perm_all">Toàn quyền (Admin)</label>
                             </div>
                             <div class="permission-item form-check">
                                 <input class="form-check-input perm-cb" type="checkbox" value="manage_product" id="perm_prod">
-                                <label class="form-check-label text-white" for="perm_prod">Quản lý Sản Phẩm (Thêm/Sửa/Xóa)</label>
+                                <label class="form-check-label" for="perm_prod">Quản lý Sản Phẩm (Thêm/Sửa/Xóa)</label>
                             </div>
                             <div class="permission-item form-check">
                                 <input class="form-check-input perm-cb" type="checkbox" value="read_product" id="perm_read_prod">
-                                <label class="form-check-label text-white" for="perm_read_prod">Xem Sản Phẩm</label>
+                                <label class="form-check-label" for="perm_read_prod">Xem Sản Phẩm</label>
                             </div>
                             <div class="permission-item form-check">
                                 <input class="form-check-input perm-cb" type="checkbox" value="manage_customer" id="perm_cust">
-                                <label class="form-check-label text-white" for="perm_cust">Quản lý Khách Hàng</label>
+                                <label class="form-check-label" for="perm_cust">Quản lý Khách Hàng</label>
                             </div>
                             <div class="permission-item form-check">
                                 <input class="form-check-input perm-cb" type="checkbox" value="manage_employee" id="perm_emp">
-                                <label class="form-check-label text-white" for="perm_emp">Quản lý Nhân Viên</label>
+                                <label class="form-check-label" for="perm_emp">Quản lý Nhân Viên</label>
                             </div>
                             <div class="permission-item form-check">
                                 <input class="form-check-input perm-cb" type="checkbox" value="manage_order" id="perm_order">
-                                <label class="form-check-label text-white" for="perm_order">Quản lý Đơn Hàng</label>
+                                <label class="form-check-label" for="perm_order">Quản lý Đơn Hàng</label>
                             </div>
                             <div class="permission-item form-check">
                                 <input class="form-check-input perm-cb" type="checkbox" value="manage_marketing" id="perm_marketing">
-                                <label class="form-check-label text-white" for="perm_marketing">Quản lý Khuyến Mãi</label>
+                                <label class="form-check-label" for="perm_marketing">Quản lý Khuyến Mãi</label>
                             </div>
                             <div class="permission-item form-check">
                                 <input class="form-check-input perm-cb" type="checkbox" value="manage_cms" id="perm_cms">
-                                <label class="form-check-label text-white" for="perm_cms">Quản lý Nội Dung (Blog/FAQ)</label>
+                                <label class="form-check-label" for="perm_cms">Quản lý Nội Dung (Blog/FAQ)</label>
                             </div>
                             <div class="permission-item form-check">
                                 <input class="form-check-input perm-cb" type="checkbox" value="read_report" id="perm_report">
-                                <label class="form-check-label text-white" for="perm_report">Xem Báo Cáo</label>
+                                <label class="form-check-label" for="perm_report">Xem Báo Cáo</label>
                             </div>
                             <div class="permission-item form-check">
                                 <input class="form-check-input perm-cb" type="checkbox" value="manage_setting" id="perm_setting">
-                                <label class="form-check-label text-white" for="perm_setting">Quản lý Cài Đặt HT</label>
+                                <label class="form-check-label" for="perm_setting">Quản lý Cài Đặt HT</label>
                             </div>
                         </div>
                     </div>
@@ -268,4 +268,5 @@
         }
     </script>
 }
+
 

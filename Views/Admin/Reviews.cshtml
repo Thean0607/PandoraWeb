@@ -1,10 +1,10 @@
-@model IEnumerable<PandoraWeb.Models.Review>
+﻿@model IEnumerable<PandoraWeb.Models.Review>
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0 text-white">@ViewBag.Title</h1>
+    <h1 class="h3 mb-0">@ViewBag.Title</h1>
 </div>
 
 <div class="table-wrapper">
@@ -41,7 +41,7 @@
                         <td><small class="text-muted">@item.Comment</small></td>
                         <td>@item.ReviewDate.ToString("dd/MM/yyyy")</td>
                         <td>
-                            <select class="form-select form-select-sm bg-dark text-white border-secondary status-select" 
+                            <select class="form-select form-select-sm status-select" 
                                     onchange="updateReviewStatus(@item.ReviewId, this.value)" 
                                     style="width: 110px; font-size: 0.8rem;">
                                 <option value="Pending" @(item.Status == "Pending" ? "selected" : "")>Chờ duyệt</option>
@@ -100,3 +100,4 @@
         }
     </script>
 }
+

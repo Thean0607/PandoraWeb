@@ -5,7 +5,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h1 class="h3 mb-1 text-white">@ViewBag.Title</h1>
+        <h1 class="h3 mb-1">@ViewBag.Title</h1>
         <p class="text-muted mb-0 fs-7">Cấu hình hiển thị và nội dung Popup thông báo ưu đãi xuất hiện khi khách hàng truy cập website.</p>
     </div>
     <div>
@@ -40,12 +40,12 @@
         <!-- Settings Form Column -->
         <div class="col-lg-7 mb-4">
             <div class="admin-card p-4 shadow-sm">
-                <h5 class="text-white mb-4 pb-2 border-bottom border-secondary"><i class="fas fa-cog text-warning me-2"></i>Cấu Hình Popup</h5>
+                <h5 class="mb-4 pb-2 border-bottom"><i class="fas fa-cog text-warning me-2"></i>Cấu Hình Popup</h5>
                 
                 <!-- Toggle Switch -->
-                <div class="p-3 mb-4 rounded bg-dark border border-secondary d-flex align-items-center justify-content-between">
+                <div class="p-3 mb-4 rounded border d-flex align-items-center justify-content-between">
                     <div>
-                        <strong class="d-block text-white">Trạng thái Bật/Tắt Popup</strong>
+                        <strong class="d-block">Trạng thái Bật/Tắt Popup</strong>
                         <small class="text-muted">Khi bật, popup sẽ tự động xuất hiện 1 lần khi khách mở trang web.</small>
                     </div>
                     <div class="form-check form-switch fs-4 mb-0">
@@ -55,22 +55,22 @@
 
                 <div class="mb-3">
                     <label class="form-label text-muted fw-semibold">Tiêu Đề Ưu Đãi <span class="text-danger">*</span></label>
-                    <input type="text" name="title" class="form-control bg-dark text-white border-secondary" value="@Model.Title" placeholder="VD: ƯU ĐÃI ĐẶC BIỆT THÁNG NÀY" required>
+                    <input type="text" name="title" class="form-control" value="@Model.Title" placeholder="VD: ƯU ĐÃI ĐẶC BIỆT THÁNG NÀY" required>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label text-muted fw-semibold">Phụ Đề (Subtitle)</label>
-                    <input type="text" name="subtitle" class="form-control bg-dark text-white border-secondary" value="@Model.Subtitle" placeholder="VD: Giảm ngay 20% cho đơn hàng Pandora">
+                    <input type="text" name="subtitle" class="form-control" value="@Model.Subtitle" placeholder="VD: Giảm ngay 20% cho đơn hàng Pandora">
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label text-muted fw-semibold">Nội Dung Chi Tiết</label>
-                    <textarea name="content" class="form-control bg-dark text-white border-secondary" rows="3" placeholder="Mô tả chương trình khuyến mãi...">@Model.Content</textarea>
+                    <textarea name="content" class="form-control" rows="3" placeholder="Mô tả chương trình khuyến mãi...">@Model.Content</textarea>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label text-muted fw-semibold">Mã Giảm Giá (Coupon Code)</label>
-                    <input type="text" name="couponCode" class="form-control bg-dark text-warning fw-bold border-secondary text-uppercase" value="@Model.CouponCode" placeholder="VD: PANDORA20">
+                    <input type="text" name="couponCode" class="form-control text-warning fw-bold text-uppercase" value="@Model.CouponCode" placeholder="VD: PANDORA20">
                     <small class="text-muted">Khách hàng có thể bấm nút 1-click để Sao chép mã này trên Popup.</small>
                 </div>
 
@@ -78,39 +78,53 @@
                 <div class="mb-4">
                     <label class="form-label text-muted fw-semibold">Hình Ảnh Banner Popup</label>
                     <div class="input-group mb-2">
-                        <span class="input-group-text bg-secondary border-secondary text-white"><i class="fas fa-link"></i></span>
-                        <input type="text" name="imageUrl" class="form-control bg-dark text-white border-secondary" value="@Model.ImageUrl" placeholder="Nhập đường dẫn URL ảnh hoặc chọn file bên dưới">
+                        <span class="input-group-text bg-secondary"><i class="fas fa-link"></i></span>
+                        <input type="text" name="imageUrl" class="form-control" value="@Model.ImageUrl" placeholder="Nhập đường dẫn URL ảnh hoặc chọn file bên dưới">
                     </div>
                     <div class="input-group">
-                        <input type="file" name="imageFile" class="form-control bg-dark text-white border-secondary" accept="image/*">
-                        <span class="input-group-text bg-secondary border-secondary text-white"><i class="fas fa-upload me-1"></i> Tải ảnh lên</span>
+                        <input type="file" name="imageFile" class="form-control" accept="image/*">
+                        <span class="input-group-text bg-secondary"><i class="fas fa-upload me-1"></i> Tải ảnh lên</span>
                     </div>
                     <small class="text-muted">Khuyên dùng ảnh tỷ lệ đứng hoặc vuông (kích thước ~ 600x800 px) - Tối đa: 2MB.</small>
                 </div>
 
                 <div class="row g-3 mb-4">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label text-muted fw-semibold">Tên Nút Hành Động</label>
-                        <input type="text" name="buttonText" class="form-control bg-dark text-white border-secondary" value="@Model.ButtonText" placeholder="VD: KHÁM PHÁ NGAY">
+                        <input type="text" name="buttonText" class="form-control" value="@Model.ButtonText" placeholder="VD: KHÁM PHÁ NGAY">
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label text-muted fw-semibold">Đường Dẫn Khi Bấm Nút</label>
-                        <input type="text" name="buttonLink" class="form-control bg-dark text-white border-secondary" value="@Model.ButtonLink" placeholder="VD: /Product/Category">
+                        <input type="text" name="buttonLink" class="form-control" value="@Model.ButtonLink" placeholder="VD: /Product/Category">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label text-muted fw-semibold">Bố Cục</label>
+                        <select name="popupLayout" class="form-select">
+                            <option value="horizontal" @(Model.PopupLayout == "horizontal" ? "selected" : "")>Ngang (Ảnh trái)</option>
+                            <option value="vertical" @(Model.PopupLayout == "vertical" ? "selected" : "")>Dọc (Ảnh trên)</option>
+                            <option value="square" @(Model.PopupLayout == "square" ? "selected" : "")>Vuông (Ảnh nhỏ trên)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-1">
+                        <label class="form-label text-muted fw-semibold">Nền</label>
+                        <input type="color" name="backgroundColor" id="backgroundColorInput" class="form-control form-control-color w-100 p-1" value="@Model.BackgroundColor" title="Chọn màu nền">
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-admin btn-lg w-100 py-3 font-semibold">
-                    <i class="fas fa-save me-2"></i> LƯU THAY ĐỔI POPUP
-                </button>
+                <div class="mt-4 mb-2">
+                    <button type="submit" class="btn btn-admin btn-lg w-100 py-3 font-semibold">
+                        <i class="fas fa-save me-2"></i> LƯU THAY ĐỔI POPUP
+                    </button>
+                </div>
             </div>
         </div>
 
         <!-- Live Preview Column -->
         <div class="col-lg-5 mb-4">
-            <div class="admin-card p-4 shadow-sm sticky-top" style="top: 100px;">
-                <h5 class="text-white mb-3 pb-2 border-bottom border-secondary"><i class="fas fa-desktop text-info me-2"></i>Xem Trước Giao Diện (Preview)</h5>
+            <div class="admin-card p-4 shadow-sm sticky-top" style="top: 100px; z-index: 99;">
+                <h5 class="mb-3 pb-2 border-bottom"><i class="fas fa-desktop text-info me-2"></i>Xem Trước Giao Diện (Preview)</h5>
                 
-                <div class="border border-secondary rounded-4 overflow-hidden shadow-lg p-3" style="background-color: #121212; color: #ffffff;">
+                <div id="previewContainer" class="border rounded-4 overflow-hidden shadow-lg p-3" style="background-color: @Model.BackgroundColor; color: #ffffff;">
                     <div class="text-center position-relative p-3">
                         <span class="badge bg-warning text-dark mb-2 px-3 py-1 font-serif">QUÀ TẶNG ĐẶC BIỆT</span>
                         
@@ -130,14 +144,14 @@
 
                         @if (!string.IsNullOrEmpty(Model.Content))
                         {
-                            <p class="text-muted fs-8 mb-3">@Model.Content</p>
+                            <p class="text-light fs-8 mb-3">@Model.Content</p>
                         }
 
                         @if (!string.IsNullOrEmpty(Model.CouponCode))
                         {
-                            <div class="p-2 mb-3 border border-warning border-dashed rounded bg-dark d-flex align-items-center justify-content-between">
+                            <div class="p-2 mb-3 border border-warning border-dashed rounded d-flex align-items-center justify-content-between">
                                 <div class="text-start">
-                                    <small class="text-muted d-block fs-8">MÃ GIẢM GIÁ</small>
+                                    <small class="text-white-50 d-block fs-8">MÃ GIẢM GIÁ</small>
                                     <strong class="fs-6 text-warning font-monospace">@Model.CouponCode</strong>
                                 </div>
                                 <button type="button" class="btn btn-outline-warning btn-sm py-1 px-2 fs-8 rounded-pill" disabled>Sao Chép</button>
@@ -153,3 +167,18 @@
         </div>
     </div>
 </form>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var colorInput = document.getElementById('backgroundColorInput');
+            var previewContainer = document.getElementById('previewContainer');
+            if (colorInput && previewContainer) {
+                colorInput.addEventListener('input', function() {
+                    previewContainer.style.backgroundColor = this.value;
+                });
+            }
+        });
+    </script>
+}
+

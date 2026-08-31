@@ -16,7 +16,7 @@ DELETE FROM [Employees];
 -- Ensure Admin role exists
 IF NOT EXISTS (SELECT 1 FROM [Roles] WHERE RoleName = 'Admin')
 BEGIN
-    INSERT INTO [Roles] (RoleName) VALUES ('Admin');
+    INSERT INTO [Roles] (RoleName, Permissions) VALUES ('Admin', 'all');
 END
 
 DECLARE @AdminRoleId INT = (SELECT TOP 1 RoleId FROM [Roles] WHERE RoleName = 'Admin');

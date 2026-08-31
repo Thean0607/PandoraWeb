@@ -8,6 +8,9 @@
 <div class="breadcrumb-wrap mt-5 pt-5 pb-5 bg-light" style="background: url('@PandoraWeb.Helpers.ImageHelper.GetImageUrl(Model.ImageUrl, "https://images.unsplash.com/photo-1605100804763-247f67b6348e?q=80&w=1200")') center/cover no-repeat; position: relative;">
     <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-50"></div>
     <div class="container mt-4 position-relative z-1 text-center text-white">
+        <a href="javascript:history.back()" class="position-absolute top-0 start-0 text-white text-decoration-none mt-2 opacity-75 hover-opacity-100 transition" title="Quay lại trang trước">
+            <i class="fas fa-arrow-left fs-4"></i>
+        </a>
         <h1 class="breadcrumb-title font-serif text-white">Bộ Sưu Tập: @Model.CollectionName</h1>
         @if(!string.IsNullOrEmpty(Model.Description)){
             <p class="lead mt-3 mx-auto" style="max-width: 800px;">@Model.Description</p>
