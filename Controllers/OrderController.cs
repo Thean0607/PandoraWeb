@@ -86,6 +86,71 @@ namespace PandoraWeb.Controllers
             return View(orders);
         }
 
+        public ActionResult Details(int id)
+        {
+            if (Session["CustomerId"] == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            int customerId = (int)Session["CustomerId"];
+
+            var order = db.Orders
+                .Include(o => o.ShippingAddress)
+                .Include(o => o.OrderItems.Select(i => i.Variant.Product))
+                .FirstOrDefault(o => o.OrderId == id && o.CustomerId == customerId);
+
+            if (order == null)
+            {
+                return HttpNotFound("Không tìm thấy đơn hàng hoặc bạn không có quyền xem đơn hàng này.");
+            }
+
+            ViewBag.ActiveMenu = "Orders";
+            ViewBag.Title = $"Chi Tiết Đơn Hàng #PAN{order.OrderId}";
+            
+            return View(order);
+        }
+
+        [HttpPost]
+        public ActionResult CancelOrder(int id)
+        {
+            if (Session["CustomerId"] == null)
+            {
+                return Json(new { success = false, message = "Vui lòng đăng nhập để thực hiện chức năng này." });
+            }
+
+            int customerId = (int)Session["CustomerId"];
+
+            var order = db.Orders.Include(o => o.OrderItems).FirstOrDefault(o => o.OrderId == id && o.CustomerId == customerId);
+            
+            if (order == null)
+            {
+                return Json(new { success = false, message = "Không tìm thấy đơn hàng." });
+            }
+
+            if (order.OrderStatus != "Pending" && order.OrderStatus != "Processing")
+            {
+                return Json(new { success = false, message = "Không thể hủy đơn hàng đã được xác nhận đóng gói hoặc đang giao." });
+            }
+
+            // Hoàn lại kho sản phẩm
+            foreach(var item in order.OrderItems)
+            {
+                var variant = db.ProductVariants.Find(item.VariantId);
+                if (variant != null)
+                {
+                    variant.Stock += item.Quantity;
+                }
+            }
+
+            order.OrderStatus = "Cancelled";
+            db.SaveChanges();
+            
+            PandoraWeb.Helpers.LogHelper.LogActivity("Customer", customerId, "CANCEL_ORDER", $"Khách hàng tự hủy đơn hàng {order.OrderId}");
+
+            return Json(new { success = true, message = "Đã hủy đơn hàng thành công." });
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)

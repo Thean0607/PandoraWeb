@@ -29,5 +29,14 @@ namespace PandoraWeb
             {
             }
         }
+
+        protected void Application_Error(object sender, EventArgs e)
+        {
+            Exception exception = Server.GetLastError();
+            if (exception != null)
+            {
+                PandoraWeb.Helpers.LogHelper.LogError(exception, "Global_Application_Error");
+            }
+        }
     }
 }

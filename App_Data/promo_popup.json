@@ -6,5 +6,8 @@
   "CouponCode": "PANDORA10",
   "ImageUrl": "https://res.cloudinary.com/jakgdlqr/image/upload/v1787797324/PandoraWeb/Products/pexels-naresh99-5301351_cl2lge.jpg",
   "ButtonText": "KHÁM PHÁ NGAY",
-  "ButtonLink": "/Product/Category"
+  "ButtonLink": "/Product/Category",
+  "BackgroundColor": "#ffffff",
+  "TextColor": "#000000",
+  "PopupLayout": "vertical"
 }

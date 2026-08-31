@@ -38,6 +38,7 @@ namespace PandoraWeb.Controllers
                 Session["FullName"] = emp.FullName;
                 Session["Role"] = emp.Role.RoleName;
                 Session["Permissions"] = emp.Role.Permissions;
+                PandoraWeb.Helpers.LogHelper.LogActivity("Employee", emp.EmployeeId, "LOGIN_SUCCESS", "Nhân viên đăng nhập thành công");
                 return RedirectToAction("Index", "Admin");
             }
 
@@ -48,13 +49,19 @@ namespace PandoraWeb.Controllers
                 Session["CustomerId"] = cus.CustomerId;
                 Session["FullName"] = cus.FullName;
                 Session["Role"] = "Customer";
+                if (!string.IsNullOrEmpty(cus.AvatarUrl))
+                {
+                    Session["AvatarUrl"] = PandoraWeb.Helpers.ImageHelper.GetImageUrl(cus.AvatarUrl, "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop");
+                }
                 
                 SyncDbCartToSession(cus.CustomerId);
                 SyncWishlist(cus.CustomerId);
+                PandoraWeb.Helpers.LogHelper.LogActivity("Customer", cus.CustomerId, "LOGIN_SUCCESS", "Khách hàng đăng nhập thành công");
                 
                 return RedirectToAction("Index", "Home");
             }
 
+            PandoraWeb.Helpers.LogHelper.LogActivity("Unknown", null, "LOGIN_FAILED", $"Đăng nhập thất bại với tài khoản: {loginId}");
             ViewBag.Error = "Email hoặc mật khẩu không đúng!";
             return View();
         }
@@ -305,6 +312,7 @@ namespace PandoraWeb.Controllers
                     }
                     customer.PasswordHash = PandoraWeb.Helpers.SecurityHelper.HashSHA256(newPassword);
                     db.SaveChanges();
+                    PandoraWeb.Helpers.LogHelper.LogActivity("Customer", customer.CustomerId, "CHANGE_PASSWORD", "Khách hàng đổi mật khẩu");
                     PandoraWeb.Helpers.EmailHelper.SendPasswordResetEmail(customer.Email, customer.FullName);
                     ViewBag.Success = "Đổi mật khẩu tài khoản thành công!";
                     return View();
@@ -324,6 +332,7 @@ namespace PandoraWeb.Controllers
                     }
                     emp.PasswordHash = PandoraWeb.Helpers.SecurityHelper.HashSHA256(newPassword);
                     db.SaveChanges();
+                    PandoraWeb.Helpers.LogHelper.LogActivity("Employee", emp.EmployeeId, "CHANGE_PASSWORD", "Quản trị viên đổi mật khẩu");
                     PandoraWeb.Helpers.EmailHelper.SendPasswordResetEmail(emp.Email, emp.FullName);
                     ViewBag.Success = "Đổi mật khẩu tài khoản quản trị thành công!";
                     return View();
@@ -433,6 +442,7 @@ namespace PandoraWeb.Controllers
 
                     // Send Email OTP
                     PandoraWeb.Helpers.EmailHelper.SendOtpEmail(email, name, otp);
+                    PandoraWeb.Helpers.LogHelper.LogActivity("Unknown", null, "OTP_REQUESTED", $"Yêu cầu gửi OTP đến email: {email}");
 
                     ViewBag.SuccessMessage = $"Mã xác thực OTP 6 số đã được gửi đến email {email}. Vui lòng kiểm tra hộp thư!";
                     ViewBag.Step = 2;
@@ -522,12 +532,14 @@ namespace PandoraWeb.Controllers
                     {
                         customer.PasswordHash = PandoraWeb.Helpers.SecurityHelper.HashSHA256(newPassword);
                         db.SaveChanges();
+                        PandoraWeb.Helpers.LogHelper.LogActivity("Customer", customer.CustomerId, "RESET_PASSWORD", "Khách hàng đặt lại mật khẩu thành công qua OTP");
                         PandoraWeb.Helpers.EmailHelper.SendPasswordResetEmail(customer.Email, customer.FullName);
                     }
                     else if (employee != null)
                     {
                         employee.PasswordHash = PandoraWeb.Helpers.SecurityHelper.HashSHA256(newPassword);
                         db.SaveChanges();
+                        PandoraWeb.Helpers.LogHelper.LogActivity("Employee", employee.EmployeeId, "RESET_PASSWORD", "Nhân viên đặt lại mật khẩu thành công qua OTP");
                         PandoraWeb.Helpers.EmailHelper.SendPasswordResetEmail(employee.Email, employee.FullName);
                     }
 

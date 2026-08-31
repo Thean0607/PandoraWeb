@@ -16,6 +16,7 @@ namespace PandoraWeb.Helpers
         public string ButtonText { get; set; } = "KHÁM PHÁ NGAY";
         public string ButtonLink { get; set; } = "/Product/Category";
         public string BackgroundColor { get; set; } = "#121212";
+        public string TextColor { get; set; } = "#FFFFFF";
         public string PopupLayout { get; set; } = "horizontal";
     }
 

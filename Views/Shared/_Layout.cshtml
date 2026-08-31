@@ -81,7 +81,14 @@
                     {
                         <div class="dropdown d-inline-block">
                             <a href="#" class="nav-icon dropdown-toggle d-flex align-items-center text-decoration-none" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user-circle text-primary-gold"></i>
+                                @if (Session["AvatarUrl"] != null)
+                                {
+                                    <img src="@Session["AvatarUrl"]" alt="Avatar" class="rounded-circle" style="width: 24px; height: 24px; object-fit: cover;" />
+                                }
+                                else
+                                {
+                                    <i class="fas fa-user-circle text-primary-gold"></i>
+                                }
                                 <span class="ms-2 text-white fw-medium d-none d-md-inline-block" style="font-family: 'Inter', sans-serif; font-size: 0.8rem;">@Session["FullName"]</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2" aria-labelledby="profileDropdown">
@@ -271,7 +278,7 @@
         <!-- Promotional Popup Modal -->
         <div class="modal fade" id="promoPopupModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered @modalSizeClass">
-                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden position-relative" style="background-color: @promoSettings.BackgroundColor; color: #ffffff;">
+                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden position-relative" style="background-color: @promoSettings.BackgroundColor; color: @promoSettings.TextColor;">
                     <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 z-3 bg-dark p-2 rounded-circle shadow" data-bs-dismiss="modal" aria-label="Close"></button>
                     
                     <div class="row g-0">
@@ -287,12 +294,12 @@
                             <h3 class="font-serif fw-bold text-warning mb-2" style="letter-spacing: 1px;">@promoSettings.Title</h3>
                             @if (!string.IsNullOrEmpty(promoSettings.Subtitle))
                             {
-                                <p class="text-white-50 fs-6 mb-3">@promoSettings.Subtitle</p>
+                                <p class="fs-6 mb-3" style="color: @promoSettings.TextColor; opacity: 0.8;">@promoSettings.Subtitle</p>
                             }
                             
                             @if (!string.IsNullOrEmpty(promoSettings.Content))
                             {
-                                <p class="text-muted fs-7 mb-3">@promoSettings.Content</p>
+                                <p class="fs-7 mb-3" style="color: @promoSettings.TextColor;">@promoSettings.Content</p>
                             }
 
                             @if (!string.IsNullOrEmpty(promoSettings.CouponCode))
@@ -326,8 +333,11 @@
         <script>
             document.addEventListener("DOMContentLoaded", function () {
                 var expiry = localStorage.getItem("pandora_promo_expiry");
+                var sessionShown = sessionStorage.getItem("pandora_promo_shown");
                 var now = new Date().getTime();
                 var expiryTime = parseInt(expiry);
+                
+                if (sessionShown) return; // Đã xem trong session này (đã mở hoặc tắt popup)
                 
                 if (!expiry || isNaN(expiryTime) || now > expiryTime) {
                     // if expired or invalid, clear it
@@ -338,6 +348,9 @@
                         if (myModalEl) {
                             var myModal = new bootstrap.Modal(myModalEl);
                             myModal.show();
+                            
+                            // Đánh dấu đã hiển thị trong session hiện tại để không bị nhảy lên ở trang khác
+                            sessionStorage.setItem("pandora_promo_shown", "true");
                         }
                     }, 1000);
                 }
@@ -346,6 +359,7 @@
             function closePromoFor2Hours() {
                 var expiryTime = new Date().getTime() + (2 * 60 * 60 * 1000); // 2 hours
                 localStorage.setItem("pandora_promo_expiry", expiryTime);
+                sessionStorage.setItem("pandora_promo_shown", "true"); // Đánh dấu luôn cho session
             }
 
             function copyPromoCoupon(code) {

@@ -32,6 +32,8 @@ namespace PandoraWeb.Models.Data
         public DbSet<Page> Pages { get; set; }
         public DbSet<BlogPost> BlogPosts { get; set; }
         public DbSet<Faq> Faqs { get; set; }
+        public DbSet<SystemLog> SystemLogs { get; set; }
+        public DbSet<ActivityLog> ActivityLogs { get; set; }
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             // Configure some relationships to avoid cascade delete cycles

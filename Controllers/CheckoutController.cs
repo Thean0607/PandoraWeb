@@ -233,6 +233,8 @@ namespace PandoraWeb.Controllers
                     db.SaveChanges();
 
                     transaction.Commit();
+                    
+                    PandoraWeb.Helpers.LogHelper.LogActivity("Customer", customer.CustomerId, "CREATE_ORDER", $"Khách hàng đặt thành công đơn hàng {order.OrderId}");
 
                     // 4. Auto login guest session so user can view order history immediately
                     Session["CustomerId"] = customer.CustomerId;

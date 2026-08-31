@@ -181,6 +181,7 @@ namespace PandoraWeb.Controllers
                 db.SaveChanges();
             }
             
+            PandoraWeb.Helpers.LogHelper.LogActivity("Employee", Session["EmployeeId"] as int?, "SAVE_PRODUCT", $"Đã thêm/sửa sản phẩm ID: {targetProductId}");
             TempData["Success"] = "Đã lưu sản phẩm thành công!";
             return RedirectToAction("Products");
         }
@@ -696,6 +697,27 @@ namespace PandoraWeb.Controllers
         }
 
         [AdminAuthorize(Permission = "manage_order")]
+        public ActionResult OrderDetails(int id)
+        {
+            ViewBag.ActiveMenu = "Orders";
+            ViewBag.ActiveSubMenu = "OrdersList";
+            ViewBag.Title = $"Chi Tiết Đơn Hàng #PAN{id}";
+
+            var order = db.Orders
+                .Include(o => o.Customer)
+                .Include(o => o.ShippingAddress)
+                .Include(o => o.OrderItems.Select(i => i.Variant.Product))
+                .FirstOrDefault(o => o.OrderId == id);
+
+            if (order == null)
+            {
+                return HttpNotFound("Không tìm thấy đơn hàng.");
+            }
+
+            return View(order);
+        }
+
+        [AdminAuthorize(Permission = "manage_order")]
         [HttpPost]
         public ActionResult UpdateOrderStatus(int id, string status)
         {
@@ -704,6 +726,7 @@ namespace PandoraWeb.Controllers
                 if (order != null) {
                     order.OrderStatus = status;
                     db.SaveChanges();
+                    PandoraWeb.Helpers.LogHelper.LogActivity("Employee", Session["EmployeeId"] as int?, "UPDATE_ORDER_STATUS", $"Cập nhật trạng thái đơn hàng {id} thành {status}");
                     return Json(new { success = true });
                 }
                 return Json(new { success = false, message = "Không tìm thấy đơn hàng" });
@@ -987,7 +1010,7 @@ namespace PandoraWeb.Controllers
 
         [AdminAuthorize(Permission = "manage_marketing")]
         [HttpPost]
-        public ActionResult SavePromoPopup(bool isEnabled = false, string title = null, string subtitle = null, string content = null, string couponCode = null, string imageUrl = null, string buttonText = null, string buttonLink = null, string backgroundColor = null, string popupLayout = null, System.Web.HttpPostedFileBase imageFile = null)
+        public ActionResult SavePromoPopup(bool isEnabled = false, string title = null, string subtitle = null, string content = null, string couponCode = null, string imageUrl = null, string buttonText = null, string buttonLink = null, string backgroundColor = null, string textColor = null, string popupLayout = null, System.Web.HttpPostedFileBase imageFile = null)
         {
             var settings = PandoraWeb.Helpers.PromoPopupHelper.GetSettings();
             settings.IsEnabled = isEnabled;
@@ -998,6 +1021,7 @@ namespace PandoraWeb.Controllers
             settings.ButtonText = !string.IsNullOrWhiteSpace(buttonText) ? buttonText.Trim() : "KHÁM PHÁ NGAY";
             settings.ButtonLink = !string.IsNullOrWhiteSpace(buttonLink) ? buttonLink.Trim() : "/Product/Category";
             settings.BackgroundColor = !string.IsNullOrWhiteSpace(backgroundColor) ? backgroundColor.Trim() : "#121212";
+            settings.TextColor = !string.IsNullOrWhiteSpace(textColor) ? textColor.Trim() : "#FFFFFF";
             settings.PopupLayout = !string.IsNullOrWhiteSpace(popupLayout) ? popupLayout.Trim() : "horizontal";
 
             if (imageFile != null && imageFile.ContentLength > 0)

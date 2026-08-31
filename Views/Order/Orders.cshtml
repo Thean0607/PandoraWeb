@@ -81,10 +81,15 @@
                                     {
                                         string statusClass = "bg-warning text-dark";
                                         string statusText = order.OrderStatus ?? "Chờ xử lý";
-                                        if (order.OrderStatus == "Shipped" || order.OrderStatus == "Delivered")
+                                        if (order.OrderStatus == "Delivered")
                                         {
                                             statusClass = "bg-success";
                                             statusText = "Đã giao";
+                                        }
+                                        else if (order.OrderStatus == "Shipped")
+                                        {
+                                            statusClass = "bg-primary";
+                                            statusText = "Đang giao";
                                         }
                                         else if (order.OrderStatus == "Cancelled")
                                         {
@@ -111,7 +116,7 @@
                                             <td><span class="badge @statusClass">@statusText</span></td>
                                             <td class="fs-8 text-muted">@order.PaymentMethod</td>
                                             <td>
-                                                <a href="@Url.Action("OrderSuccess", "Order", new { id = order.OrderId })" class="btn btn-sm btn-outline-dark">Xem</a>
+                                                <a href="@Url.Action("Details", "Order", new { id = order.OrderId })" class="btn btn-sm btn-outline-dark">Xem</a>
                                             </td>
                                         </tr>
                                     }

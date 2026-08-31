@@ -93,7 +93,7 @@
                         <label class="form-label text-muted fw-semibold">Tên Nút Hành Động</label>
                         <input type="text" name="buttonText" class="form-control" value="@Model.ButtonText" placeholder="VD: KHÁM PHÁ NGAY">
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="form-label text-muted fw-semibold">Đường Dẫn Khi Bấm Nút</label>
                         <input type="text" name="buttonLink" class="form-control" value="@Model.ButtonLink" placeholder="VD: /Product/Category">
                     </div>
@@ -108,6 +108,10 @@
                     <div class="col-md-1">
                         <label class="form-label text-muted fw-semibold">Nền</label>
                         <input type="color" name="backgroundColor" id="backgroundColorInput" class="form-control form-control-color w-100 p-1" value="@Model.BackgroundColor" title="Chọn màu nền">
+                    </div>
+                    <div class="col-md-1">
+                        <label class="form-label text-muted fw-semibold">Chữ</label>
+                        <input type="color" name="textColor" id="textColorInput" class="form-control form-control-color w-100 p-1" value="@Model.TextColor" title="Chọn màu chữ">
                     </div>
                 </div>
 
@@ -124,7 +128,7 @@
             <div class="admin-card p-4 shadow-sm sticky-top" style="top: 100px; z-index: 99;">
                 <h5 class="mb-3 pb-2 border-bottom"><i class="fas fa-desktop text-info me-2"></i>Xem Trước Giao Diện (Preview)</h5>
                 
-                <div id="previewContainer" class="border rounded-4 overflow-hidden shadow-lg p-3" style="background-color: @Model.BackgroundColor; color: #ffffff;">
+                <div id="previewContainer" class="border rounded-4 overflow-hidden shadow-lg p-3" style="background-color: @Model.BackgroundColor; color: @Model.TextColor;">
                     <div class="text-center position-relative p-3">
                         <span class="badge bg-warning text-dark mb-2 px-3 py-1 font-serif">QUÀ TẶNG ĐẶC BIỆT</span>
                         
@@ -132,7 +136,7 @@
                         
                         @if (!string.IsNullOrEmpty(Model.Subtitle))
                         {
-                            <p class="text-white-50 fs-7 mb-2">@Model.Subtitle</p>
+                            <p class="fs-7 mb-2" style="color: @Model.TextColor; opacity: 0.8;">@Model.Subtitle</p>
                         }
 
                         @if (!string.IsNullOrEmpty(Model.ImageUrl))
@@ -144,7 +148,7 @@
 
                         @if (!string.IsNullOrEmpty(Model.Content))
                         {
-                            <p class="text-light fs-8 mb-3">@Model.Content</p>
+                            <p class="fs-8 mb-3" style="color: @Model.TextColor;">@Model.Content</p>
                         }
 
                         @if (!string.IsNullOrEmpty(Model.CouponCode))
@@ -172,10 +176,19 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var colorInput = document.getElementById('backgroundColorInput');
+            var textColorInput = document.getElementById('textColorInput');
             var previewContainer = document.getElementById('previewContainer');
+            
             if (colorInput && previewContainer) {
                 colorInput.addEventListener('input', function() {
                     previewContainer.style.backgroundColor = this.value;
+                });
+            }
+            if (textColorInput && previewContainer) {
+                textColorInput.addEventListener('input', function() {
+                    previewContainer.style.color = this.value;
+                    var subtitles = previewContainer.querySelectorAll('p');
+                    subtitles.forEach(p => p.style.color = this.value);
                 });
             }
         });

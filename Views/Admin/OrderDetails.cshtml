@@ -1,0 +1,192 @@
+@model PandoraWeb.Models.Order
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-0">@ViewBag.Title</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0 fs-7">
+                <li class="breadcrumb-item"><a href="@Url.Action("Dashboard", "Admin")">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="@Url.Action("Orders", "Admin")">Đơn hàng</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Chi tiết</li>
+            </ol>
+        </nav>
+    </div>
+    <div>
+        <a href="@Url.Action("Orders", "Admin")" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i> Quay lại</a>
+        <button class="btn btn-admin ms-2"><i class="fas fa-print me-1"></i> In hóa đơn</button>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Left Column: Order Items & Pricing -->
+    <div class="col-lg-8">
+        <div class="admin-card p-4 shadow-sm mb-4">
+            <h5 class="border-bottom pb-3 mb-3 fw-bold"><i class="fas fa-shopping-cart text-muted me-2"></i>Chi tiết sản phẩm</h5>
+            <div class="table-responsive">
+                <table class="table align-middle text-nowrap">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-3">Sản phẩm</th>
+                            <th class="text-center">Số lượng</th>
+                            <th class="text-end">Đơn giá</th>
+                            <th class="text-end pe-3">Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(var item in Model.OrderItems)
+                        {
+                            var p = item.Variant?.Product;
+                            var img = p != null && !string.IsNullOrEmpty(p.ImageUrl) ? p.ImageUrl : "https://via.placeholder.com/80";
+                            var name = p != null ? p.ProductName : "Trang sức Pandora";
+                            
+                            <tr>
+                                <td class="ps-3">
+                                    <div class="d-flex align-items-center">
+                                        <img src="@img" class="rounded object-fit-cover me-3" style="width: 50px; height: 50px;" alt="">
+                                        <div>
+                                            <h6 class="mb-0 fw-bold fs-7">@name</h6>
+                                            <small class="text-muted">Kích cỡ: @(item.Variant?.Size?.SizeValue ?? "N/A") | Chất liệu: @(item.Variant?.Material?.MaterialName ?? "N/A")</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center fw-bold">@item.Quantity</td>
+                                <td class="text-end">@item.UnitPrice.ToString("N0") ₫</td>
+                                <td class="text-end pe-3 fw-bold text-warning">@((item.UnitPrice * item.Quantity).ToString("N0")) ₫</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tóm tắt số tiền -->
+            <div class="row justify-content-end mt-4">
+                <div class="col-md-6 col-lg-5">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Tạm tính:</span>
+                        <span class="fw-semibold">@((Model.TotalAmount + Model.DiscountAmount - Model.ShippingFee).ToString("N0")) ₫</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Phí vận chuyển:</span>
+                        <span class="fw-semibold">@(Model.ShippingFee > 0 ? Model.ShippingFee.ToString("N0") + " ₫" : "0 ₫")</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Giảm giá:</span>
+                        <span class="text-danger fw-semibold">-@Model.DiscountAmount.ToString("N0") ₫</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="fw-bold fs-6">Tổng cộng:</span>
+                        <span class="fw-bold fs-5 text-warning">@Model.TotalAmount.ToString("N0") ₫</span>
+                    </div>
+                    <div class="d-flex justify-content-between mt-3 bg-light p-2 rounded">
+                        <span class="text-muted fs-7">Thanh toán qua:</span>
+                        <span class="fw-bold fs-7">@Model.PaymentMethod</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Status, Customer, Address -->
+    <div class="col-lg-4">
+        <!-- Card: Trạng thái đơn hàng -->
+        <div class="admin-card p-4 shadow-sm mb-4 border-top border-warning border-3">
+            <h5 class="fw-bold mb-3"><i class="fas fa-info-circle text-muted me-2"></i>Trạng thái đơn hàng</h5>
+            <div class="mb-3">
+                <label class="form-label text-muted fs-7 mb-1">Ngày đặt hàng</label>
+                <div class="fw-bold">@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label text-muted fs-7 mb-1">Cập nhật trạng thái mới</label>
+                <select class="form-select status-select" 
+                        onchange="updateStatus(@Model.OrderId, this.value)" 
+                        data-original="@Model.OrderStatus">
+                    <option value="Pending" @(Model.OrderStatus == "Pending" ? "selected" : "")>Chờ xử lý</option>
+                    <option value="Processing" @(Model.OrderStatus == "Processing" ? "selected" : "")>Đang xử lý</option>
+                    <option value="Shipped" @(Model.OrderStatus == "Shipped" ? "selected" : "")>Đang giao</option>
+                    <option value="Delivered" @(Model.OrderStatus == "Delivered" ? "selected" : "")>Đã giao</option>
+                    <option value="Cancelled" @(Model.OrderStatus == "Cancelled" ? "selected" : "")>Đã hủy</option>
+                </select>
+                <small class="text-muted mt-2 d-block">Trạng thái sẽ được cập nhật ngay lập tức vào CSDL.</small>
+            </div>
+        </div>
+
+        <!-- Card: Khách hàng -->
+        <div class="admin-card p-4 shadow-sm mb-4">
+            <h5 class="fw-bold mb-3"><i class="fas fa-user text-muted me-2"></i>Khách hàng</h5>
+            @if(Model.Customer != null)
+            {
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-light rounded-circle p-3 me-3 text-center" style="width: 50px; height: 50px; line-height: 20px;">
+                        <i class="fas fa-user text-secondary"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0 fw-bold">@Model.Customer.FullName</h6>
+                        <a href="mailto:@Model.Customer.Email" class="text-decoration-none fs-7">@Model.Customer.Email</a>
+                    </div>
+                </div>
+                <div class="mb-0 fs-7">
+                    <span class="text-muted">SĐT Đăng ký:</span> @Model.Customer.PhoneNumber
+                </div>
+            }
+            else
+            {
+                <p class="text-muted fst-italic mb-0">Khách mua ẩn danh (Guest)</p>
+            }
+        </div>
+
+        <!-- Card: Giao hàng -->
+        <div class="admin-card p-4 shadow-sm mb-4">
+            <h5 class="fw-bold mb-3"><i class="fas fa-truck text-muted me-2"></i>Giao hàng đến</h5>
+            @if(Model.ShippingAddress != null)
+            {
+                <h6 class="fw-bold mb-1">@Model.ShippingAddress.ReceiverName</h6>
+                <p class="mb-2"><i class="fas fa-phone-alt fs-8 text-muted me-2"></i>@Model.ShippingAddress.PhoneNumber</p>
+                <p class="text-muted fs-7 mb-0">
+                    @Model.ShippingAddress.StreetAddress<br />
+                    @Model.ShippingAddress.Ward, @Model.ShippingAddress.District<br />
+                    @Model.ShippingAddress.City
+                </p>
+            }
+            else
+            {
+                <p class="text-muted fst-italic mb-0">Không có thông tin địa chỉ.</p>
+            }
+            
+            @if(!string.IsNullOrEmpty(Model.Notes))
+            {
+                <hr>
+                <h6 class="fw-bold fs-7 mb-1">Ghi chú của khách:</h6>
+                <p class="text-danger bg-light p-2 rounded fs-7 mb-0 fst-italic">"@Model.Notes"</p>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function updateStatus(id, status) {
+            fetch('@Url.Action("UpdateOrderStatus", "Admin")', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ id: id, status: status })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    alert('Đã cập nhật trạng thái đơn hàng!');
+                } else {
+                    alert(data.message || 'Có lỗi xảy ra!');
+                    location.reload();
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                location.reload();
+            });
+        }
+    </script>
+}
