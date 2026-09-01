@@ -73,53 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // 4. Lightweight static cart behaviour for demo consistency.
-    const updateCartSummary = function() {
-        const cartRows = document.querySelectorAll('table tbody tr');
-        if (!cartRows.length) {
-            return;
-        }
-
-        let subtotal = 0;
-        cartRows.forEach(function(row) {
-            const priceEl = row.querySelector('.text-primary-gold.fw-bold');
-            const quantityEl = row.querySelector('.quantity-input input');
-            const lineTotalEl = row.querySelector('td:nth-child(3)');
-
-            if (!priceEl || !quantityEl || !lineTotalEl) {
-                return;
-            }
-
-            const lineTotal = parseCurrency(priceEl.textContent) * getQuantityValue(quantityEl);
-            subtotal += lineTotal;
-            lineTotalEl.textContent = formatCurrency(lineTotal);
-        });
-
-        const summaryValues = document.querySelectorAll('.col-lg-4 .d-flex.justify-content-between span.fw-bold, .col-lg-4 strong.text-primary-gold');
-        summaryValues.forEach(function(el) {
-            el.textContent = formatCurrency(subtotal);
-        });
-
-        const badge = document.querySelector('.fa-shopping-bag + .badge');
-        if (badge) {
-            const totalItems = Array.from(document.querySelectorAll('.quantity-input input')).reduce(function(total, input) {
-                return total + getQuantityValue(input);
-            }, 0);
-            badge.textContent = totalItems;
-        }
-    };
-
-    document.querySelectorAll('.table .btn-link.text-danger').forEach(function(button) {
-        button.setAttribute('type', 'button');
-        button.addEventListener('click', function() {
-            const row = button.closest('tr');
-            if (row) {
-                row.remove();
-                updateCartSummary();
-            }
-        });
-    });
-    updateCartSummary();
+    // 4. (Removed static cart behavior as it conflicts with backend AJAX calculations)
 
     // 5. Form validation with Bootstrap
     document.querySelectorAll('form').forEach(function(form) {
@@ -228,9 +182,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     const badge = document.getElementById('cart-badge');
                     if (badge) badge.textContent = data.totalItems;
 
-                    document.querySelectorAll('.cart-subtotal, .cart-total').forEach(el => {
-                        el.textContent = data.subTotal;
-                    });
+                    document.querySelectorAll('.cart-subtotal').forEach(el => { el.textContent = data.subTotal; });
+                    if (data.discountAmt !== undefined) {
+                        document.querySelectorAll('.cart-discount').forEach(el => { el.textContent = "-" + data.discountAmt; });
+                    }
+                    if (data.finalTotal !== undefined) {
+                        document.querySelectorAll('.cart-total').forEach(el => { el.textContent = data.finalTotal; });
+                    } else {
+                        document.querySelectorAll('.cart-total').forEach(el => { el.textContent = data.subTotal; });
+                    }
                 }
             });
         });
@@ -272,9 +232,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     const badge = document.getElementById('cart-badge');
                     if (badge) badge.textContent = data.totalItems;
 
-                    document.querySelectorAll('.cart-subtotal, .cart-total').forEach(el => {
-                        el.textContent = data.subTotal;
-                    });
+                    document.querySelectorAll('.cart-subtotal').forEach(el => { el.textContent = data.subTotal; });
+                    if (data.discountAmt !== undefined) {
+                        document.querySelectorAll('.cart-discount').forEach(el => { el.textContent = "-" + data.discountAmt; });
+                    }
+                    if (data.finalTotal !== undefined) {
+                        document.querySelectorAll('.cart-total').forEach(el => { el.textContent = data.finalTotal; });
+                    } else {
+                        document.querySelectorAll('.cart-total').forEach(el => { el.textContent = data.subTotal; });
+                    }
                 }
             });
         });

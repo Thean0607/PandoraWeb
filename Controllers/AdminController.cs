@@ -37,7 +37,7 @@ namespace PandoraWeb.Controllers
             ViewBag.ActiveMenu = "Catalog";
             ViewBag.ActiveSubMenu = "Products";
             ViewBag.Title = "Quản lý Sản Phẩm";
-            var products = db.Products.Include(p => p.Category).Include(p => p.Collection).OrderByDescending(p => p.ProductId).ToList();
+            var products = db.Products.Include(p => p.Category).Include(p => p.Collection).Include(p => p.ProductImages).OrderByDescending(p => p.ProductId).ToList();
             ViewBag.Categories = db.Categories.ToList();
             ViewBag.Collections = db.Collections.ToList();
             return View(products);
@@ -45,6 +45,7 @@ namespace PandoraWeb.Controllers
 
         [AdminAuthorize(Permission = "manage_product")]
         [HttpPost]
+        [ValidateInput(false)]
         public ActionResult SaveProduct(int? productId, string productName, int categoryId, int? collectionId, string price, int stock, string status, string description, System.Web.HttpPostedFileBase imageFile, System.Collections.Generic.IEnumerable<System.Web.HttpPostedFileBase> extraImages)
         {
             if (string.IsNullOrEmpty(productName))
@@ -753,7 +754,7 @@ namespace PandoraWeb.Controllers
             ViewBag.ActiveSubMenu = "CustomerSegments";
             ViewBag.Title = "Phân Nhóm Khách Hàng";
             // Group by spending
-            var segments = db.Customers.Select(c => new {
+            var segments = db.Customers.Select(c => new PandoraWeb.ViewModels.CustomerSegmentVM {
                 Customer = c,
                 TotalSpent = db.Orders.Where(o => o.CustomerId == c.CustomerId && o.PaymentStatus == "Paid").Sum(o => (decimal?)o.TotalAmount) ?? 0m
             }).OrderByDescending(x => x.TotalSpent).ToList();
@@ -847,8 +848,73 @@ namespace PandoraWeb.Controllers
             ViewBag.ActiveMenu = "Marketing";
             ViewBag.ActiveSubMenu = "FlashSales";
             ViewBag.Title = "Flash Sales";
-            var sales = db.Promotions.Where(p => p.DiscountPercentage >= 30).ToList();
+            PandoraWeb.Helpers.ProductHelper.RevertExpiredFlashSales(db);
+            var sales = db.Products.Include(p => p.Category).Where(p => p.OldPrice != null && p.OldPrice > p.BasePrice).ToList();
             return View(sales);
+        }
+
+        [AdminAuthorize(Permission = "manage_marketing")]
+        public ActionResult CreateFlashSale()
+        {
+            ViewBag.ActiveMenu = "Marketing";
+            ViewBag.ActiveSubMenu = "FlashSales";
+            ViewBag.Title = "Quản lý Giá Flash Sale Hàng Loạt";
+            var products = db.Products.Include(p => p.Category).Where(p => p.Status == "active").OrderByDescending(p => p.ProductId).ToList();
+            return View(products);
+        }
+
+        public class FlashSaleInput
+        {
+            public int ProductId { get; set; }
+            public int? DiscountPercent { get; set; }
+            public decimal? DiscountAmount { get; set; }
+            public DateTime? EndDate { get; set; }
+        }
+
+        [HttpPost]
+        [AdminAuthorize(Permission = "manage_marketing")]
+        public ActionResult SaveFlashSale(System.Collections.Generic.List<FlashSaleInput> flashSales)
+        {
+            if (flashSales == null || !flashSales.Any())
+            {
+                return Json(new { success = false, message = "Không có dữ liệu gửi lên." });
+            }
+
+            foreach (var item in flashSales)
+            {
+                var p = db.Products.Find(item.ProductId);
+                if (p != null)
+                {
+                    if (item.DiscountPercent.HasValue || item.DiscountAmount.HasValue)
+                    {
+                        // Ensure we have an OldPrice
+                        if (!p.OldPrice.HasValue)
+                        {
+                            p.OldPrice = p.BasePrice;
+                        }
+
+                        decimal originalPrice = p.OldPrice.Value;
+                        decimal newPrice = originalPrice;
+
+                        if (item.DiscountPercent.HasValue && item.DiscountPercent.Value > 0)
+                        {
+                            newPrice = originalPrice * (100 - item.DiscountPercent.Value) / 100m;
+                        }
+                        else if (item.DiscountAmount.HasValue && item.DiscountAmount.Value > 0)
+                        {
+                            newPrice = originalPrice - item.DiscountAmount.Value;
+                        }
+
+                        if (newPrice < 0) newPrice = 0;
+                        p.BasePrice = newPrice;
+                        p.FlashSaleEndDate = item.EndDate;
+                    }
+                }
+            }
+            db.SaveChanges();
+            
+            TempData["Success"] = "Đã cập nhật Flash Sale thành công!";
+            return Json(new { success = true });
         }
 
 

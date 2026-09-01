@@ -190,6 +190,7 @@
     <Compile Include="Helpers\ImageHelper.cs" />
     <Compile Include="Helpers\PromoPopupHelper.cs" />
     <Compile Include="Helpers\LogHelper.cs" />
+    <Compile Include="Helpers\ProductHelper.cs" />
     <Compile Include="Models\Data\SystemLog.cs" />
     <Compile Include="Models\Data\ActivityLog.cs" />
     <Compile Include="ViewModels\HomeViewModel.cs" />

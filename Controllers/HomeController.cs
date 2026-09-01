@@ -14,6 +14,8 @@ namespace PandoraWeb.Controllers
             ViewBag.ActiveMenu = "Home";
             ViewBag.Title = "Trang Chủ";
 
+            PandoraWeb.Helpers.ProductHelper.RevertExpiredFlashSales(db);
+
             var vm = new PandoraWeb.ViewModels.HomeViewModel();
             vm.Banners = db.Banners.Where(b => b.IsActive).OrderBy(b => b.DisplayOrder).ToList();
             vm.Collections = db.Collections.Take(3).ToList();

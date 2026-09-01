@@ -166,14 +166,32 @@
                     <span class="text-muted">Phí vận chuyển</span>
                     <span class="text-success fw-bold">Miễn phí</span>
                 </div>
+                @{
+                    decimal discountAmt = 0m;
+                    var promo = Session["Coupon"] as PandoraWeb.Models.Promotion;
+                    if (promo != null && Model != null)
+                    {
+                        decimal baseDiscountable = Model.Where(m => !m.IsFlashSale).Sum(m => m.Total);
+                        if (promo.DiscountPercentage.HasValue && promo.DiscountPercentage.Value > 0)
+                        {
+                            discountAmt = baseDiscountable * ((decimal)promo.DiscountPercentage.Value / 100);
+                        }
+                        else if (promo.DiscountAmount.HasValue)
+                        {
+                            discountAmt = promo.DiscountAmount.Value;
+                            if (discountAmt > baseDiscountable) { discountAmt = baseDiscountable; }
+                        }
+                    }
+                    decimal finalTotal = subTotal - discountAmt;
+                }
                 <div class="d-flex justify-content-between mb-2 fs-7">
-                    <span class="text-muted">Giảm giá</span>
-                    <span class="text-danger">-0 ₫</span>
+                    <span class="text-muted">Giảm giá @(promo != null ? $"({promo.Code})" : "")</span>
+                    <span class="text-danger">-@discountAmt.ToString("N0") ₫</span>
                 </div>
                 <hr>
                 <div class="d-flex justify-content-between mb-4">
                     <strong class="fs-5">Tổng thanh toán</strong>
-                    <strong class="fs-5 text-primary-gold">@subTotal.ToString("N0") ₫</strong>
+                    <strong class="fs-5 text-primary-gold">@finalTotal.ToString("N0") ₫</strong>
                 </div>
 
                 <button type="submit" form="form-checkout" class="btn btn-gold w-100 py-3 mb-3 fw-bold tracking-wider fs-6 shadow-sm">

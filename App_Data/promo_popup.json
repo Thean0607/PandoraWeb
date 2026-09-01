@@ -1,9 +1,9 @@
 {
   "IsEnabled": true,
   "Title": "ƯU ĐÃI ĐẶC BIỆT THÁNG NÀY",
-  "Subtitle": "Giảm ngay 10% cho đơn hàng trang sức Pandora",
-  "Content": "Nhập mã PANDORA10 khi thanh toán để nhận ngay ưu đãi giảm 20% cùng quà tặng hấp dẫn!",
-  "CouponCode": "PANDORA10",
+  "Subtitle": "Giảm ngay 30% cho đơn hàng trang sức Pandora",
+  "Content": "Nhập mã PANDORA30 khi thanh toán để nhận ngay ưu đãi giảm 30% cùng quà tặng hấp dẫn!",
+  "CouponCode": "PANDORA30",
   "ImageUrl": "https://res.cloudinary.com/jakgdlqr/image/upload/v1787797324/PandoraWeb/Products/pexels-naresh99-5301351_cl2lge.jpg",
   "ButtonText": "KHÁM PHÁ NGAY",
   "ButtonLink": "/Product/Category",

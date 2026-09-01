@@ -67,6 +67,13 @@ namespace PandoraWeb.Controllers
                     TempData["ErrorMessage"] = $"Sản phẩm '{item.ProductName}' không đủ số lượng trong kho (chỉ còn {variant?.Stock ?? 0} sản phẩm). Vui lòng cập nhật lại giỏ hàng.";
                     return RedirectToAction("Index", "Cart");
                 }
+
+                var prod = db.Products.Find(item.ProductId);
+                if (prod != null)
+                {
+                    item.IsFlashSale = prod.OldPrice.HasValue && prod.BasePrice < prod.OldPrice.Value && (!prod.FlashSaleEndDate.HasValue || prod.FlashSaleEndDate.Value >= DateTime.Now);
+                    item.Price = prod.BasePrice + (variant?.PriceAdjustment ?? 0m);
+                }
             }
 
             if (Session["CustomerId"] != null)
@@ -186,6 +193,37 @@ namespace PandoraWeb.Controllers
                             TempData["ErrorMessage"] = $"Sản phẩm '{item.ProductName}' không đủ số lượng trong kho (chỉ còn {variantInDb?.Stock ?? 0} sản phẩm). Vui lòng cập nhật giỏ hàng.";
                             return RedirectToAction("Index", "Cart");
                         }
+                        
+                        var prod = db.Products.Find(item.ProductId);
+                        if (prod != null)
+                        {
+                            item.IsFlashSale = prod.OldPrice.HasValue && prod.BasePrice < prod.OldPrice.Value && (!prod.FlashSaleEndDate.HasValue || prod.FlashSaleEndDate.Value >= DateTime.Now);
+                            item.Price = prod.BasePrice + (variantInDb?.PriceAdjustment ?? 0m);
+                        }
+                    }
+
+                    // 1.5 Calculate Coupon Discount
+                    decimal discountAmt = 0m;
+                    int? promoId = null;
+                    var promo = Session["Coupon"] as PandoraWeb.Models.Promotion;
+                    if (promo != null)
+                    {
+                        // Ensure single usage
+                        bool used = db.Orders.Any(o => o.CustomerId == customer.CustomerId && o.PromotionId == promo.PromotionId && o.OrderStatus != "Cancelled");
+                        if (!used && promo.IsActive && promo.StartDate <= DateTime.Now && promo.EndDate >= DateTime.Now)
+                        {
+                            decimal baseDiscountable = cart.Where(m => !m.IsFlashSale).Sum(m => m.Total);
+                            if (promo.DiscountPercentage.HasValue && promo.DiscountPercentage.Value > 0)
+                            {
+                                discountAmt = baseDiscountable * ((decimal)promo.DiscountPercentage.Value / 100);
+                            }
+                            else if (promo.DiscountAmount.HasValue)
+                            {
+                                discountAmt = promo.DiscountAmount.Value;
+                                if (discountAmt > baseDiscountable) discountAmt = baseDiscountable;
+                            }
+                            promoId = promo.PromotionId;
+                        }
                     }
 
                     // 2. Create Order
@@ -193,9 +231,10 @@ namespace PandoraWeb.Controllers
                     {
                         CustomerId = customer.CustomerId,
                         ShippingAddressId = newAddress.AddressId,
-                        TotalAmount = cart.Sum(c => c.Total),
+                        TotalAmount = cart.Sum(c => c.Total) - discountAmt,
                         ShippingFee = 0m,
-                        DiscountAmount = 0m,
+                        DiscountAmount = discountAmt,
+                        PromotionId = promoId,
                         OrderStatus = "Pending",
                         PaymentMethod = string.IsNullOrEmpty(paymentMethod) ? "COD" : paymentMethod,
                         PaymentStatus = "Pending",
@@ -242,8 +281,9 @@ namespace PandoraWeb.Controllers
                     Session["CustomerEmail"] = customer.Email;
                     Session["Role"] = "Customer";
 
-                    // Clear Session Cart & DB Cart
+                    // Clear Session Cart, Coupon & DB Cart
                     Session["Cart"] = null;
+                    Session["Coupon"] = null;
                     SaveCartToDb(customer.CustomerId, new List<CartItemVM>());
 
                     // Send order confirmation email asynchronously to the email address specified at checkout

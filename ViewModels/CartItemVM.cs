@@ -11,6 +11,7 @@ namespace PandoraWeb.ViewModels
         public string Size { get; set; }
         public string Material { get; set; }
         public bool IsOutOfStock { get; set; }
+        public bool IsFlashSale { get; set; }
         public decimal Total => Price * Quantity;
     }
 }

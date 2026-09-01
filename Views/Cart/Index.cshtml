@@ -3,6 +3,24 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Cart";
     decimal subTotal = Model != null ? Model.Sum(x => x.Total) : 0;
+    
+    var promo = Session["Coupon"] as PandoraWeb.Models.Promotion;
+    decimal discountAmt = 0;
+    if (promo != null && Model != null)
+    {
+        // Chỉ giảm giá trên các sản phẩm KHÔNG phải Flash Sale
+        decimal baseDiscountable = Model.Where(m => !m.IsFlashSale).Sum(m => m.Total);
+        if (promo.DiscountPercentage.HasValue && promo.DiscountPercentage.Value > 0)
+        {
+            discountAmt = baseDiscountable * ((decimal)promo.DiscountPercentage.Value / 100);
+        }
+        else if (promo.DiscountAmount.HasValue)
+        {
+            discountAmt = promo.DiscountAmount.Value;
+            if (discountAmt > baseDiscountable) { discountAmt = baseDiscountable; }
+        }
+    }
+    decimal finalTotal = subTotal - discountAmt;
 }
 
 <div class="container mt-5 pt-5 pb-5">
@@ -100,13 +118,17 @@
                     <span class="fw-bold cart-subtotal">@subTotal.ToString("N0") ₫</span>
                 </div>
                 <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted">Giảm giá</span>
+                    <span class="text-danger fw-bold cart-discount">-@discountAmt.ToString("N0") ₫</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
                     <span class="text-muted">Giao hàng</span>
                     <span class="text-success fw-bold">Miễn phí</span>
                 </div>
                 <hr>
                 <div class="d-flex justify-content-between mb-4">
                     <strong class="fs-5">Tổng cộng</strong>
-                    <strong class="fs-5 text-primary-gold cart-total">@subTotal.ToString("N0") ₫</strong>
+                    <strong class="fs-5 text-primary-gold cart-total">@finalTotal.ToString("N0") ₫</strong>
                 </div>
                 
                 @if (Model != null && Model.Count > 0 && ViewBag.HasOutOfStock != true)
@@ -126,8 +148,8 @@
                 <div class="mt-3">
                     <label class="form-label text-muted fs-7">Mã giảm giá</label>
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Nhập mã">
-                        <button class="btn btn-outline-secondary" type="button">Áp dụng</button>
+                        <input type="text" id="couponCode" class="form-control" placeholder="Nhập mã" value="@(promo != null ? promo.Code : "")">
+                        <button class="btn btn-outline-secondary" type="button" onclick="applyCoupon()">Áp dụng</button>
                     </div>
                 </div>
             </div>
@@ -140,3 +162,30 @@
         </div>
     </div>
 </div>
+
+<script>
+    function applyCoupon() {
+        var code = document.getElementById('couponCode').value;
+        if (!code) {
+            alert('Vui lòng nhập mã giảm giá');
+            return;
+        }
+
+        fetch('@Url.Action("ApplyCoupon", "Cart")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'code=' + encodeURIComponent(code)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        });
+    }
+</script>

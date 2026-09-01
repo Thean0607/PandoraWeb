@@ -24,7 +24,7 @@ namespace PandoraWeb.Controllers
                 cart = new List<CartItemVM>();
             }
 
-            // Kiểm tra tồn kho
+            // Kiểm tra tồn kho và cập nhật giá/flash sale
             foreach (var item in cart)
             {
                 var variant = db.ProductVariants.Find(item.VariantId);
@@ -36,6 +36,13 @@ namespace PandoraWeb.Controllers
                 else
                 {
                     item.IsOutOfStock = false;
+                }
+
+                var prod = db.Products.Find(item.ProductId);
+                if (prod != null)
+                {
+                    item.IsFlashSale = prod.OldPrice.HasValue && prod.BasePrice < prod.OldPrice.Value && (!prod.FlashSaleEndDate.HasValue || prod.FlashSaleEndDate.Value >= DateTime.Now);
+                    item.Price = prod.BasePrice + (variant?.PriceAdjustment ?? 0m); // Update price dynamically
                 }
             }
 
@@ -84,6 +91,7 @@ namespace PandoraWeb.Controllers
 
             int finalVariantId = variant?.VariantId ?? 0;
             decimal price = product.BasePrice + (variant?.PriceAdjustment ?? 0m);
+            bool isFlashSale = product.OldPrice.HasValue && product.BasePrice < product.OldPrice.Value && (!product.FlashSaleEndDate.HasValue || product.FlashSaleEndDate.Value >= DateTime.Now);
             
             // Lấy thêm thông tin size/material
             string sizeStr = "", materialStr = "";
@@ -111,7 +119,8 @@ namespace PandoraWeb.Controllers
                     Price = price,
                     Quantity = quantity,
                     Size = sizeStr,
-                    Material = materialStr
+                    Material = materialStr,
+                    IsFlashSale = isFlashSale
                 });
             }
 
@@ -124,11 +133,30 @@ namespace PandoraWeb.Controllers
 
             int totalItems = cart.Sum(x => x.Quantity);
             decimal subTotal = cart.Sum(x => x.Total);
+            
+            decimal discountAmt = 0m;
+            var promo = Session["Coupon"] as PandoraWeb.Models.Promotion;
+            if (promo != null)
+            {
+                decimal baseDiscountable = cart.Where(m => !m.IsFlashSale).Sum(m => m.Total);
+                if (promo.DiscountPercentage.HasValue && promo.DiscountPercentage.Value > 0)
+                {
+                    discountAmt = baseDiscountable * ((decimal)promo.DiscountPercentage.Value / 100);
+                }
+                else if (promo.DiscountAmount.HasValue)
+                {
+                    discountAmt = promo.DiscountAmount.Value;
+                    if (discountAmt > baseDiscountable) { discountAmt = baseDiscountable; }
+                }
+            }
+            decimal finalTotal = subTotal - discountAmt;
 
             return Json(new { 
                 success = true, 
                 totalItems = totalItems, 
                 subTotal = subTotal.ToString("N0") + " ₫",
+                discountAmt = discountAmt.ToString("N0") + " ₫",
+                finalTotal = finalTotal.ToString("N0") + " ₫",
                 message = "Đã thêm sản phẩm vào giỏ hàng!"
             });
         }
@@ -152,10 +180,29 @@ namespace PandoraWeb.Controllers
             decimal subTotal = cart != null ? cart.Sum(x => x.Total) : 0m;
             bool isEmpty = cart == null || !cart.Any();
 
+            decimal discountAmt = 0m;
+            var promo = Session["Coupon"] as PandoraWeb.Models.Promotion;
+            if (promo != null && cart != null)
+            {
+                decimal baseDiscountable = cart.Where(m => !m.IsFlashSale).Sum(m => m.Total);
+                if (promo.DiscountPercentage.HasValue && promo.DiscountPercentage.Value > 0)
+                {
+                    discountAmt = baseDiscountable * ((decimal)promo.DiscountPercentage.Value / 100);
+                }
+                else if (promo.DiscountAmount.HasValue)
+                {
+                    discountAmt = promo.DiscountAmount.Value;
+                    if (discountAmt > baseDiscountable) { discountAmt = baseDiscountable; }
+                }
+            }
+            decimal finalTotal = subTotal - discountAmt;
+
             return Json(new { 
                 success = true, 
                 totalItems = totalItems, 
                 subTotal = subTotal.ToString("N0") + " ₫",
+                discountAmt = discountAmt.ToString("N0") + " ₫",
+                finalTotal = finalTotal.ToString("N0") + " ₫",
                 isEmpty = isEmpty
             });
         }
@@ -191,14 +238,63 @@ namespace PandoraWeb.Controllers
             decimal subTotal = cart != null ? cart.Sum(x => x.Total) : 0m;
             bool isEmpty = cart == null || !cart.Any();
 
+            decimal discountAmt = 0m;
+            var promo = Session["Coupon"] as PandoraWeb.Models.Promotion;
+            if (promo != null && cart != null)
+            {
+                decimal baseDiscountable = cart.Where(m => !m.IsFlashSale).Sum(m => m.Total);
+                if (promo.DiscountPercentage.HasValue && promo.DiscountPercentage.Value > 0)
+                {
+                    discountAmt = baseDiscountable * ((decimal)promo.DiscountPercentage.Value / 100);
+                }
+                else if (promo.DiscountAmount.HasValue)
+                {
+                    discountAmt = promo.DiscountAmount.Value;
+                    if (discountAmt > baseDiscountable) { discountAmt = baseDiscountable; }
+                }
+            }
+            decimal finalTotal = subTotal - discountAmt;
+
             return Json(new { 
                 success = true, 
                 totalItems = totalItems, 
                 itemTotal = itemTotal.ToString("N0") + " ₫",
                 subTotal = subTotal.ToString("N0") + " ₫",
+                discountAmt = discountAmt.ToString("N0") + " ₫",
+                finalTotal = finalTotal.ToString("N0") + " ₫",
                 isEmpty = isEmpty
             });
         }
+
+        [HttpPost]
+        public ActionResult ApplyCoupon(string code)
+        {
+            if (string.IsNullOrEmpty(code))
+                return Json(new { success = false, message = "Vui lòng nhập mã." });
+            
+            var promo = db.Promotions.FirstOrDefault(p => p.Code == code && p.IsActive);
+            if (promo == null)
+                return Json(new { success = false, message = "Mã giảm giá không hợp lệ hoặc đã hết hạn." });
+                
+            if (promo.StartDate > DateTime.Now || promo.EndDate < DateTime.Now)
+                return Json(new { success = false, message = "Mã giảm giá không trong thời gian sử dụng." });
+
+            int? customerId = Session["CustomerId"] as int?;
+            if (customerId.HasValue)
+            {
+                bool used = db.Orders.Any(o => o.CustomerId == customerId.Value && o.PromotionId == promo.PromotionId && o.OrderStatus != "Cancelled");
+                if (used)
+                    return Json(new { success = false, message = "Tài khoản của bạn đã sử dụng mã này rồi." });
+            }
+            else
+            {
+                return Json(new { success = false, message = "Vui lòng đăng nhập để sử dụng mã giảm giá." });
+            }
+
+            Session["Coupon"] = promo;
+            return Json(new { success = true, message = "Áp dụng mã thành công!" });
+        }
+
 
         protected override void Dispose(bool disposing)
         {

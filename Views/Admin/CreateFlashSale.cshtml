@@ -1,0 +1,148 @@
+@model IEnumerable<PandoraWeb.Models.Product>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">@ViewBag.Title</h1>
+    <div>
+        <a href="@Url.Action("FlashSales", "Admin")" class="btn btn-secondary me-2">Hủy</a>
+        <button type="button" class="btn btn-admin" onclick="saveFlashSales()">
+            <i class="fas fa-save me-2"></i> Lưu Áp Dụng
+        </button>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table align-middle" id="flashSaleTable">
+                <thead>
+                    <tr>
+                        <th style="width: 250px;">Sản Phẩm</th>
+                        <th>Giá Gốc</th>
+                        <th>Giảm (%)</th>
+                        <th>Giảm (Tiền)</th>
+                        <th>Giá Mới</th>
+                        <th>Ngày Kết Thúc</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(var item in Model)
+                    {
+                        var rawImg = PandoraWeb.Helpers.ImageHelper.GetImageUrl(item.ImageUrl, "");
+                        decimal currentOriginal = item.OldPrice ?? item.BasePrice;
+                        decimal currentPercent = 0;
+                        if (item.OldPrice.HasValue && item.OldPrice.Value > 0)
+                        {
+                            currentPercent = Math.Round((1 - (item.BasePrice / item.OldPrice.Value)) * 100);
+                        }
+
+                        <tr data-id="@item.ProductId" data-original="@currentOriginal">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <img src="@rawImg" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 10px;" />
+                                    <div>
+                                        <div class="fw-bold">@item.ProductName</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="fw-bold text-muted">@currentOriginal.ToString("N0")</span>
+                            </td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm discount-percent" value="@(currentPercent > 0 ? currentPercent.ToString() : "")" placeholder="0" min="0" max="100" style="width: 80px;" oninput="calcRow(this, 'percent')" />
+                            </td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm discount-amount" value="" placeholder="0" min="0" style="width: 120px;" oninput="calcRow(this, 'amount')" />
+                            </td>
+                            <td>
+                                <span class="fw-bold text-danger new-price-label">@item.BasePrice.ToString("N0")</span>
+                            </td>
+                            <td>
+                                <input type="datetime-local" class="form-control form-control-sm end-date" value="@(item.FlashSaleEndDate?.ToString("yyyy-MM-ddTHH:mm") ?? "")" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function calcRow(input, type) {
+        const tr = input.closest('tr');
+        const originalPrice = parseFloat(tr.dataset.original);
+        const percentInput = tr.querySelector('.discount-percent');
+        const amountInput = tr.querySelector('.discount-amount');
+        const newPriceLabel = tr.querySelector('.new-price-label');
+
+        let newPrice = originalPrice;
+
+        if (type === 'percent') {
+            amountInput.value = ''; // clear amount if percent is typed
+            const p = parseFloat(percentInput.value);
+            if (!isNaN(p) && p > 0) {
+                newPrice = originalPrice * (100 - p) / 100;
+            }
+        } else if (type === 'amount') {
+            percentInput.value = ''; // clear percent if amount is typed
+            const a = parseFloat(amountInput.value);
+            if (!isNaN(a) && a > 0) {
+                newPrice = originalPrice - a;
+            }
+        }
+
+        if (newPrice < 0) newPrice = 0;
+        
+        // Format to string
+        newPriceLabel.textContent = Math.round(newPrice).toLocaleString('vi-VN');
+    }
+
+    function saveFlashSales() {
+        const rows = document.querySelectorAll('#flashSaleTable tbody tr');
+        const data = [];
+
+        rows.forEach(tr => {
+            const pId = tr.dataset.id;
+            const pInput = tr.querySelector('.discount-percent').value;
+            const aInput = tr.querySelector('.discount-amount').value;
+            const endDate = tr.querySelector('.end-date').value;
+
+            if (pInput || aInput) {
+                data.push({
+                    ProductId: pId,
+                    DiscountPercent: pInput ? parseInt(pInput) : null,
+                    DiscountAmount: aInput ? parseFloat(aInput) : null,
+                    EndDate: endDate || null
+                });
+            }
+        });
+
+        if (data.length === 0) {
+            alert("Bạn chưa cấu hình giảm giá cho sản phẩm nào!");
+            return;
+        }
+
+        fetch('@Url.Action("SaveFlashSale", "Admin")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(res => {
+            if (res.success) {
+                window.location.href = '@Url.Action("FlashSales", "Admin")';
+            } else {
+                alert(res.message || "Có lỗi xảy ra");
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Có lỗi mạng!");
+        });
+    }
+</script>
