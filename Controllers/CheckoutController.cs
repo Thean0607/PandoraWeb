@@ -295,6 +295,11 @@ namespace PandoraWeb.Controllers
                         PandoraWeb.Helpers.EmailHelper.SendOrderConfirmationEmail(order, recipientEmail, recipientName);
                     }
 
+                    if (paymentMethod == "VNPAY")
+                    {
+                        return RedirectToAction("Checkout", "VnPay", new { orderId = order.OrderId });
+                    }
+
                     return RedirectToAction("OrderSuccess", new { id = order.OrderId });
                 }
                 catch (Exception ex)

@@ -108,10 +108,7 @@ namespace PandoraWeb.Controllers
                     {
                         p.ImageUrl = imageUrl;
                     }
-                    // Since Stock is handled via variants, for a simple implementation we might just update a default variant or not touch it if it's complex.
-                    // But for this project, let's assume we don't have direct Stock on Product table (Wait, let me check Product model)
-                    // Product model does NOT have Stock property. Stock is in ProductVariant.
-                    // I will find the first variant and update its stock, or create one if none exists.
+
                     var variant = db.ProductVariants.FirstOrDefault(v => v.ProductId == p.ProductId);
                     if (variant != null)
                     {
@@ -728,6 +725,22 @@ namespace PandoraWeb.Controllers
                     order.OrderStatus = status;
                     db.SaveChanges();
                     PandoraWeb.Helpers.LogHelper.LogActivity("Employee", Session["EmployeeId"] as int?, "UPDATE_ORDER_STATUS", $"Cập nhật trạng thái đơn hàng {id} thành {status}");
+                    return Json(new { success = true });
+                }
+                return Json(new { success = false, message = "Không tìm thấy đơn hàng" });
+            } catch(Exception e) { return Json(new { success = false, message = e.Message }); }
+        }
+
+        [HttpPost]
+        [AdminAuthorize(Permission = "manage_order")]
+        public ActionResult UpdatePaymentStatus(int id, string status)
+        {
+            try {
+                var order = db.Orders.Find(id);
+                if (order != null) {
+                    order.PaymentStatus = status;
+                    db.SaveChanges();
+                    PandoraWeb.Helpers.LogHelper.LogActivity("Employee", Session["EmployeeId"] as int?, "UPDATE_PAYMENT_STATUS", $"Cập nhật trạng thái thanh toán đơn hàng {id} thành {status}");
                     return Json(new { success = true });
                 }
                 return Json(new { success = false, message = "Không tìm thấy đơn hàng" });

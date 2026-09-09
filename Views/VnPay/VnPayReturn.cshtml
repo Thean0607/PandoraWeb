@@ -1,0 +1,27 @@
+@{
+    ViewBag.Title = "Kết Quả Thanh Toán VNPAY";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5 pt-5 pb-5 text-center">
+    @if (ViewBag.Message != null && ViewBag.Message.ToString().Contains("thành công"))
+    {
+        <div class="alert alert-success d-inline-block px-5 py-4 shadow-sm">
+            <i class="fas fa-check-circle text-success" style="font-size: 50px;"></i>
+            <h3 class="mt-3">@ViewBag.Message</h3>
+            <p class="mb-0 mt-3"><a href="@Url.Action("Index", "Home")" class="btn btn-outline-success">Về trang chủ</a></p>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-danger d-inline-block px-5 py-4 shadow-sm">
+            <i class="fas fa-times-circle text-danger" style="font-size: 50px;"></i>
+            <h3 class="mt-3 text-danger">Giao Dịch Thất Bại</h3>
+            <p class="mb-4">@ViewBag.Message</p>
+            <p class="mb-0">
+                <a href="@Url.Action("Index", "Cart")" class="btn btn-danger me-2">Quay lại giỏ hàng</a>
+                <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary">Về trang chủ</a>
+            </p>
+        </div>
+    }
+</div>

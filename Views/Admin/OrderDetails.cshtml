@@ -20,7 +20,7 @@
     </div>
 </div>
 
-<div class="row">
+<div class="row align-items-start">
     <!-- Left Column: Order Items & Pricing -->
     <div class="col-lg-8">
         <div class="admin-card p-4 shadow-sm mb-4">
@@ -112,6 +112,17 @@
                 </select>
                 <small class="text-muted mt-2 d-block">Trạng thái sẽ được cập nhật ngay lập tức vào CSDL.</small>
             </div>
+            <div class="mb-3 pt-3 border-top">
+                <label class="form-label text-muted fs-7 mb-1">Cập nhật thanh toán</label>
+                <select class="form-select status-select" 
+                        onchange="updatePaymentStatus(@Model.OrderId, this.value)" 
+                        data-original="@Model.PaymentStatus">
+                    <option value="Pending" @(Model.PaymentStatus == "Pending" ? "selected" : "")>Chờ thanh toán</option>
+                    <option value="Paid" @(Model.PaymentStatus == "Paid" ? "selected" : "")>Đã thanh toán</option>
+                    <option value="Refunded" @(Model.PaymentStatus == "Refunded" ? "selected" : "")>Đã hoàn tiền</option>
+                </select>
+                <small class="text-muted mt-2 d-block">Lưu ý: Chỉ đơn "Đã thanh toán" mới được tính vào Tổng chi tiêu khách hàng.</small>
+            </div>
         </div>
 
         <!-- Card: Khách hàng -->
@@ -178,6 +189,27 @@
             .then(data => {
                 if(data.success) {
                     alert('Đã cập nhật trạng thái đơn hàng!');
+                } else {
+                    alert(data.message || 'Có lỗi xảy ra!');
+                    location.reload();
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                location.reload();
+            });
+        }
+
+        function updatePaymentStatus(id, status) {
+            fetch('@Url.Action("UpdatePaymentStatus", "Admin")', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ id: id, status: status })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    alert('Đã cập nhật trạng thái thanh toán!');
                 } else {
                     alert(data.message || 'Có lỗi xảy ra!');
                     location.reload();

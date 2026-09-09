@@ -59,7 +59,7 @@
                         @{ 
                             var reviews = ViewBag.Reviews as List<PandoraWeb.Models.Review>;
                             int totalReviews = reviews != null ? reviews.Count : 0;
-                            double avgRating = totalReviews > 0 ? reviews.Average(r => r.Rating) : 5.0;
+                            double avgRating = totalReviews > 0 ? reviews.Average(r => r.Rating) : 0;
                             int fullStars = (int)avgRating;
                             bool hasHalfStar = (avgRating - fullStars) >= 0.5;
                             for (int i = 0; i < fullStars; i++)
@@ -138,15 +138,23 @@
 <!-- Detailed Tabs -->
 <section class="py-5 border-top">
     <div class="container">
-        <ul class="nav nav-tabs justify-content-center mb-4" id="myTab" role="tablist">
+        <style>
+            .product-tabs .nav-link {
+                color: #555 !important;
+            }
+            .product-tabs .nav-link.active {
+                color: var(--primary-color, #d4af37) !important;
+            }
+        </style>
+        <ul class="nav nav-tabs justify-content-center mb-4 product-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active text-dark fw-bold" id="desc-tab" data-bs-toggle="tab" data-bs-target="#desc" type="button" role="tab">Mô Tả Sản Phẩm</button>
+                <button class="nav-link active fw-bold" id="desc-tab" data-bs-toggle="tab" data-bs-target="#desc" type="button" role="tab">Mô Tả Sản Phẩm</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link text-dark fw-bold" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">Thông Tin Chi Tiết</button>
+                <button class="nav-link fw-bold" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">Thông Tin Chi Tiết</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link text-dark fw-bold" id="review-tab" data-bs-toggle="tab" data-bs-target="#review" type="button" role="tab">Đánh Giá Sản Phẩm</button>
+                <button class="nav-link fw-bold" id="review-tab" data-bs-toggle="tab" data-bs-target="#review" type="button" role="tab">Đánh Giá Sản Phẩm</button>
             </li>
         </ul>
         <div class="tab-content" id="myTabContent">

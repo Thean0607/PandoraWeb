@@ -74,3 +74,44 @@ function generateId(dataArray) {
     if (dataArray.length === 0) return 1;
     return Math.max(...dataArray.map(item => item.id)) + 1;
 }
+
+// Export Table to CSV
+function exportTableToCSV(filename) {
+    const table = document.querySelector('.admin-table');
+    if (!table) {
+        alert("Không tìm thấy dữ liệu để xuất!");
+        return;
+    }
+    
+    let csv = [];
+    // BOM for UTF-8 Excel support
+    const BOM = "\uFEFF";
+    const rows = table.querySelectorAll("tr");
+    
+    for (let i = 0; i < rows.length; i++) {
+        let row = [], cols = rows[i].querySelectorAll("td, th");
+        
+        for (let j = 0; j < cols.length; j++) {
+            // Ignore columns that are for actions (like Edit/Delete buttons)
+            // Usually the last column or one without much text
+            let cellText = (cols[j].innerText || cols[j].textContent || "").trim();
+            // Escape double quotes
+            cellText = cellText.replace(/"/g, '""');
+            // Enclose in double quotes to handle commas and newlines
+            row.push('"' + cellText + '"');
+        }
+        
+        // Remove the last column if it's "Thao Tác" on the header, or just skip checking
+        // For simplicity, we just export everything but can filter out empty action headers
+        csv.push(row.join(","));
+    }
+    
+    const csvFile = new Blob([BOM + csv.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const downloadLink = document.createElement("a");
+    downloadLink.download = filename;
+    downloadLink.href = window.URL.createObjectURL(csvFile);
+    downloadLink.style.display = "none";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+}

@@ -181,6 +181,8 @@
     <Compile Include="Controllers\CartController.cs" />
     <Compile Include="Controllers\CheckoutController.cs" />
     <Compile Include="Controllers\WishlistController.cs" />
+    <Compile Include="Controllers\VnPayController.cs" />
+    <Compile Include="Helpers\VnPayLibrary.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -322,6 +324,7 @@
     <Content Include="Views\Order\Wishlist.cshtml" />
     <Content Include="Views\Product\Category.cshtml" />
     <Content Include="Views\Product\ProductDetail.cshtml" />
+    <Content Include="Views\VnPay\VnPayReturn.cshtml" />
     <Content Include="Views\Home\Stores.cshtml" />
     <Content Include="Views\Home\Faq.cshtml" />
   </ItemGroup>
