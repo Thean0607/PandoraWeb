@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
   <Import Project="packages\EntityFramework.6.5.2\build\EntityFramework.props" Condition="Exists('packages\EntityFramework.6.5.2\build\EntityFramework.props')" />
@@ -176,6 +176,15 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Areas\Admin\AdminAreaRegistration.cs" />
+    <Compile Include="Areas\Admin\Controllers\CmsController.cs" />
+    <Compile Include="Areas\Admin\Controllers\CustomersController.cs" />
+    <Compile Include="Areas\Admin\Controllers\DashboardController.cs" />
+    <Compile Include="Areas\Admin\Controllers\MarketingController.cs" />
+    <Compile Include="Areas\Admin\Controllers\OrdersController.cs" />
+    <Compile Include="Areas\Admin\Controllers\ProductsController.cs" />
+    <Compile Include="Areas\Admin\Controllers\ReportsController.cs" />
+    <Compile Include="Areas\Admin\Controllers\SettingsController.cs" />
     <Compile Include="Controllers\OrderController.cs" />
     <Compile Include="Controllers\ProductController.cs" />
     <Compile Include="Controllers\CartController.cs" />
@@ -302,16 +311,39 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\Admin\Views\Cms\Blog.cshtml" />
+    <Content Include="Areas\Admin\Views\Cms\FAQ.cshtml" />
+    <Content Include="Areas\Admin\Views\Cms\Pages.cshtml" />
+    <Content Include="Areas\Admin\Views\Customers\Customers.cshtml" />
+    <Content Include="Areas\Admin\Views\Customers\CustomerSegments.cshtml" />
+    <Content Include="Areas\Admin\Views\Customers\Reviews.cshtml" />
+    <Content Include="Areas\Admin\Views\Dashboard\Index.cshtml" />
+    <Content Include="Areas\Admin\Views\Marketing\Banners.cshtml" />
+    <Content Include="Areas\Admin\Views\Marketing\Coupons.cshtml" />
+    <Content Include="Areas\Admin\Views\Marketing\CreateFlashSale.cshtml" />
+    <Content Include="Areas\Admin\Views\Marketing\FlashSales.cshtml" />
+    <Content Include="Areas\Admin\Views\Marketing\PromoPopup.cshtml" />
+    <Content Include="Areas\Admin\Views\Orders\OrderDetails.cshtml" />
+    <Content Include="Areas\Admin\Views\Orders\Orders.cshtml" />
+    <Content Include="Areas\Admin\Views\Orders\Refunds.cshtml" />
+    <Content Include="Areas\Admin\Views\Products\Attributes.cshtml" />
+    <Content Include="Areas\Admin\Views\Products\Brands.cshtml" />
+    <Content Include="Areas\Admin\Views\Products\Categories.cshtml" />
+    <Content Include="Areas\Admin\Views\Products\Collections.cshtml" />
+    <Content Include="Areas\Admin\Views\Products\Products.cshtml" />
+    <Content Include="Areas\Admin\Views\Reports\InventoryReports.cshtml" />
+    <Content Include="Areas\Admin\Views\Reports\SalesReports.cshtml" />
+    <Content Include="Areas\Admin\Views\Settings\Employees.cshtml" />
+    <Content Include="Areas\Admin\Views\Settings\Payments.cshtml" />
+    <Content Include="Areas\Admin\Views\Settings\Roles.cshtml" />
+    <Content Include="Areas\Admin\Views\Settings\Settings.cshtml" />
+    <Content Include="Areas\Admin\Views\Settings\Shipping.cshtml" />
+    <Content Include="Areas\Admin\Views\Shared\_AdminLayout.cshtml" />
+    <Content Include="Areas\Admin\Views\_ViewStart.cshtml" />
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Views\Admin\Customers.cshtml" />
-    <Content Include="Views\Admin\Employees.cshtml" />
-    <Content Include="Views\Admin\Index.cshtml" />
-    <Content Include="Views\Admin\Products.cshtml" />
-    <Content Include="Views\Admin\Roles.cshtml" />
-    <Content Include="Views\Shared\_AdminLayout.cshtml" />
-    <Content Include="Views\Account\Address.cshtml" />
+                            <Content Include="Views\Account\Address.cshtml" />
     <Content Include="Views\Account\ChangePassword.cshtml" />
     <Content Include="Views\Account\ForgotPassword.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
@@ -408,3 +440,4 @@
   <Target Name="AfterBuild">
   </Target> -->
 </Project>
+
