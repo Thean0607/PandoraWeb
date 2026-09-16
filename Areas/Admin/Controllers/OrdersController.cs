@@ -5,6 +5,7 @@ using PandoraWeb.Models.Data;
 using System.Linq;
 using System.Data.Entity;
 using System;
+using PagedList;
 
 namespace PandoraWeb.Areas.Admin.Controllers
 {
@@ -14,12 +15,14 @@ namespace PandoraWeb.Areas.Admin.Controllers
         private PandoraDbContext db = new PandoraDbContext();
 
         [AdminAuthorize(Permission = "manage_order")]
-        public ActionResult Index()
+        public ActionResult Index(int? page)
         {
             ViewBag.ActiveMenu = "Orders";
             ViewBag.ActiveSubMenu = "OrdersList";
             ViewBag.Title = "Danh sách Đơn Hàng";
-            var orders = db.Orders.Include(o => o.Customer).OrderByDescending(o => o.OrderDate).ToList();
+            int pageSize = 15;
+            int pageNumber = (page ?? 1);
+            var orders = db.Orders.Include(o => o.Customer).OrderByDescending(o => o.OrderDate).ToPagedList(pageNumber, pageSize);
             return View("Orders", orders);
         }
 
@@ -46,6 +49,7 @@ namespace PandoraWeb.Areas.Admin.Controllers
 
         [AdminAuthorize(Permission = "manage_order")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult UpdateOrderStatus(int id, string status)
         {
             try {
@@ -62,6 +66,7 @@ namespace PandoraWeb.Areas.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(Permission = "manage_order")]
+        [ValidateAntiForgeryToken]
         public ActionResult UpdatePaymentStatus(int id, string status)
         {
             try {
@@ -77,14 +82,16 @@ namespace PandoraWeb.Areas.Admin.Controllers
         }
 
         [AdminAuthorize(Permission = "manage_order")]
-        public ActionResult Refunds()
+        public ActionResult Refunds(int? page)
         {
             ViewBag.ActiveMenu = "Orders";
             ViewBag.ActiveSubMenu = "Refunds";
             ViewBag.Title = "Hoàn Trả / Hủy";
+            int pageSize = 15;
+            int pageNumber = (page ?? 1);
             var refunds = db.Orders.Include(o => o.Customer)
                             .Where(o => o.OrderStatus == "Cancelled" || o.OrderStatus == "Refunded")
-                            .OrderByDescending(o => o.OrderDate).ToList();
+                            .OrderByDescending(o => o.OrderDate).ToPagedList(pageNumber, pageSize);
             return View(refunds);
         }
 

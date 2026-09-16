@@ -1,4 +1,4 @@
-@model List<PandoraWeb.Models.Address>
+﻿@model List<PandoraWeb.Models.Address>
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Sổ Địa Chỉ - Pandora";
@@ -126,6 +126,7 @@
                 </div>
                 <div class="modal-body">
                     <form id="form-address" method="post" action="@Url.Action("SaveAddress", "Account")">
+                    @Html.AntiForgeryToken()
                         <div class="row g-3">
                             <div class="col-md-12">
                                 <label class="form-label fw-bold fs-7">Tỉnh / Thành phố <span class="text-danger">*</span></label>
@@ -272,3 +273,4 @@
     });
 </script>
 }
+

@@ -26,25 +26,24 @@ namespace PandoraWeb.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Login(string loginId, string password)
         {
-            string hashedPassword = PandoraWeb.Helpers.SecurityHelper.HashSHA256(password);
-
             // Kiểm tra trong bảng Employees trước (Admin/Manager)
-            var emp = db.Employees.Include("Role").FirstOrDefault(e => e.Email == loginId && e.PasswordHash == hashedPassword);
-            if (emp != null)
+            var emp = db.Employees.Include("Role").FirstOrDefault(e => e.Email == loginId);
+            if (emp != null && PandoraWeb.Helpers.SecurityHelper.VerifyPassword(password, emp.PasswordHash))
             {
                 Session["EmployeeId"] = emp.EmployeeId;
                 Session["FullName"] = emp.FullName;
                 Session["Role"] = emp.Role.RoleName;
                 Session["Permissions"] = emp.Role.Permissions;
                 PandoraWeb.Helpers.LogHelper.LogActivity("Employee", emp.EmployeeId, "LOGIN_SUCCESS", "Nhân viên đăng nhập thành công");
-                return RedirectToAction("Index", "Admin");
+                return RedirectToAction("Index", "Admin", new { area = "Admin" });
             }
 
             // Kiểm tra trong bảng Customers (Khách hàng)
-            var cus = db.Customers.FirstOrDefault(c => (c.Email == loginId || c.PhoneNumber == loginId) && c.PasswordHash == hashedPassword);
-            if (cus != null)
+            var cus = db.Customers.FirstOrDefault(c => c.Email == loginId || c.PhoneNumber == loginId);
+            if (cus != null && PandoraWeb.Helpers.SecurityHelper.VerifyPassword(password, cus.PasswordHash))
             {
                 Session["CustomerId"] = cus.CustomerId;
                 Session["FullName"] = cus.FullName;
@@ -97,6 +96,7 @@ namespace PandoraWeb.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public new ActionResult Profile(string fullName, string email, string phoneNumber, string gender, DateTime? dateOfBirth, System.Web.HttpPostedFileBase avatarFile)
         {
             if (Session["CustomerId"] == null) return RedirectToAction("Login");
@@ -157,6 +157,7 @@ namespace PandoraWeb.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult UploadAvatar(System.Web.HttpPostedFileBase avatarFile)
         {
             EnsureAvatarColumnExists();
@@ -202,7 +203,11 @@ namespace PandoraWeb.Controllers
         public ActionResult Logout()
         {
             Session.Clear();
-            return RedirectToAction("Index", "Home");
+            Session.Abandon();
+            // Đảm bảo xóa cache trình duyệt để tránh bị back lại trang cũ vẫn còn session
+            Response.Cache.SetCacheability(System.Web.HttpCacheability.NoCache);
+            Response.Cache.SetNoStore();
+            return RedirectToAction("Index", "Home", new { area = "" });
         }
 
         public ActionResult Signup()
@@ -213,6 +218,7 @@ namespace PandoraWeb.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Signup(string lastName, string firstName, string email, string phone, string password, string confirmPassword)
         {
             ViewBag.ActiveMenu = "Signup";
@@ -224,14 +230,24 @@ namespace PandoraWeb.Controllers
                 return View();
             }
 
-            // Check if email already exists
-            var existingCustomer = db.Customers.FirstOrDefault(c => c.Email == email);
-            var existingEmployee = db.Employees.FirstOrDefault(e => e.Email == email);
-
-            if (existingCustomer != null || existingEmployee != null)
+            // Check if email or phone already exists
+            var existingEmailCustomer = db.Customers.FirstOrDefault(c => c.Email == email);
+            var existingEmailEmployee = db.Employees.FirstOrDefault(e => e.Email == email);
+            
+            if (existingEmailCustomer != null || existingEmailEmployee != null)
             {
                 ViewBag.Error = "Email này đã được sử dụng. Vui lòng chọn email khác.";
                 return View();
+            }
+
+            if (!string.IsNullOrEmpty(phone))
+            {
+                var existingPhoneCustomer = db.Customers.FirstOrDefault(c => c.PhoneNumber == phone);
+                if (existingPhoneCustomer != null)
+                {
+                    ViewBag.Error = "Số điện thoại này đã được sử dụng. Vui lòng chọn số khác.";
+                    return View();
+                }
             }
 
             // Create new customer
@@ -240,7 +256,7 @@ namespace PandoraWeb.Controllers
                 FullName = (lastName + " " + firstName).Trim(),
                 Email = email,
                 PhoneNumber = phone,
-                PasswordHash = PandoraWeb.Helpers.SecurityHelper.HashSHA256(password),
+                PasswordHash = PandoraWeb.Helpers.SecurityHelper.HashPassword(password),
                 Status = "active",
                 CreatedAt = System.DateTime.Now
             };
@@ -271,6 +287,7 @@ namespace PandoraWeb.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult ChangePassword(string currentPassword, string newPassword, string confirmPassword)
         {
             if (Session["CustomerId"] == null && Session["EmployeeId"] == null)
@@ -304,13 +321,12 @@ namespace PandoraWeb.Controllers
                 var customer = db.Customers.Find(customerId);
                 if (customer != null)
                 {
-                    string hashedCurrent = PandoraWeb.Helpers.SecurityHelper.HashSHA256(currentPassword);
-                    if (customer.PasswordHash != hashedCurrent)
+                    if (!PandoraWeb.Helpers.SecurityHelper.VerifyPassword(currentPassword, customer.PasswordHash))
                     {
                         ViewBag.Error = "Mật khẩu hiện tại không chính xác.";
                         return View();
                     }
-                    customer.PasswordHash = PandoraWeb.Helpers.SecurityHelper.HashSHA256(newPassword);
+                    customer.PasswordHash = PandoraWeb.Helpers.SecurityHelper.HashPassword(newPassword);
                     db.SaveChanges();
                     PandoraWeb.Helpers.LogHelper.LogActivity("Customer", customer.CustomerId, "CHANGE_PASSWORD", "Khách hàng đổi mật khẩu");
                     PandoraWeb.Helpers.EmailHelper.SendPasswordResetEmail(customer.Email, customer.FullName);
@@ -324,13 +340,12 @@ namespace PandoraWeb.Controllers
                 var emp = db.Employees.Find(empId);
                 if (emp != null)
                 {
-                    string hashedCurrent = PandoraWeb.Helpers.SecurityHelper.HashSHA256(currentPassword);
-                    if (emp.PasswordHash != hashedCurrent)
+                    if (!PandoraWeb.Helpers.SecurityHelper.VerifyPassword(currentPassword, emp.PasswordHash))
                     {
                         ViewBag.Error = "Mật khẩu hiện tại không chính xác.";
                         return View();
                     }
-                    emp.PasswordHash = PandoraWeb.Helpers.SecurityHelper.HashSHA256(newPassword);
+                    emp.PasswordHash = PandoraWeb.Helpers.SecurityHelper.HashPassword(newPassword);
                     db.SaveChanges();
                     PandoraWeb.Helpers.LogHelper.LogActivity("Employee", emp.EmployeeId, "CHANGE_PASSWORD", "Quản trị viên đổi mật khẩu");
                     PandoraWeb.Helpers.EmailHelper.SendPasswordResetEmail(emp.Email, emp.FullName);
@@ -375,6 +390,7 @@ namespace PandoraWeb.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult ForgotPassword(string actionStep, string loginId, string otpCode, string newPassword, string confirmPassword)
         {
             ViewBag.ActiveMenu = "ForgotPassword";
@@ -530,7 +546,7 @@ namespace PandoraWeb.Controllers
 
                     if (customer != null)
                     {
-                        customer.PasswordHash = PandoraWeb.Helpers.SecurityHelper.HashSHA256(newPassword);
+                        customer.PasswordHash = PandoraWeb.Helpers.SecurityHelper.HashPassword(newPassword);
                         db.SaveChanges();
                         PandoraWeb.Helpers.LogHelper.LogActivity("Customer", customer.CustomerId, "RESET_PASSWORD", "Khách hàng đặt lại mật khẩu thành công qua OTP");
                         PandoraWeb.Helpers.EmailHelper.SendPasswordResetEmail(customer.Email, customer.FullName);
@@ -586,6 +602,7 @@ namespace PandoraWeb.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult SaveAddress(string fullAddress, string city, string district, string ward, string street)
         {
             if (Session["CustomerId"] == null) return RedirectToAction("Login");
@@ -644,7 +661,7 @@ namespace PandoraWeb.Controllers
                         });
                     }
                 }
-            }
+            }   
             Session["Cart"] = sessionCart;
 
             // Đồng thời lưu ngược những thứ có sẵn trong session (trước khi login) vào DB
@@ -690,3 +707,5 @@ namespace PandoraWeb.Controllers
         }
     }
 }
+
+

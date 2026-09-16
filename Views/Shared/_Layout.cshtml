@@ -1,4 +1,4 @@
-@{
+﻿@{
     var cart = Session["Cart"] as List<PandoraWeb.ViewModels.CartItemVM>;
     int cartCount = cart != null ? cart.Sum(c => c.Quantity) : 0;
 }
@@ -13,20 +13,13 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="~/assets/css/global.css">
-    <link rel="stylesheet" href="~/assets/css/components/buttons.css">
-    <link rel="stylesheet" href="~/assets/css/components/navbar.css">
-    <link rel="stylesheet" href="~/assets/css/components/product-card.css">
-    <link rel="stylesheet" href="~/assets/css/components/footer.css">
-    <link rel="stylesheet" href="~/assets/css/components/forms.css">
-    <link rel="stylesheet" href="~/assets/css/components/quantity-input.css">
-    <link rel="stylesheet" href="~/assets/css/components/section-title.css">
-    <link rel="stylesheet" href="~/assets/css/components/breadcrumb.css">
-    <link rel="stylesheet" href="~/assets/css/index.css">
-    <link rel="stylesheet" href="~/assets/css/profile.css">
+    @Styles.Render("~/bundles/public_css")
     @RenderSection("Styles", required: false)
 </head>
 <body>
+    <div id="csrf-token-container" style="display:none;">
+        @Html.AntiForgeryToken()
+    </div>
 
     <!-- Header / Navbar -->
     <nav class="navbar navbar-expand-xl fixed-top navbar-dark">
@@ -374,8 +367,29 @@
     }
 
     @RenderSection("Scripts", required: false)
+    <script>
+        const originalFetch = window.fetch;
+        window.fetch = function() {
+            let [resource, config] = arguments;
+            if(config && config.method && config.method.toUpperCase() === 'POST') {
+                const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+                if(token) {
+                    if (config.body instanceof URLSearchParams) {
+                        config.body.append('__RequestVerificationToken', token);
+                    } else if (config.body instanceof FormData) {
+                        config.body.append('__RequestVerificationToken', token);
+                    } else if (typeof config.body === 'string' && config.headers && config.headers['Content-Type'] === 'application/x-www-form-urlencoded') {
+                        if (config.body.length > 0) config.body += '&';
+                        config.body += '__RequestVerificationToken=' + encodeURIComponent(token);
+                    }
+                }
+            }
+            return originalFetch(resource, config);
+        };
+    </script>
 </body>
 </html>
+
 
 
 

@@ -5,6 +5,7 @@ using PandoraWeb.Models.Data;
 using System.Linq;
 using System.Data.Entity;
 using System;
+using PagedList;
 
 namespace PandoraWeb.Areas.Admin.Controllers
 {
@@ -14,12 +15,14 @@ namespace PandoraWeb.Areas.Admin.Controllers
         private PandoraDbContext db = new PandoraDbContext();
 
         [AdminAuthorize(Permission = "manage_customer")]
-        public ActionResult Index()
+        public ActionResult Index(int? page)
         {
             ViewBag.ActiveMenu = "Customers";
             ViewBag.ActiveSubMenu = "CustomersList";
             ViewBag.Title = "Danh sách Khách Hàng";
-            var customers = db.Customers.OrderByDescending(c => c.CreatedAt).ToList();
+            int pageSize = 15;
+            int pageNumber = (page ?? 1);
+            var customers = db.Customers.OrderByDescending(c => c.CreatedAt).ToPagedList(pageNumber, pageSize);
             return View("Customers", customers);
         }
 
@@ -40,17 +43,20 @@ namespace PandoraWeb.Areas.Admin.Controllers
         }
         
         [AdminAuthorize(Permission = "manage_customer")]
-        public ActionResult Reviews()
+        public ActionResult Reviews(int? page)
         {
             ViewBag.ActiveMenu = "Customers";
             ViewBag.ActiveSubMenu = "Reviews";
             ViewBag.Title = "Đánh Giá Sản Phẩm";
-            var reviews = db.Reviews.Include(r => r.Product).Include(r => r.Customer).OrderByDescending(r => r.ReviewDate).ToList();
+            int pageSize = 15;
+            int pageNumber = (page ?? 1);
+            var reviews = db.Reviews.Include(r => r.Product).Include(r => r.Customer).OrderByDescending(r => r.ReviewDate).ToPagedList(pageNumber, pageSize);
             return View(reviews);
         }
 
         [AdminAuthorize(Permission = "manage_customer")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult UpdateReviewStatus(int id, string status)
         {
             try {
@@ -66,6 +72,7 @@ namespace PandoraWeb.Areas.Admin.Controllers
 
         [AdminAuthorize(Permission = "manage_customer")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult DeleteReview(int id)
         {
             try {

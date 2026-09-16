@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 @{
     var perms = Session["Permissions"]?.ToString() ?? "";
     var permsArray = perms.Split(',');
@@ -240,14 +240,21 @@
             <button class="toggle-sidebar-btn" id="toggleSidebar">
                 <i class="fas fa-bars"></i>
             </button>
-            <div class="header-user">
-                <div class="user-info text-end">
-                    <span class="user-name">Phạm Admin</span>
-                    <span class="user-role">Quản trị viên</span>
-                </div>
-                <div class="user-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
+            <div class="header-user dropdown">
+                <a href="#" class="d-flex align-items-center text-decoration-none text-dark" id="adminProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="user-info text-end me-2">
+                        <span class="user-name d-block">@(Session["FullName"] ?? "Admin")</span>
+                        <span class="user-role text-muted small">@(Session["Role"] ?? "Quản trị viên")</span>
+                    </div>
+                    <div class="user-avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" aria-labelledby="adminProfileDropdown">
+                    <li><a class="dropdown-item" href="@Url.Action("Profile", "Account", new { area = "" })"><i class="far fa-id-badge me-2"></i>Hồ sơ cá nhân</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="@Url.Action("Logout", "Account", new { area = "" })"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                </ul>
             </div>
         </header>
 
@@ -259,9 +266,31 @@
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- SheetJS for Excel Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <!-- Admin Main JS -->
     <script src="~/assets/js/admin-main.js?v=@DateTime.Now.Ticks"></script>
     @RenderSection("Scripts", required: false)
+    <script>
+        const originalFetch = window.fetch;
+        window.fetch = function() {
+            let [resource, config] = arguments;
+            if(config && config.method && config.method.toUpperCase() === 'POST') {
+                const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+                if(token) {
+                    if (config.body instanceof URLSearchParams) {
+                        config.body.append('__RequestVerificationToken', token);
+                    } else if (config.body instanceof FormData) {
+                        config.body.append('__RequestVerificationToken', token);
+                    } else if (typeof config.body === 'string' && config.headers && config.headers['Content-Type'] === 'application/x-www-form-urlencoded') {
+                        if (config.body.length > 0) config.body += '&';
+                        config.body += '__RequestVerificationToken=' + encodeURIComponent(token);
+                    }
+                }
+            }
+            return originalFetch(resource, config);
+        };
+    </script>
 </body>
 </html>
 

@@ -1,6 +1,6 @@
-﻿@model IEnumerable<PandoraWeb.Models.Collection>
+@model IEnumerable<PandoraWeb.Models.Collection>
 @{
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -81,7 +81,8 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="collectionForm" method="post" action="@Url.Action("SaveCollection", "Admin")" enctype="multipart/form-data">
+                <form id="collectionForm" method="post" action="@Url.Action("SaveCollection", "Products", new { area = "Admin" })" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
                     <input type="hidden" id="collectionId" name="collectionId" value="" />
                     <div class="mb-3">
                         <label class="form-label">Tên Bộ Sưu Tập <span class="text-danger">*</span></label>
@@ -168,7 +169,7 @@
 
         function deleteCollection(id) {
             if (confirm('Bạn có chắc chắn muốn xóa bộ sưu tập này? Các sản phẩm thuộc bộ sưu tập sẽ không bị xóa nhưng sẽ mất liên kết.')) {
-                fetch('@Url.Action("DeleteCollection", "Admin")', {
+                fetch('@Url.Action("DeleteCollection", "Products", new { area = "Admin" })', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: new URLSearchParams({ id: id })
@@ -186,4 +187,6 @@
         }
     </script>
 }
+
+
 

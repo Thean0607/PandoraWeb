@@ -1,4 +1,4 @@
-@model PandoraWeb.Models.Product
+﻿@model PandoraWeb.Models.Product
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = Model != null ? Model.ProductName : "Chi Tiết Sản Phẩm";
@@ -175,6 +175,7 @@
                         @if (Session["CustomerId"] != null)
                         {
                             <form id="reviewForm">
+                    @Html.AntiForgeryToken()
                                 <input type="hidden" id="reviewProductId" value="@Model.ProductId" />
                                 <div class="mb-3">
                                     <label class="form-label">Chọn số sao:</label>
@@ -361,3 +362,4 @@
         });
     </script>
 }
+

@@ -22,9 +22,22 @@ namespace PandoraWeb
             bundles.Add(new Bundle("~/bundles/bootstrap").Include(
                       "~/Scripts/bootstrap.js"));
 
+                        bundles.Add(new StyleBundle("~/bundles/public_css").Include(
+                      "~/assets/css/global.css",
+                      "~/assets/css/components/buttons.css",
+                      "~/assets/css/components/navbar.css",
+                      "~/assets/css/components/product-card.css",
+                      "~/assets/css/components/footer.css",
+                      "~/assets/css/components/forms.css",
+                      "~/assets/css/components/quantity-input.css",
+                      "~/assets/css/components/section-title.css",
+                      "~/assets/css/components/breadcrumb.css",
+                      "~/assets/css/index.css",
+                      "~/assets/css/profile.css"));
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
                       "~/Content/site.css"));
         }
     }
 }
+

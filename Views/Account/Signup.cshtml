@@ -1,4 +1,4 @@
-@{
+﻿@{
     Layout = null;
     ViewBag.Title = "Signup";
 }
@@ -33,6 +33,7 @@
             </div>
             
             <form method="post" action="@Url.Action("Signup", "Account")">
+                    @Html.AntiForgeryToken()
                 @if (ViewBag.Error != null)
                 {
                     <div class="alert alert-danger" role="alert">
@@ -87,6 +88,7 @@
     <script src="~/assets/js/main.js"></script>
 </body>
 </html>
+
 
 
 

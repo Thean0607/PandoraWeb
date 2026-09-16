@@ -1,6 +1,6 @@
-﻿@model IEnumerable<PandoraWeb.Models.Collection>
+@model IEnumerable<PandoraWeb.Models.Collection>
 @{
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -62,7 +62,8 @@
                 <h5 class="modal-title" id="brandModalLabel">Thêm Nhãn Hiệu</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="@Url.Action("SaveBrand", "Admin")" method="post" enctype="multipart/form-data">
+            <form action="@Url.Action("SaveBrand", "Products", new { area = "Admin" })" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
                 <div class="modal-body admin-form">
                     <input type="hidden" id="brandId" name="id" value="" />
                     <div class="mb-3">
@@ -102,7 +103,7 @@
 
         function deleteBrand(id) {
             if (confirm('Bạn có chắc chắn muốn xóa nhãn hiệu này?')) {
-                fetch('@Url.Action("DeleteBrand", "Admin")', {
+                fetch('@Url.Action("DeleteBrand", "Products", new { area = "Admin" })', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: new URLSearchParams({ id: id })
@@ -120,4 +121,6 @@
         }
     </script>
 }
+
+
 

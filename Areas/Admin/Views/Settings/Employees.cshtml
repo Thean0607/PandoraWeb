@@ -1,6 +1,6 @@
 @model IEnumerable<PandoraWeb.Models.Employee>
 @{
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
     var roles = ViewBag.Roles as IEnumerable<PandoraWeb.Models.Role>;
 }
 
@@ -64,6 +64,7 @@
             </div>
             <div class="modal-body">
                 <form id="employeeForm">
+                    @Html.AntiForgeryToken()
                     <input type="hidden" id="employeeId">
                     <div class="mb-3">
                         <label class="form-label">Họ Tên</label>
@@ -143,7 +144,7 @@
             const formData = new FormData(form);
             if(id) formData.append('id', id);
 
-            fetch('@Url.Action("SaveEmployee", "Admin")', {
+            fetch('@Url.Action("SaveEmployee", "Settings", new { area = "Admin" })', {
                 method: 'POST',
                 body: formData
             })
@@ -160,7 +161,7 @@
 
         function deleteEmployee(id) {
             if (confirm('Bạn có chắc chắn muốn xóa nhân viên này?')) {
-                fetch('@Url.Action("DeleteEmployee", "Admin")', {
+                fetch('@Url.Action("DeleteEmployee", "Settings", new { area = "Admin" })', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: 'id=' + id
@@ -174,3 +175,5 @@
         }
     </script>
 }
+
+

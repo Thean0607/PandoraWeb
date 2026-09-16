@@ -1,5 +1,5 @@
-﻿@{
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
     var materials = ViewBag.Materials as IEnumerable<PandoraWeb.Models.Material>;
     var sizes = ViewBag.Sizes as IEnumerable<PandoraWeb.Models.Size>;
 }
@@ -187,7 +187,7 @@
                 return;
             }
 
-            const url = type === 'material' ? '@Url.Action("SaveMaterial", "Admin")' : '@Url.Action("SaveSize", "Admin")';
+            const url = type === 'material' ? '@Url.Action("SaveMaterial", "Products", new { area = "Admin" })' : '@Url.Action("SaveSize", "Products", new { area = "Admin" })';
 
             fetch(url, {
                 method: 'POST',
@@ -204,7 +204,7 @@
 
         function deleteAttr(type, id) {
             if (confirm('Bạn có chắc chắn muốn xóa?')) {
-                const url = type === 'material' ? '@Url.Action("DeleteMaterial", "Admin")' : '@Url.Action("DeleteSize", "Admin")';
+                const url = type === 'material' ? '@Url.Action("DeleteMaterial", "Products", new { area = "Admin" })' : '@Url.Action("DeleteSize", "Products", new { area = "Admin" })';
                 fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -220,4 +220,6 @@
         }
     </script>
 }
+
+
 

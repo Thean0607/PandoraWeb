@@ -1,4 +1,4 @@
-@model PandoraWeb.Models.Collection
+﻿@model PandoraWeb.Models.Collection
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = Model.CollectionName;
@@ -27,7 +27,8 @@
 <!-- Product Content -->
 <section class="py-5">
     <div class="container">
-        @using (Html.BeginForm("CollectionDetail", "Product", FormMethod.Get, new { id = "filterForm" }))
+        @using (Html.BeginForm("CollectionDetail", "Product", FormMethod.Get, new {
+    @Html.AntiForgeryToken() id = "filterForm" }))
         {
             <input type="hidden" name="id" value="@Model.CollectionId" />
             <div class="row">
@@ -81,3 +82,4 @@
         }
     </div>
 </section>
+

@@ -1,6 +1,6 @@
-﻿@model IEnumerable<PandoraWeb.Models.Banner>
+@model IEnumerable<PandoraWeb.Models.Banner>
 @{
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -67,7 +67,8 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="bannerForm" method="post" action="@Url.Action("SaveBanner", "Admin")" enctype="multipart/form-data">
+                <form id="bannerForm" method="post" action="@Url.Action("SaveBanner", "Marketing", new { area = "Admin" })" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
                     <input type="hidden" name="bannerId" id="bannerId">
                     <div class="mb-3">
                         <label class="form-label">Tiêu Đề (Mô tả nội bộ)</label>
@@ -155,7 +156,7 @@
 
         function deleteBanner(id) {
             if(confirm("Bạn có chắc chắn muốn xóa banner này?")) {
-                fetch('@Url.Action("DeleteBanner", "Admin")', {
+                fetch('@Url.Action("DeleteBanner", "Marketing", new { area = "Admin" })', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: 'id=' + id
@@ -172,4 +173,6 @@
         }
     </script>
 }
+
+
 

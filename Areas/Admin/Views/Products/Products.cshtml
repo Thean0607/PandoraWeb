@@ -1,6 +1,7 @@
-@model IEnumerable<PandoraWeb.Models.Product>
+@model PagedList.IPagedList<PandoraWeb.Models.Product>
+@using PagedList.Mvc;
 @{
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
 <div class="page-title">
@@ -68,7 +69,15 @@
                     </tr>
                 }
             </tbody>
-        </table>
+                </table>
+    </div>
+    
+    <div class="d-flex justify-content-center mt-4">
+        @Html.PagedListPager(Model, page => Url.Action("Index", new { page }), new PagedListRenderOptions {
+            LiElementClasses = new string[] { "page-item" },
+            
+            UlElementClasses = new string[] { "pagination", "justify-content-center" }
+        })
     </div>
 </div>
 
@@ -81,7 +90,8 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="productForm" method="post" action="@Url.Action("SaveProduct", "Admin")" enctype="multipart/form-data">
+                <form id="productForm" method="post" action="@Url.Action("SaveProduct", "Products", new { area = "Admin" })" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
                     <input type="hidden" name="productId" id="productId">
                     
                     <div class="mb-3">
@@ -401,4 +411,7 @@
         }
     </script>
 }
+
+
+
 

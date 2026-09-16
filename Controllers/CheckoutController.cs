@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
@@ -87,6 +87,7 @@ namespace PandoraWeb.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Index(string fullName, string phone, string email, string address, string notes, string paymentMethod, string city = null, string district = null, string ward = null, string street = null)
         {
             var cart = Session["Cart"] as List<CartItemVM>;
@@ -339,3 +340,4 @@ namespace PandoraWeb.Controllers
         }
     }
 }
+

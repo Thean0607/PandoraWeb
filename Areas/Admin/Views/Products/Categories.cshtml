@@ -1,6 +1,6 @@
-﻿@model IEnumerable<PandoraWeb.Models.Category>
+@model IEnumerable<PandoraWeb.Models.Category>
 @{
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -58,6 +58,7 @@
             </div>
             <div class="modal-body admin-form">
                 <form id="categoryForm">
+                    @Html.AntiForgeryToken()
                     <input type="hidden" id="categoryId" name="id" value="" />
                     <div class="mb-3">
                         <label for="categoryName" class="form-label">Tên danh mục <span class="text-danger">*</span></label>
@@ -93,7 +94,7 @@
                 return;
             }
 
-            fetch('@Url.Action("SaveCategory", "Admin")', {
+            fetch('@Url.Action("SaveCategory", "Products", new { area = "Admin" })', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ id: id, name: name })
@@ -111,7 +112,7 @@
 
         function deleteCategory(id) {
             if (confirm('Bạn có chắc chắn muốn xóa danh mục này?')) {
-                fetch('@Url.Action("DeleteCategory", "Admin")', {
+                fetch('@Url.Action("DeleteCategory", "Products", new { area = "Admin" })', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: new URLSearchParams({ id: id })
@@ -129,4 +130,6 @@
         }
     </script>
 }
+
+
 

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
@@ -79,6 +79,7 @@ namespace PandoraWeb.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult AddToCart(int productId, int quantity = 1, int? variantId = null)
         {
             if (quantity <= 0) quantity = 1;
@@ -162,6 +163,7 @@ namespace PandoraWeb.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult RemoveFromCart(int productId, int variantId)
         {
             var cart = Session["Cart"] as List<CartItemVM>;
@@ -208,6 +210,7 @@ namespace PandoraWeb.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult UpdateQuantity(int productId, int variantId, int quantity)
         {
             var cart = Session["Cart"] as List<CartItemVM>;
@@ -267,6 +270,7 @@ namespace PandoraWeb.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult ApplyCoupon(string code)
         {
             if (string.IsNullOrEmpty(code))
@@ -306,3 +310,4 @@ namespace PandoraWeb.Controllers
         }
     }
 }
+

@@ -1,6 +1,6 @@
-﻿@model IEnumerable<PandoraWeb.Models.Order>
+@model IEnumerable<PandoraWeb.Models.Order>
 @{
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
     string FormatCurrency(decimal? value) {
         return (value ?? 0).ToString("N0") + " ₫";
     }
@@ -114,5 +114,7 @@
         </div>
     </div>
 </div>
+
+
 
 

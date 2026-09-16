@@ -75,43 +75,64 @@ function generateId(dataArray) {
     return Math.max(...dataArray.map(item => item.id)) + 1;
 }
 
-// Export Table to CSV
-function exportTableToCSV(filename) {
+// Export Table to Excel (XLSX)
+function exportTableToExcel(filename) {
     const table = document.querySelector('.admin-table');
     if (!table) {
         alert("Không tìm thấy dữ liệu để xuất!");
         return;
     }
     
-    let csv = [];
-    // BOM for UTF-8 Excel support
-    const BOM = "\uFEFF";
-    const rows = table.querySelectorAll("tr");
+    // Clone table to remove actions column if needed
+    const cloneTable = table.cloneNode(true);
     
-    for (let i = 0; i < rows.length; i++) {
-        let row = [], cols = rows[i].querySelectorAll("td, th");
-        
-        for (let j = 0; j < cols.length; j++) {
-            // Ignore columns that are for actions (like Edit/Delete buttons)
-            // Usually the last column or one without much text
-            let cellText = (cols[j].innerText || cols[j].textContent || "").trim();
-            // Escape double quotes
-            cellText = cellText.replace(/"/g, '""');
-            // Enclose in double quotes to handle commas and newlines
-            row.push('"' + cellText + '"');
+    // Remove the last column (Thao Tác) from headers and rows
+    const ths = cloneTable.querySelectorAll('th');
+    if(ths.length > 0 && ths[ths.length-1].innerText.includes('Thao Tác')) {
+        const rows = cloneTable.querySelectorAll('tr');
+        rows.forEach(row => {
+            if (row.lastElementChild) {
+                row.removeChild(row.lastElementChild);
+            }
+        });
+    }
+
+    // Convert table to worksheet
+    const ws = XLSX.utils.table_to_sheet(cloneTable, {raw:true});
+    
+    // Auto format columns width
+    const wscols = [];
+    const range = XLSX.utils.decode_range(ws['!ref']);
+    for(let C = range.s.c; C <= range.e.c; ++C) {
+        let max = 15; // min width
+        for(let R = range.s.r; R <= range.e.r; ++R) {
+            let cell = ws[XLSX.utils.encode_cell({c:C, r:R})];
+            if(cell && cell.v) {
+                let len = cell.v.toString().length;
+                if(len > max) max = len;
+            }
         }
-        
-        // Remove the last column if it's "Thao Tác" on the header, or just skip checking
-        // For simplicity, we just export everything but can filter out empty action headers
-        csv.push(row.join(","));
+        wscols.push({wch: max + 2}); // Add some padding
+    }
+    ws['!cols'] = wscols;
+
+    // Create workbook and append worksheet
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Data");
+    
+    // Ensure filename has .xlsx extension
+    if (!filename.endsWith(".xlsx")) {
+        filename = filename.replace(".csv", ".xlsx");
+        if (!filename.endsWith(".xlsx")) filename += ".xlsx";
     }
     
-    const csvFile = new Blob([BOM + csv.join("\n")], { type: "text/csv;charset=utf-8;" });
-    const downloadLink = document.createElement("a");
-    downloadLink.download = filename;
-    downloadLink.href = window.URL.createObjectURL(csvFile);
-    downloadLink.style.display = "none";
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
+    // Download file
+    XLSX.writeFile(wb, filename);
 }
+
+// Fix Bootstrap pagination styling for PagedList.Mvc
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.pagination a, .pagination span').forEach(el => {
+        el.classList.add('page-link');
+    });
+});

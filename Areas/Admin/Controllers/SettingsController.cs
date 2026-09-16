@@ -53,6 +53,7 @@ namespace PandoraWeb.Areas.Admin.Controllers
 
         [AdminAuthorize(Permission = "manage_employee")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult SaveEmployee(int? id, string fullName, string email, int roleId, string status, string password)
         {
             if (string.IsNullOrEmpty(fullName) || string.IsNullOrEmpty(email)) 
@@ -71,7 +72,7 @@ namespace PandoraWeb.Areas.Admin.Controllers
                         emp.Status = status;
                         if (!string.IsNullOrEmpty(password))
                         {
-                            emp.PasswordHash = PandoraWeb.Helpers.SecurityHelper.HashSHA256(password);
+                            emp.PasswordHash = PandoraWeb.Helpers.SecurityHelper.HashPassword(password);
                         }
                     }
                 }
@@ -82,7 +83,7 @@ namespace PandoraWeb.Areas.Admin.Controllers
                     {
                         FullName = fullName,
                         Email = email,
-                        PasswordHash = PandoraWeb.Helpers.SecurityHelper.HashSHA256(finalPass),
+                        PasswordHash = PandoraWeb.Helpers.SecurityHelper.HashPassword(finalPass),
                         RoleId = roleId,
                         Status = status
                     });
@@ -98,6 +99,7 @@ namespace PandoraWeb.Areas.Admin.Controllers
 
         [AdminAuthorize(Permission = "manage_employee")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult DeleteEmployee(int id)
         {
             try
@@ -129,6 +131,7 @@ namespace PandoraWeb.Areas.Admin.Controllers
 
         [AdminAuthorize(Permission = "manage_employee")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult SaveRole(int? id, string name, string description, string permissions)
         {
             if (string.IsNullOrEmpty(name)) 
@@ -164,6 +167,7 @@ namespace PandoraWeb.Areas.Admin.Controllers
 
         [AdminAuthorize(Permission = "manage_employee")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult DeleteRole(int id)
         {
             try

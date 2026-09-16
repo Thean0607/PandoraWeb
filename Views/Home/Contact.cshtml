@@ -1,4 +1,4 @@
-@{
+﻿@{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Contact";
 }
@@ -68,6 +68,7 @@
                     <div class="card border-0 shadow-sm p-4 p-md-5">
                         <h3 class="font-serif mb-4">Gửi Tin Nhắn</h3>
                         <form>
+                    @Html.AntiForgeryToken()
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Họ và tên *</label>
@@ -102,4 +103,5 @@
     </div>
 
     <!-- Footer -->
+
 

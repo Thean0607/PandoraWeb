@@ -5,6 +5,7 @@ using PandoraWeb.Models.Data;
 using System.Linq;
 using System.Data.Entity;
 using System;
+using Ganss.Xss;
 
 namespace PandoraWeb.Areas.Admin.Controllers
 {
@@ -36,6 +37,7 @@ namespace PandoraWeb.Areas.Admin.Controllers
         [AdminAuthorize(Permission = "manage_cms")]
         [HttpPost]
         [ValidateInput(false)]
+        [ValidateAntiForgeryToken]
         public ActionResult SaveBlog(int? postId, string title, string author, bool isPublished, string content, System.Web.HttpPostedFileBase imageFile)
         {
             if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(content))
@@ -43,6 +45,9 @@ namespace PandoraWeb.Areas.Admin.Controllers
                 TempData["Error"] = "Tiêu đề và Nội dung không được để trống!";
                 return RedirectToAction("Blog");
             }
+
+            var sanitizer = new HtmlSanitizer();
+            string safeContent = sanitizer.Sanitize(content);
 
             BlogPost post;
             if (postId.HasValue && postId.Value > 0)
@@ -64,7 +69,7 @@ namespace PandoraWeb.Areas.Admin.Controllers
             post.Title = title.Trim();
             post.Author = string.IsNullOrWhiteSpace(author) ? "Admin" : author.Trim();
             post.IsPublished = isPublished;
-            post.Content = content;
+            post.Content = safeContent;
 
             if (imageFile != null && imageFile.ContentLength > 0)
             {
@@ -91,6 +96,7 @@ namespace PandoraWeb.Areas.Admin.Controllers
 
         [AdminAuthorize(Permission = "manage_cms")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public JsonResult DeleteBlog(int id)
         {
             var post = db.BlogPosts.Find(id);
@@ -115,6 +121,7 @@ namespace PandoraWeb.Areas.Admin.Controllers
 
         [AdminAuthorize(Permission = "manage_cms")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult SaveFaq(int? id, string question, string answer, int displayOrder, bool isActive)
         {
             if (string.IsNullOrEmpty(question) || string.IsNullOrEmpty(answer))
@@ -154,6 +161,7 @@ namespace PandoraWeb.Areas.Admin.Controllers
 
         [AdminAuthorize(Permission = "manage_cms")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult DeleteFaq(int id)
         {
             try

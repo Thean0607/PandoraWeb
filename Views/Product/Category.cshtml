@@ -22,6 +22,7 @@
         <div class="container">
             @using (Html.BeginForm("Category", "Product", FormMethod.Get, new { id = "filterForm" }))
             {
+                @Html.AntiForgeryToken()
                 if (!string.IsNullOrEmpty(ViewBag.Search))
                 {
                     <input type="hidden" name="search" value="@ViewBag.Search" />

@@ -1,4 +1,4 @@
-@model PandoraWeb.Models.Order
+﻿@model PandoraWeb.Models.Order
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Tra Cứu Đơn Hàng - Pandora";
@@ -34,6 +34,7 @@
                 }
 
                 <form action="@Url.Action("Lookup", "Order")" method="post">
+                    @Html.AntiForgeryToken()
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label fw-bold fs-7">Mã đơn hàng <span class="text-danger">*</span></label>
@@ -147,3 +148,4 @@
         </div>
     </div>
 </div>
+

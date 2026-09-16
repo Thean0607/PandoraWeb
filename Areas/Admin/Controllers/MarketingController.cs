@@ -25,6 +25,7 @@ namespace PandoraWeb.Areas.Admin.Controllers
 
         [AdminAuthorize(Permission = "manage_marketing")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult SaveCoupon(int? id, string code, int? percent, decimal? amount, DateTime start, DateTime end, bool active)
         {
             if (id.HasValue && id.Value > 0)
@@ -44,6 +45,7 @@ namespace PandoraWeb.Areas.Admin.Controllers
         
         [AdminAuthorize(Permission = "manage_marketing")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult DeleteCoupon(int id)
         {
             var p = db.Promotions.Find(id);
@@ -82,6 +84,7 @@ namespace PandoraWeb.Areas.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(Permission = "manage_marketing")]
+        [ValidateAntiForgeryToken]
         public ActionResult SaveFlashSale(System.Collections.Generic.List<FlashSaleInput> flashSales)
         {
             if (flashSales == null || !flashSales.Any())
@@ -137,6 +140,7 @@ namespace PandoraWeb.Areas.Admin.Controllers
 
         [AdminAuthorize(Permission = "manage_marketing")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult SavePromoPopup(bool isEnabled = false, string title = null, string subtitle = null, string content = null, string couponCode = null, string imageUrl = null, string buttonText = null, string buttonLink = null, string backgroundColor = null, string textColor = null, string popupLayout = null, System.Web.HttpPostedFileBase imageFile = null)
         {
             var settings = PandoraWeb.Helpers.PromoPopupHelper.GetSettings();
@@ -189,6 +193,7 @@ namespace PandoraWeb.Areas.Admin.Controllers
 
         [AdminAuthorize(Permission = "manage_marketing")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult SaveBanner(int? bannerId, string title, string linkUrl, int displayOrder = 0, bool isActive = true, System.Web.HttpPostedFileBase imageFile = null)
         {
             Banner banner = null;
@@ -229,12 +234,13 @@ namespace PandoraWeb.Areas.Admin.Controllers
             }
 
             db.SaveChanges();
-            TempData["Success"] = "Đã lưu thông tin Banner thành công!";
+            TempData["Success"] = "Đã lưu thông biến Banner thành công!";
             return RedirectToAction("Banners");
         }
 
         [AdminAuthorize(Permission = "manage_marketing")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public JsonResult DeleteBanner(int id)
         {
             var banner = db.Banners.Find(id);

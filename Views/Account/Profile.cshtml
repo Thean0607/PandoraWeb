@@ -1,4 +1,4 @@
-@model PandoraWeb.Models.Customer
+﻿@model PandoraWeb.Models.Customer
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Hồ Sơ Của Tôi - Pandora";
@@ -169,6 +169,7 @@
                         <!-- TAB 2: EDIT MODE -->
                         <div class="tab-pane fade" id="edit-mode" role="tabpanel" aria-labelledby="edit-tab">
                             <form action="@Url.Action("Profile", "Account")" method="post" enctype="multipart/form-data" id="profileEditForm">
+                    @Html.AntiForgeryToken()
                                 <div class="row">
                                     <div class="col-md-8 order-2 order-md-1">
                                         <div class="row mb-3">
@@ -334,3 +335,4 @@
         });
     </script>
 }
+

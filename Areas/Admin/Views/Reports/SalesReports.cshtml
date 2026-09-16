@@ -1,14 +1,14 @@
-﻿@model IEnumerable<PandoraWeb.Models.Order>
+@model IEnumerable<PandoraWeb.Models.Order>
 @{
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
     decimal totalRev = ViewBag.TotalRevenue ?? 0;
     int totalOrders = ViewBag.TotalOrders ?? 0;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h3 mb-0">@ViewBag.Title</h1>
-    <button class="btn btn-admin">
-        <i class="fas fa-file-export"></i> Tải Báo Cáo PDF
+    <button class="btn btn-admin" onclick="exportTableToExcel('BaoCaoDoanhThu.xlsx')">
+        <i class="fas fa-file-excel"></i> Xuất Báo Cáo Excel
     </button>
 </div>
 
@@ -60,4 +60,6 @@
         </table>
     </div>
 </div>
+
+
 

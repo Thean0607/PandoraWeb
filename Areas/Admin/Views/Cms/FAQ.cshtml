@@ -1,6 +1,6 @@
-﻿@model IEnumerable<PandoraWeb.Models.Faq>
+@model IEnumerable<PandoraWeb.Models.Faq>
 @{
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -70,6 +70,7 @@
             </div>
             <div class="modal-body">
                 <form id="faqForm">
+                    @Html.AntiForgeryToken()
                     <input type="hidden" id="faqId">
                     <div class="mb-3">
                         <label class="form-label">Câu Hỏi</label>
@@ -148,7 +149,7 @@
             formData.append('displayOrder', document.getElementById('faqOrder').value || 0);
             formData.append('isActive', document.getElementById('faqActive').checked);
 
-            fetch('@Url.Action("SaveFaq", "Admin")', {
+            fetch('@Url.Action("SaveFaq", "Cms", new { area = "Admin" })', {
                 method: 'POST',
                 body: formData
             })
@@ -165,7 +166,7 @@
 
         function deleteFaq(id) {
             if (confirm('Bạn có chắc chắn muốn xóa câu hỏi này?')) {
-                fetch('@Url.Action("DeleteFaq", "Admin")', {
+                fetch('@Url.Action("DeleteFaq", "Cms", new { area = "Admin" })', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: 'id=' + id
@@ -179,4 +180,6 @@
         }
     </script>
 }
+
+
 

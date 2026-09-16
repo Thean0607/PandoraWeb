@@ -1,6 +1,6 @@
 @model PandoraWeb.Helpers.PromoPopupSettings
 @{
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -35,7 +35,8 @@
     </div>
 }
 
-<form action="@Url.Action("SavePromoPopup", "Admin")" method="post" enctype="multipart/form-data">
+<form action="@Url.Action("SavePromoPopup", "Marketing", new { area = "Admin" })" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
     <div class="row">
         <!-- Settings Form Column -->
         <div class="col-lg-7 mb-4">
@@ -194,4 +195,6 @@
         });
     </script>
 }
+
+
 

@@ -1,4 +1,4 @@
-@model PandoraWeb.ViewModels.HomeViewModel
+﻿@model PandoraWeb.ViewModels.HomeViewModel
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Trang Chủ";
@@ -19,6 +19,7 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <form class="d-flex align-items-center position-relative w-100" action="@Url.Action("Category", "Product")" method="get">
+                    @Html.AntiForgeryToken()
                     <div class="input-group input-group-lg shadow-sm border rounded-pill overflow-hidden bg-white">
                         <input type="text" id="searchInput" class="form-control border-0 px-4" name="search" placeholder="Tìm kiếm trang sức, bộ sưu tập..." aria-label="Search" style="box-shadow: none;" autocomplete="off">
                         <button class="btn btn-gold px-4 text-dark fw-bold border-0" type="submit">
@@ -340,3 +341,4 @@
         });
     </script>
 }
+
