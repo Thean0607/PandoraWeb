@@ -1,5 +1,3 @@
-
-using System;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -41,11 +39,11 @@ namespace PandoraWeb.Helpers
                 return HashSHA256(password) == hash;
             }
 
-            try 
+            try
             {
                 return BCrypt.Net.BCrypt.EnhancedVerify(password, hash);
-            } 
-            catch 
+            }
+            catch
             {
                 return false;
             }

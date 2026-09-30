@@ -223,7 +223,7 @@
             }
 
             <div class="sidebar-nav-item mt-4">
-                <a href="@Url.Action("Index", "Home")" class="sidebar-nav-link">
+                <a href="@Url.Action("Index", "Home", new { area = "" })" class="sidebar-nav-link">
                     <span class="sidebar-nav-link-content">
                         <i class="fas fa-store sidebar-nav-icon"></i>
                         <span class="sidebar-nav-text">Về Cửa Hàng</span>
@@ -279,12 +279,18 @@
                 const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
                 if(token) {
                     if (config.body instanceof URLSearchParams) {
-                        config.body.append('__RequestVerificationToken', token);
+                        if (!config.body.has('__RequestVerificationToken')) {
+                            config.body.append('__RequestVerificationToken', token);
+                        }
                     } else if (config.body instanceof FormData) {
-                        config.body.append('__RequestVerificationToken', token);
+                        if (!config.body.has('__RequestVerificationToken')) {
+                            config.body.append('__RequestVerificationToken', token);
+                        }
                     } else if (typeof config.body === 'string' && config.headers && config.headers['Content-Type'] === 'application/x-www-form-urlencoded') {
-                        if (config.body.length > 0) config.body += '&';
-                        config.body += '__RequestVerificationToken=' + encodeURIComponent(token);
+                        if (!config.body.includes('__RequestVerificationToken=')) {
+                            if (config.body.length > 0) config.body += '&';
+                            config.body += '__RequestVerificationToken=' + encodeURIComponent(token);
+                        }
                     }
                 }
             }

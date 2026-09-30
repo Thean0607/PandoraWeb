@@ -97,6 +97,16 @@ function exportTableToExcel(filename) {
         });
     }
 
+    // Fix select elements by replacing them with their selected text
+    const originalSelects = table.querySelectorAll('select');
+    const clonedSelects = cloneTable.querySelectorAll('select');
+    for (let i = 0; i < originalSelects.length; i++) {
+        if (clonedSelects[i] && clonedSelects[i].parentElement) {
+            const selectedText = originalSelects[i].options[originalSelects[i].selectedIndex]?.text || '';
+            clonedSelects[i].parentElement.innerText = selectedText;
+        }
+    }
+
     // Convert table to worksheet
     const ws = XLSX.utils.table_to_sheet(cloneTable, {raw:true});
     
@@ -104,7 +114,7 @@ function exportTableToExcel(filename) {
     const wscols = [];
     const range = XLSX.utils.decode_range(ws['!ref']);
     for(let C = range.s.c; C <= range.e.c; ++C) {
-        let max = 15; // min width
+        let max = 15;
         for(let R = range.s.r; R <= range.e.r; ++R) {
             let cell = ws[XLSX.utils.encode_cell({c:C, r:R})];
             if(cell && cell.v) {

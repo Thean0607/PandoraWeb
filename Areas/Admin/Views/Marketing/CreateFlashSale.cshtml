@@ -24,6 +24,7 @@
                         <th>Giảm (%)</th>
                         <th>Giảm (Tiền)</th>
                         <th>Giá Mới</th>
+                        <th>Ngày Bắt Đầu</th>
                         <th>Ngày Kết Thúc</th>
                     </tr>
                 </thead>
@@ -58,6 +59,9 @@
                             </td>
                             <td>
                                 <span class="fw-bold text-danger new-price-label">@item.BasePrice.ToString("N0")</span>
+                            </td>
+                            <td>
+                                <input type="datetime-local" class="form-control form-control-sm start-date" value="@(item.FlashSaleStartDate?.ToString("yyyy-MM-ddTHH:mm") ?? "")" />
                             </td>
                             <td>
                                 <input type="datetime-local" class="form-control form-control-sm end-date" value="@(item.FlashSaleEndDate?.ToString("yyyy-MM-ddTHH:mm") ?? "")" />
@@ -108,6 +112,7 @@
             const pId = tr.dataset.id;
             const pInput = tr.querySelector('.discount-percent').value;
             const aInput = tr.querySelector('.discount-amount').value;
+            const startDate = tr.querySelector('.start-date').value;
             const endDate = tr.querySelector('.end-date').value;
 
             if (pInput || aInput) {
@@ -115,6 +120,7 @@
                     ProductId: pId,
                     DiscountPercent: pInput ? parseInt(pInput) : null,
                     DiscountAmount: aInput ? parseFloat(aInput) : null,
+                    StartDate: startDate || null,
                     EndDate: endDate || null
                 });
             }

@@ -1,11 +1,10 @@
-using System.Web.Mvc;
-using PandoraWeb.Filters;
-using PandoraWeb.Models;
-using PandoraWeb.Models.Data;
-using System.Linq;
-using System.Data.Entity;
-using System;
 using PagedList;
+using PandoraWeb.Filters;
+using PandoraWeb.Models.Data;
+using System;
+using System.Data.Entity;
+using System.Linq;
+using System.Web.Mvc;
 
 namespace PandoraWeb.Areas.Admin.Controllers
 {
@@ -33,15 +32,16 @@ namespace PandoraWeb.Areas.Admin.Controllers
             ViewBag.ActiveSubMenu = "CustomerSegments";
             ViewBag.Title = "Phân Nhóm Khách Hàng";
             // Group by spending
-            var segments = db.Customers.Select(c => new PandoraWeb.ViewModels.CustomerSegmentVM {
+            var segments = db.Customers.Select(c => new PandoraWeb.ViewModels.CustomerSegmentVM
+            {
                 Customer = c,
                 TotalSpent = db.Orders.Where(o => o.CustomerId == c.CustomerId && o.PaymentStatus == "Paid").Sum(o => (decimal?)o.TotalAmount) ?? 0m
             }).OrderByDescending(x => x.TotalSpent).ToList();
-            
+
             ViewBag.Segments = segments;
             return View();
         }
-        
+
         [AdminAuthorize(Permission = "manage_customer")]
         public ActionResult Reviews(int? page)
         {
@@ -59,15 +59,18 @@ namespace PandoraWeb.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult UpdateReviewStatus(int id, string status)
         {
-            try {
+            try
+            {
                 var review = db.Reviews.Find(id);
-                if (review != null) {
+                if (review != null)
+                {
                     review.Status = status;
                     db.SaveChanges();
                     return Json(new { success = true });
                 }
                 return Json(new { success = false, message = "Không tìm thấy đánh giá" });
-            } catch(Exception e) { return Json(new { success = false, message = e.Message }); }
+            }
+            catch (Exception e) { return Json(new { success = false, message = e.Message }); }
         }
 
         [AdminAuthorize(Permission = "manage_customer")]
@@ -75,15 +78,18 @@ namespace PandoraWeb.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteReview(int id)
         {
-            try {
+            try
+            {
                 var review = db.Reviews.Find(id);
-                if (review != null) {
+                if (review != null)
+                {
                     db.Reviews.Remove(review);
                     db.SaveChanges();
                     return Json(new { success = true });
                 }
                 return Json(new { success = false });
-            } catch(Exception e) { return Json(new { success = false, message = e.Message }); }
+            }
+            catch (Exception e) { return Json(new { success = false, message = e.Message }); }
         }
 
         protected override void Dispose(bool disposing)

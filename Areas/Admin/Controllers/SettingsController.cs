@@ -1,10 +1,10 @@
-using System.Web.Mvc;
 using PandoraWeb.Filters;
 using PandoraWeb.Models;
 using PandoraWeb.Models.Data;
-using System.Linq;
-using System.Data.Entity;
 using System;
+using System.Data.Entity;
+using System.Linq;
+using System.Web.Mvc;
 
 namespace PandoraWeb.Areas.Admin.Controllers
 {
@@ -56,9 +56,9 @@ namespace PandoraWeb.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult SaveEmployee(int? id, string fullName, string email, int roleId, string status, string password)
         {
-            if (string.IsNullOrEmpty(fullName) || string.IsNullOrEmpty(email)) 
+            if (string.IsNullOrEmpty(fullName) || string.IsNullOrEmpty(email))
                 return Json(new { success = false, message = "Thiếu thông tin bắt buộc" });
-            
+
             try
             {
                 if (id.HasValue && id.Value > 0)
@@ -134,7 +134,7 @@ namespace PandoraWeb.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult SaveRole(int? id, string name, string description, string permissions)
         {
-            if (string.IsNullOrEmpty(name)) 
+            if (string.IsNullOrEmpty(name))
                 return Json(new { success = false, message = "Tên không được để trống" });
 
             try

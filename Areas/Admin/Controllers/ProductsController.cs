@@ -1,11 +1,11 @@
-﻿using System.Web.Mvc;
+using PagedList;
 using PandoraWeb.Filters;
 using PandoraWeb.Models;
 using PandoraWeb.Models.Data;
-using System.Linq;
-using System.Data.Entity;
 using System;
-using PagedList;
+using System.Data.Entity;
+using System.Linq;
+using System.Web.Mvc;
 
 namespace PandoraWeb.Areas.Admin.Controllers
 {
@@ -26,6 +26,8 @@ namespace PandoraWeb.Areas.Admin.Controllers
                              .Where(p => p.Status != "deleted")
                              .OrderByDescending(p => p.ProductId)
                              .ToPagedList(pageNumber, pageSize);
+            ViewBag.Categories = db.Categories.ToList();
+            ViewBag.Collections = db.Collections.ToList();
             return View("Products", products);
         }
 
@@ -127,7 +129,7 @@ namespace PandoraWeb.Areas.Admin.Controllers
             if (id.HasValue && id.Value > 0)
             {
                 var c = db.Categories.Find(id.Value);
-                if (c != null) { c.CategoryName = name;  }
+                if (c != null) { c.CategoryName = name; }
             }
             else { db.Categories.Add(new Category { CategoryName = name }); }
             db.SaveChanges();
@@ -171,7 +173,7 @@ namespace PandoraWeb.Areas.Admin.Controllers
             if (id.HasValue && id.Value > 0)
             {
                 var c = db.Collections.Find(id.Value);
-                if (c != null) { c.CollectionName = name;  }
+                if (c != null) { c.CollectionName = name; }
             }
             else { db.Collections.Add(new Collection { CollectionName = name }); }
             db.SaveChanges();

@@ -1,10 +1,10 @@
-using System.Web.Mvc;
 using PandoraWeb.Filters;
 using PandoraWeb.Models;
 using PandoraWeb.Models.Data;
-using System.Linq;
-using System.Data.Entity;
 using System;
+using System.Data.Entity;
+using System.Linq;
+using System.Web.Mvc;
 
 namespace PandoraWeb.Areas.Admin.Controllers
 {
@@ -31,18 +31,20 @@ namespace PandoraWeb.Areas.Admin.Controllers
             if (id.HasValue && id.Value > 0)
             {
                 var promo = db.Promotions.Find(id.Value);
-                if (promo != null) {
+                if (promo != null)
+                {
                     promo.Code = code; promo.DiscountPercentage = percent; promo.DiscountAmount = amount;
                     promo.StartDate = start; promo.EndDate = end; promo.IsActive = active;
                 }
             }
-            else {
+            else
+            {
                 db.Promotions.Add(new Promotion { Code = code, DiscountPercentage = percent, DiscountAmount = amount, StartDate = start, EndDate = end, IsActive = active });
             }
             db.SaveChanges();
             return RedirectToAction("Coupons");
         }
-        
+
         [AdminAuthorize(Permission = "manage_marketing")]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -79,6 +81,7 @@ namespace PandoraWeb.Areas.Admin.Controllers
             public int ProductId { get; set; }
             public int? DiscountPercent { get; set; }
             public decimal? DiscountAmount { get; set; }
+            public DateTime? StartDate { get; set; }
             public DateTime? EndDate { get; set; }
         }
 
@@ -118,12 +121,13 @@ namespace PandoraWeb.Areas.Admin.Controllers
 
                         if (newPrice < 0) newPrice = 0;
                         p.BasePrice = newPrice;
+                        p.FlashSaleStartDate = item.StartDate;
                         p.FlashSaleEndDate = item.EndDate;
                     }
                 }
             }
             db.SaveChanges();
-            
+
             TempData["Success"] = "Đã cập nhật Flash Sale thành công!";
             return Json(new { success = true });
         }

@@ -1,9 +1,8 @@
-using System.Web.Mvc;
 using PandoraWeb.Filters;
-using PandoraWeb.Models;
 using PandoraWeb.Models.Data;
-using System.Linq;
 using System.Data.Entity;
+using System.Linq;
+using System.Web.Mvc;
 
 namespace PandoraWeb.Areas.Admin.Controllers
 {
@@ -24,7 +23,7 @@ namespace PandoraWeb.Areas.Admin.Controllers
             ViewBag.TotalNewOrders = db.Orders.Count(o => o.OrderStatus == "Pending");
 
             var recentOrders = db.Orders.Include(o => o.Customer).OrderByDescending(o => o.OrderDate).Take(10).ToList();
-            
+
             return View(recentOrders);
         }
 

@@ -104,7 +104,7 @@
                             <label class="form-label">Danh Mục</label>
                             <select class="form-select" name="categoryId" id="productCategory" required>
                                 <option value="">-- Chọn danh mục --</option>
-                                @foreach (var cat in ViewBag.Categories as IEnumerable<PandoraWeb.Models.Category>)
+                                @foreach (var cat in    ViewBag.Categories as IEnumerable<PandoraWeb.Models.Category>)
                                 {
                                     <option value="@cat.CategoryId">@cat.CategoryName</option>
                                 }

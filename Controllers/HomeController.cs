@@ -1,7 +1,7 @@
+using PandoraWeb.Models.Data;
+using System.Data.Entity;
 using System.Linq;
 using System.Web.Mvc;
-using System.Data.Entity;
-using PandoraWeb.Models.Data;
 
 namespace PandoraWeb.Controllers
 {
@@ -59,7 +59,7 @@ namespace PandoraWeb.Controllers
         {
             ViewBag.ActiveMenu = "Blog";
             ViewBag.Title = "Tin Tức";
-            
+
             int pageSize = 6;
             int totalPosts = db.BlogPosts.Count(b => b.IsPublished);
             var posts = db.BlogPosts.Where(b => b.IsPublished)
@@ -70,7 +70,7 @@ namespace PandoraWeb.Controllers
 
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = (int)System.Math.Ceiling((double)totalPosts / pageSize);
-            
+
             return View(posts);
         }
 

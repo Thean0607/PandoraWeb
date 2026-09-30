@@ -1,79 +1,60 @@
-﻿from docx import Document
-from docx.shared import Pt
-from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.shared import RGBColor
+import docx
+from docx.shared import Inches, Pt
+from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 
-doc = Document()
+doc = docx.Document()
+doc.add_heading('CHƯƠNG 2: CƠ SỞ LÝ THUYẾT', level=1)
 
-# Tiêu đề
-title = doc.add_paragraph()
-title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-run = title.add_run("BÁO CÁO TIẾN ĐỘ TUẦN 11\n\n")
-run.font.name = 'Times New Roman'
-run.font.size = Pt(14)
-run.bold = True
+sections = [
+    (
+        '2.1. Ngôn ngữ lập trình C# (C Sharp)',
+        'C# (đọc là C Sharp) là một ngôn ngữ lập trình hướng đối tượng, đa mục đích và vô cùng mạnh mẽ do Microsoft phát triển. Ra đời vào đầu những năm 2000 như một phần cốt lõi của nền tảng .NET, C# được thiết kế với mục tiêu kết hợp sức mạnh tính toán của C++ với sự đơn giản, dễ học của Visual Basic. Trong suốt hơn hai thập kỷ qua, C# liên tục được cập nhật và phát triển, trở thành một trong những ngôn ngữ phổ biến nhất trên thế giới, đặc biệt là trong việc phát triển các ứng dụng doanh nghiệp, ứng dụng web, phần mềm máy bàn và trò chơi điện tử.\n\nĐặc điểm nổi bật của C# là tính định kiểu mạnh (strongly-typed), khả năng thu gom rác tự động (Garbage Collection) giúp quản lý bộ nhớ hiệu quả, và hỗ trợ mạnh mẽ các nguyên lý của lập trình hướng đối tượng (OOP) như tính đóng gói, tính kế thừa, tính đa hình và tính trừu tượng. Bên cạnh đó, C# cung cấp một loạt các tính năng hiện đại như LINQ (Language Integrated Query), lập trình bất đồng bộ (Async/Await) và Lambda Expressions, giúp các lập trình viên có thể viết mã một cách ngắn gọn, tối ưu và an toàn.\n\nTrong khuôn khổ dự án PandoraWeb, C# đóng vai trò là ngôn ngữ lập trình chủ đạo ở phía Server (Backend). Ngôn ngữ này được sử dụng để xây dựng các Controller (bộ điều khiển) xử lý các luồng nghiệp vụ phức tạp như: quy trình đăng nhập, đăng ký tài khoản, xử lý thuật toán thêm sản phẩm vào giỏ hàng, tính toán tổng tiền và quản lý các hóa đơn đặt hàng. Nhờ cấu trúc rõ ràng và hệ sinh thái thư viện phong phú từ NuGet, C# giúp dự án dễ dàng tích hợp các công nghệ khác, đồng thời đảm bảo hệ thống hoạt động ổn định và có khả năng mở rộng bảo trì trong tương lai.'
+    ),
+    (
+        '2.2. Mô hình kiến trúc ASP.NET MVC 5',
+        'ASP.NET MVC 5 là một nền tảng phát triển ứng dụng web hiện đại và tối ưu của Microsoft, được xây dựng dựa trên nguyên lý kiến trúc MVC (Model - View - Controller). Kiến trúc MVC là một mẫu thiết kế phần mềm kinh điển, giúp phân tách rõ ràng hệ thống thành ba thành phần độc lập, qua đó giải quyết triệt để sự lộn xộn trong mã nguồn thường gặp ở các ứng dụng web truyền thống (như Web Forms).\n\nCấu trúc ba thành phần cốt lõi bao gồm:\n- Model (Mô hình): Là thành phần chịu trách nhiệm quản lý cấu trúc dữ liệu, trạng thái và các quy tắc nghiệp vụ logic của ứng dụng. Model thường tương tác trực tiếp với cơ sở dữ liệu để thực hiện các thao tác thêm, sửa, xóa và truy xuất dữ liệu.\n- View (Giao diện): Là thành phần phụ trách việc hiển thị dữ liệu tới người dùng cuối. Trong ASP.NET MVC, View sử dụng Razor Engine (với cú pháp .cshtml) cho phép nhúng trực tiếp mã C# vào bên trong các thẻ HTML, tạo ra các giao diện web động vô cùng linh hoạt.\n- Controller (Bộ điều khiển): Đóng vai trò là cầu nối trung tâm giữa Model và View. Khi nhận được một yêu cầu (HTTP Request) từ trình duyệt, Controller sẽ phân tích yêu cầu đó, gọi Model tương ứng để lấy hoặc cập nhật dữ liệu, sau đó truyền dữ liệu này sang một View thích hợp để kết xuất ra HTML trả về cho người dùng.\n\nViệc áp dụng ASP.NET MVC 5 cho dự án PandoraWeb mang lại nhiều lợi ích to lớn. Đầu tiên, nó giúp các thành viên trong nhóm có thể làm việc song song: người thiết kế giao diện có thể làm việc trên View trong khi lập trình viên Backend có thể xây dựng Controller và Model mà không gây xung đột. Thứ hai, cơ chế Routing (Định tuyến) linh hoạt của MVC giúp tạo ra các đường dẫn (URL) thân thiện với người dùng và tối ưu cho công cụ tìm kiếm (SEO). Cuối cùng, việc kiểm thử tự động (Unit Testing) trở nên dễ dàng hơn bao giờ hết nhờ sự tách biệt hoàn toàn giữa giao diện và logic xử lý.'
+    ),
+    (
+        '2.3. Hệ quản trị CSDL Microsoft SQL Server',
+        'Microsoft SQL Server là một hệ quản trị cơ sở dữ liệu quan hệ (RDBMS) cấp doanh nghiệp, được phát triển và hỗ trợ bởi tập đoàn Microsoft. Kể từ khi ra mắt, SQL Server đã khẳng định được vị thế vững chắc của mình trong ngành công nghệ thông tin nhờ khả năng lưu trữ dữ liệu an toàn, xử lý truy vấn với tốc độ cao và khả năng mở rộng linh hoạt đáp ứng từ các ứng dụng nhỏ lẻ đến các hệ thống quy mô tập đoàn.\n\nNgôn ngữ truy vấn chính được sử dụng trong SQL Server là T-SQL (Transact-SQL), một phiên bản mở rộng của chuẩn SQL do Microsoft phát triển, cung cấp thêm các cấu trúc lập trình như biến, vòng lặp, xử lý ngoại lệ (Try/Catch) và các hàm hệ thống chuyên dụng. SQL Server nổi bật với cơ chế đảm bảo tính toàn vẹn dữ liệu cực kỳ khắt khe theo tiêu chuẩn ACID (Atomicity, Consistency, Isolation, Durability). Điều này đồng nghĩa với việc mọi giao dịch (Transaction) liên quan đến dữ liệu đều được thực thi một cách trọn vẹn; nếu xảy ra bất kỳ lỗi nhỏ nào trong quá trình xử lý, toàn bộ giao dịch sẽ được hoàn tác (Rollback) để trả dữ liệu về trạng thái an toàn ban đầu.\n\nTrong bài toán xây dựng website thương mại điện tử PandoraWeb, dữ liệu đóng vai trò là mạch máu của toàn bộ hệ thống. Microsoft SQL Server được lựa chọn làm giải pháp lưu trữ tập trung cho toàn bộ thông tin của website. Nó chịu trách nhiệm lưu giữ một cách bảo mật các thông tin nhạy cảm của khách hàng, quản lý danh mục sản phẩm phức tạp với hàng ngàn thuộc tính, lưu trữ lịch sử giao dịch và theo dõi trạng thái đơn hàng. Thông qua hệ thống các khóa chính (Primary Key) và khóa ngoại (Foreign Key), SQL Server đảm bảo tính nhất quán và toàn vẹn tham chiếu của các bảng dữ liệu, ngăn chặn tình trạng dữ liệu mồ côi hoặc sai lệch trong quá trình vận hành lâu dài.'
+    ),
+    (
+        '2.4. Entity Framework 6 (EF6) và LINQ',
+        'Entity Framework 6 (EF6) là một framework Object-Relational Mapping (ORM) mã nguồn mở, mạnh mẽ dành cho các ứng dụng .NET. Hiểu một cách đơn giản, ORM là công nghệ đóng vai trò như một thông dịch viên, kết nối giữa thế giới lập trình hướng đối tượng (với các Class, Object trong C#) và thế giới cơ sở dữ liệu quan hệ (với các Table, Column, Row trong SQL Server). Thay vì phải viết hàng ngàn dòng lệnh SQL thuần túy phức tạp và dễ mắc lỗi để thao tác với cơ sở dữ liệu, EF6 cho phép các lập trình viên thực hiện điều này thông qua mã C# trực quan.\n\nDự án áp dụng phương pháp tiếp cận Code-First của EF6. Nghĩa là, hệ thống cơ sở dữ liệu sẽ được sinh ra tự động dựa trên các lớp mô hình (Model Classes) được định nghĩa bằng C#. Khi cấu trúc dữ liệu thay đổi, lập trình viên chỉ cần sử dụng cơ chế Migrations để cập nhật cấu trúc bảng trong SQL Server mà không làm mất mát dữ liệu hiện có. Điều này giúp đẩy nhanh đáng kể tốc độ phát triển và giảm thiểu tối đa các lỗi do bất đồng bộ giữa mã nguồn và cơ sở dữ liệu.\n\nĐồng hành cùng EF6 là công nghệ LINQ (Language Integrated Query) – Ngôn ngữ truy vấn tích hợp. LINQ là một bước đột phá của C#, mang cú pháp truy vấn tương tự như SQL vào trực tiếp trong ngôn ngữ lập trình. Việc kết hợp EF6 và LINQ (LINQ to Entities) cho phép các truy vấn C# được biên dịch ngầm thành các câu lệnh SQL tối ưu trước khi gửi đến máy chủ CSDL. Điểm sáng giá nhất của sự kết hợp này là khả năng ngăn chặn hoàn toàn lỗ hổng bảo mật khét tiếng SQL Injection, bởi mọi dữ liệu đầu vào đều được tự động tham số hóa (Parameterized) một cách nghiêm ngặt.'
+    ),
+    (
+        '2.5. Dịch vụ lưu trữ tài nguyên đám mây Cloudinary',
+        'Cloudinary là một nền tảng quản lý tài nguyên truyền thông dựa trên điện toán đám mây (Cloud-based Media Management Platform) cung cấp giải pháp toàn diện cho việc lưu trữ, tối ưu hóa và phân phối hình ảnh cũng như video trực tuyến. Trong kỷ nguyên web hiện đại, khi mà hình ảnh chất lượng cao chiếm phần lớn dung lượng của một trang web, việc xử lý và tải hình ảnh hiệu quả là yếu tố then chốt quyết định trải nghiệm người dùng.\n\nThay vì lưu trữ hình ảnh vật lý trực tiếp trên máy chủ web nội bộ – một phương pháp truyền thống gây tốn kém không gian ổ cứng, làm chậm tốc độ phản hồi của máy chủ và khó sao lưu, dự án PandoraWeb đã tích hợp Cloudinary API để giải quyết triệt để vấn đề này. Khi người quản trị viên tải lên một hình ảnh sản phẩm mới, hình ảnh đó lập tức được đẩy lên máy chủ bảo mật của Cloudinary. Tại đây, Cloudinary sẽ tự động thực hiện các thuật toán nén thông minh (Smart Compression), giảm dung lượng file xuống mức thấp nhất nhưng vẫn giữ nguyên độ sắc nét của hình ảnh gốc.\n\nHơn thế nữa, Cloudinary hỗ trợ thao tác xử lý ảnh động ngay trên đường dẫn URL (on-the-fly transformations), cho phép tự động cắt cúp (crop), căn chỉnh kích thước (resize) hình ảnh cho phù hợp với từng thiết bị hiển thị mà không cần tạo ra nhiều bản sao khác nhau. Cuối cùng, mọi hình ảnh được phân phối đến trình duyệt của khách hàng thông qua mạng lưới phân phối nội dung toàn cầu CDN (Content Delivery Network). Điều này đảm bảo rằng dù khách hàng truy cập website PandoraWeb từ bất kỳ vị trí địa lý nào, hình ảnh sản phẩm cũng sẽ được tải xuống với tốc độ nhanh nhất từ máy chủ gần họ nhất, mang lại trải nghiệm mua sắm mượt mà không độ trễ.'
+    ),
+    (
+        '2.6. Công nghệ Front-End (HTML5, CSS3, Bootstrap 5)',
+        'Giao diện người dùng (Front-End) là cầu nối giao tiếp trực tiếp giữa khách hàng và hệ thống website. Một giao diện đẹp, trực quan và phản hồi nhanh chóng là yếu tố quyết định để giữ chân khách hàng ở lại với trang thương mại điện tử. Hệ thống PandoraWeb sử dụng một bộ ba công nghệ Front-End tiêu chuẩn và mạnh mẽ nhất hiện nay: HTML5, CSS3 và Bootstrap 5.\n\nHTML5 (HyperText Markup Language phiên bản 5) là nền tảng cốt lõi định hình cấu trúc của toàn bộ trang web. HTML5 mang đến các thẻ ngữ nghĩa (Semantic Tags) rõ ràng như <header>, <footer>, <nav>, <article>, giúp mã nguồn trở nên mạch lạc, dễ đọc và hỗ trợ tối đa cho các công cụ tìm kiếm (SEO) khi lập chỉ mục nội dung trang. Kế tiếp đó, CSS3 (Cascading Style Sheets) đóng vai trò như chiếc áo khoác thẩm mỹ cho website. Với CSS3, dự án đã triển khai các hiệu ứng thiết kế hiện đại như đổ bóng, bo góc, chuyển động mượt mà (transitions và animations) và đặc biệt là áp dụng phong cách thiết kế kính mờ (Glassmorphism), mang lại cho PandoraWeb một diện mạo sang trọng, cao cấp và chuyên nghiệp.\n\nTuy nhiên, để đảm bảo giao diện hiển thị hoàn hảo trên vô số các thiết bị khác nhau từ máy tính để bàn, laptop cho đến điện thoại di động, dự án đã sử dụng Bootstrap 5. Bootstrap là một framework CSS mã nguồn mở phổ biến nhất thế giới, cung cấp sẵn một hệ thống lưới 12 cột linh hoạt (Grid System) dựa trên nền tảng Flexbox. Thay vì phải viết hàng ngàn dòng code CSS phức tạp để tinh chỉnh bố cục cho từng kích thước màn hình, việc sử dụng các class có sẵn của Bootstrap 5 giúp giao diện PandoraWeb tự động co giãn, thích ứng hoàn hảo với mọi thiết bị (Responsive Web Design). Bên cạnh đó, các thành phần UI đúc sẵn như thanh điều hướng (Navbar), các hộp thoại bật lên (Modal), băng chuyền hình ảnh (Carousel) đã giúp tiết kiệm đáng kể thời gian phát triển giao diện.'
+    ),
+    (
+        '2.7. Thư viện xử lý JavaScript (jQuery & Newtonsoft.Json)',
+        'Bên cạnh giao diện tĩnh, tính tương tác và tính động của website là yếu tố cực kỳ quan trọng để mang lại trải nghiệm chân thực như một ứng dụng phần mềm thực thụ. Để làm được điều này mà không cần phải tải lại trang nhiều lần (gây khó chịu cho người dùng), dự án đã ứng dụng thư viện jQuery và các kỹ thuật xử lý dữ liệu JSON mạnh mẽ.\n\njQuery là một thư viện JavaScript nhẹ, nhanh chóng và giàu tính năng, ra đời với tiêu chí "Write less, do more" (Viết ít hơn, làm nhiều hơn). Mặc dù các framework JavaScript hiện đại đang nổi lên, jQuery vẫn giữ vai trò quan trọng trong việc đơn giản hóa các thao tác tương tác với mô hình DOM (Document Object Model). Trong PandoraWeb, jQuery được sử dụng rộng rãi để xử lý các sự kiện click chuột, tạo các hiệu ứng ẩn hiện mượt mà và đặc biệt là thực hiện các kỹ thuật Client-side Validation (Kiểm tra tính hợp lệ dữ liệu ở phía máy khách). Nhờ jQuery Validation, ngay khi người dùng nhập sai định dạng email hoặc bỏ trống trường mật khẩu, hệ thống lập tức hiển thị thông báo lỗi màu đỏ mà không cần phải gửi dữ liệu lên máy chủ, giúp tiết kiệm băng thông và phản hồi tức thì cho người dùng.\n\nBên cạnh đó, trong các tác vụ gọi dữ liệu ngầm (AJAX) như thêm sản phẩm vào giỏ hàng hoặc cập nhật số lượng, dữ liệu trao đổi giữa trình duyệt và máy chủ cần được đóng gói dưới định dạng chuẩn. Newtonsoft.Json (hay còn gọi là Json.NET) là một thư viện tiêu chuẩn trong hệ sinh thái .NET đảm nhiệm vai trò này. Nó cung cấp khả năng tuần tự hóa (Serialize) các đối tượng C# phức tạp thành chuỗi văn bản JSON nhẹ gọn để gửi về trình duyệt, và ngược lại, giải mã (Deserialize) dữ liệu JSON từ Client gửi lên thành các đối tượng C# tương ứng. Quá trình chuyển đổi này diễn ra với hiệu suất cực cao và độ chính xác tuyệt đối, đảm bảo luồng giao tiếp mượt mà giữa Front-End và Back-End của PandoraWeb.'
+    )
+]
 
-# Thông tin SV
-info = doc.add_paragraph()
-run = info.add_run("Họ và tên: Nguyễn Thế An\nMSSV: 2400004657\n")
-run.font.name = 'Times New Roman'
-run.font.size = Pt(12)
-
-def add_heading(text):
-    p = doc.add_paragraph()
-    r = p.add_run(text)
-    r.font.name = 'Times New Roman'
-    r.font.size = Pt(12)
-    r.bold = True
-
-def add_text(text):
-    p = doc.add_paragraph()
-    r = p.add_run(text)
-    r.font.name = 'Times New Roman'
-    r.font.size = Pt(12)
-
-def add_image_note(text):
-    p = doc.add_paragraph()
-    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    r = p.add_run(f"\n[ 📸 CHÈN ẢNH VÀO ĐÂY: {text} ]\n")
-    r.font.name = 'Times New Roman'
-    r.font.size = Pt(11)
-    r.font.color.rgb = RGBColor(0x00, 0x00, 0xFF) # Màu xanh
-    r.bold = True
-    r.italic = True
-
-add_heading("1. Tổng quan tiến độ tuần 11:")
-add_text("Trong tuần 11, dự án PandoraWeb đã bước sang một giai đoạn cực kỳ quan trọng: 'Tái cấu trúc kiến trúc (Refactoring) và Nâng cấp Bảo mật Toàn diện'. Thay vì tập trung thêm tính năng bề nổi, tuần này em đi sâu vào việc tối ưu hóa mã nguồn, chia tách các Controller cồng kềnh, vá các lỗ hổng bảo mật nghiêm trọng (CSRF, XSS) và cải thiện tốc độ tải trang cho người dùng. Website hiện tại đã chuyển từ mức độ 'chạy được' sang mức độ 'đạt chuẩn thực tế (Production-ready)'.")
-
-add_heading("2. Công việc đã thực hiện trong tuần 11:")
-add_text("Các đầu việc trong tuần 11 được triển khai theo hướng chuẩn hóa kiến trúc và bảo mật:")
-
-add_text("- Tái cấu trúc khu vực Quản trị (Admin Refactoring): Đập bỏ hoàn toàn AdminController nguyên khối khổng lồ và chia tách thành các module chuyên biệt: ProductsController, OrdersController, CustomersController, MarketingController và SettingsController. Việc này giúp mã nguồn dễ đọc, dễ bảo trì và tối ưu hiệu suất biên dịch.")
-add_image_note("Chụp màn hình thư mục Areas/Admin/Controllers trong Visual Studio để khoe các file Controller mới được tách ra.")
-
-add_text("- Nâng cấp Bảo mật Mật khẩu (BCrypt): Chuyển đổi thuật toán mã hóa mật khẩu từ chuẩn SHA256 cũ kỹ sang thuật toán BCrypt hiện đại (có trộn thêm Salt ngẫu nhiên) cho cả Admin và Khách hàng. Xây dựng cơ chế Fallback thông minh giúp khách hàng cũ (dùng pass SHA256) vẫn đăng nhập được bình thường mà không bị lỗi.")
-add_image_note("Mở SQL Server, chụp bảng Customers đoạn cột PasswordHash hiển thị chuỗi ngoằn ngoèo '$...' để chứng minh pass đã được mã hóa BCrypt.")
-
-add_text("- Vá lỗ hổng bảo mật Web (CSRF & XSS):\n  + Tích hợp thẻ [ValidateAntiForgeryToken] và xây dựng cơ chế tự động gửi Token ẩn qua Javascript (fetch interceptor) cho toàn bộ các Form nhập liệu trên cả trang Quản trị và Public, ngăn chặn triệt để tấn công giả mạo yêu cầu (CSRF).\n  + Tích hợp thư viện HtmlSanitizer để 'lọc nước', xóa bỏ các thẻ <script> độc hại khỏi nội dung bài viết và mô tả sản phẩm (phòng chống tấn công XSS).")
-add_image_note("Chụp màn hình file ProductsController.cs dòng có chữ [ValidateAntiForgeryToken] hoặc file _Layout.cshtml đoạn có HtmlSanitizer().")
-
-add_text("- Cải thiện UX và Hiệu năng (Performance):\n  + Áp dụng thư viện PagedList.Mvc để Phân trang (Pagination) cho toàn bộ các danh sách trong Admin (Sản phẩm, Đơn hàng, Khách hàng...), giải quyết tình trạng đơ trang khi dữ liệu quá lớn.")
-add_image_note("Mở giao diện Web phần Admin -> Quản lý sản phẩm. Chụp màn hình có chứa các nút phân trang (Trang 1, 2, 3...) ở dưới cùng của bảng.")
-
-add_text("  + Gộp toàn bộ 10 file CSS lắt nhắt ở trang ngoài thành 1 file duy nhất (Bundling) và kích hoạt Bộ nhớ đệm (Output Caching) cho Trang chủ giúp tốc độ tải trang nhanh hơn đáng kể.")
-add_image_note("Mở tab Network (F12) trên trình duyệt ở trang chủ, chụp màn hình hiển thị việc web load rất ít file CSS để chứng minh tốc độ.")
-
-add_text("- Áp dụng 'Xóa mềm' (Soft Delete): Thay đổi logic xóa Sản phẩm. Sản phẩm giờ đây chỉ bị gán trạng thái 'deleted' (ẩn đi) chứ không bị xóa khỏi cơ sở dữ liệu, giúp bảo toàn toàn vẹn dữ liệu cho các đơn hàng cũ.")
-add_image_note("Chụp màn hình bảng Products trong SQL Server, khoanh đỏ dòng có cột Status là chữ deleted.")
-
-add_heading("3. Kết quả đạt được:")
-add_text("Dự án đã lột xác hoàn toàn về mặt kiến trúc phần mềm. Việc chia nhỏ Controller giúp quá trình làm việc nhóm hoặc bảo trì sau này trở nên cực kỳ dễ dàng. Đặc biệt, website đã khắc phục được các lỗ hổng bảo mật cơ bản nhất của một trang web thương mại điện tử (XSS, CSRF). Hiệu năng ở cả khu vực Admin (nhờ phân trang) và khu vực Khách hàng (nhờ Bundling và Caching) đều được tăng tốc rõ rệt. Mã nguồn gọn gàng, sạch sẽ và an toàn hơn bao giờ hết.")
-
-add_heading("4. Khó khăn và hướng xử lý:")
-add_text("- Khó khăn: Quá trình chia tách AdminController và làm sạch code đã làm gãy rất nhiều đường dẫn (URL) và logic tham chiếu cũ, gây ra hàng loạt lỗi không tìm thấy trang (404) hoặc không tìm thấy Model (Compilation Error). Hơn nữa, việc nâng cấp mật khẩu sang BCrypt có nguy cơ làm toàn bộ khách hàng cũ không thể đăng nhập được.")
-add_text("- Hướng xử lý: Em đã kiên nhẫn dò tìm và sử dụng công cụ tìm kiếm trong mã nguồn để sửa lại toàn bộ định tuyến (Areas='Admin') ở tất cả các Views. Đối với sự cố mật khẩu, em đã lập trình một cơ chế 'Kiểm tra kép' (Fallback) trong AccountController và SettingsController để cho phép hệ thống tự động nhận diện và xác thực cả 2 chuẩn mật khẩu (SHA256 và BCrypt) cùng một lúc. Các lỗi khi build dự án cũng đã được rà soát và xóa bỏ triệt để.")
-
-add_heading("5. Kết luận:")
-add_text("Tuần 11 là một bước tiến mang tính chất nền tảng và cốt lõi, tập trung vào 'chất lượng mã nguồn' và 'bảo mật hệ thống' của PandoraWeb. Với kiến trúc MVC được phân chia chuẩn mực, đi kèm các chốt chặn an ninh kiên cố và hiệu năng tải trang được tối ưu hóa, dự án đã hoàn toàn sẵn sàng cho môi trường triển khai thực tế. Trong thời gian tới, em sẽ tiến hành kiểm thử toàn diện lần cuối và chuẩn bị tài liệu báo cáo nghiệm thu tổng thể dự án.")
-
-doc.save('c:/Users/thean/Desktop/PandoraWeb/FILEBAOCAO/Baocaotiendotuan11_NguyenTheAn_2400004657_Full.docx')
+for title, content in sections:
+    doc.add_heading(title, level=2)
+    p_img = doc.add_paragraph()
+    p_img.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    run_img = p_img.add_run('[HÌNH ẢNH LOGO CÔNG NGHỆ BẠN CHÈN VÀO ĐÂY (Canh giữa)]')
+    run_img.italic = True
+    run_img.bold = True
+    
+    # Split content by paragraphs
+    for para_text in content.split('\n\n'):
+        p = doc.add_paragraph(para_text)
+        p.alignment = WD_PARAGRAPH_ALIGNMENT.JUSTIFY
+        
+# Configure style (font Times New Roman, size 13 is typical for thesis)
+for p in doc.paragraphs:
+    for run in p.runs:
+        run.font.name = 'Times New Roman'
+        run.font.size = Pt(13)
+        
+output_path = r'c:\Users\thean\Desktop\PandoraWeb\FILEBAOCAO\Chuong2_DaSua_ChiTiet.docx'
+doc.save(output_path)
+print(f'Saved to {output_path}')

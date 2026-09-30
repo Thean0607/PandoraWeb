@@ -1,7 +1,7 @@
+using PandoraWeb.Models.Data;
+using System.Data.Entity;
 using System.Linq;
 using System.Web.Mvc;
-using System.Data.Entity;
-using PandoraWeb.Models.Data;
 
 namespace PandoraWeb.Controllers
 {
@@ -107,7 +107,7 @@ namespace PandoraWeb.Controllers
                     .Include(p => p.ProductImages)
                     .FirstOrDefault();
                 if (defaultProduct == null) return HttpNotFound();
-                
+
                 ViewBag.Reviews = db.Reviews.Include(r => r.Customer).Where(r => r.ProductId == defaultProduct.ProductId && r.Status == "Approved").OrderByDescending(r => r.ReviewDate).ToList();
                 return View(defaultProduct);
             }
@@ -118,7 +118,7 @@ namespace PandoraWeb.Controllers
                 .Include(p => p.ProductVariants.Select(v => v.Material))
                 .Include(p => p.ProductImages)
                 .FirstOrDefault(p => p.ProductId == id);
-            
+
             if (product == null)
             {
                 return HttpNotFound();
@@ -167,13 +167,50 @@ namespace PandoraWeb.Controllers
             return Json(new { success = true, message = "Đánh giá của bạn đã được gửi thành công!" });
         }
 
+        [HttpPost]
+        public ActionResult EditReview(int reviewId, int rating, string comment)
+        {
+            try
+            {
+                if (Session["CustomerId"] == null)
+                {
+                    return Json(new { success = false, message = "Bạn cần đăng nhập để sửa đánh giá." });
+                }
+
+                if (rating < 1 || rating > 5)
+                {
+                    return Json(new { success = false, message = "Đánh giá sao không hợp lệ." });
+                }
+
+                int customerId = (int)Session["CustomerId"];
+
+                var review = db.Reviews.FirstOrDefault(r => r.ReviewId == reviewId && r.CustomerId == customerId);
+                if (review == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy đánh giá hoặc bạn không có quyền sửa." });
+                }
+
+                review.Rating = rating;
+                review.Comment = comment;
+                review.ReviewDate = System.DateTime.Now;
+
+                db.SaveChanges();
+
+                return Json(new { success = true, message = "Đánh giá của bạn đã được cập nhật thành công!" });
+            }
+            catch (System.Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
+            }
+        }
+
         public ActionResult CollectionDetail(int id, string sort)
         {
             var collection = db.Collections
                                .Include(c => c.Products)
                                .Include("Products.Category")
                                .FirstOrDefault(c => c.CollectionId == id);
-            
+
             if (collection == null) return HttpNotFound();
 
             ViewBag.ActiveMenu = "Collection";

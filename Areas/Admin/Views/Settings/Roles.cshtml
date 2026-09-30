@@ -1,4 +1,4 @@
-@model IEnumerable<PandoraWeb.Models.Data.Role>
+@model IEnumerable<PandoraWeb.Models.Role>
 @{
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
@@ -205,7 +205,8 @@
                     document.getElementById('perm_all').dispatchEvent(new Event('change'));
                 } else {
                     pArray.forEach(p => {
-                        const cb = document.querySelector(`.perm-cb[value="${p}"]`);
+                        // Safe element finding without querySelector string injection
+                        const cb = Array.from(document.querySelectorAll('.perm-cb')).find(el => el.value === p.trim());
                         if (cb) cb.checked = true;
                     });
                 }
@@ -233,37 +234,62 @@
                 });
             }
 
-            const formData = new FormData();
-            if (id) formData.append('id', id);
-            formData.append('name', name);
-            formData.append('permissions', permissions.join(','));
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+            const params = new URLSearchParams();
+            if (id) params.append('id', id);
+            params.append('name', name);
+            params.append('permissions', permissions.join(','));
+            if (token) params.append('__RequestVerificationToken', token);
 
             fetch('@Url.Action("SaveRole", "Settings", new { area = "Admin" })', {
                 method: 'POST',
-                body: formData
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params
             })
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert('Lỗi: ' + data.message);
+            .then(async r => {
+                if (!r.ok) {
+                    const text = await r.text();
+                    console.error("Server Error:", text);
+                    throw new Error("HTTP " + r.status);
                 }
+                return r.json();
             })
-            .catch(err => alert('Lỗi mạng: ' + err));
+            .then(res => {
+                if (res.success) location.reload();
+                else alert('Lỗi: ' + res.message);
+            })
+            .catch(err => {
+                alert('Lỗi mạng hoặc lỗi Server. Vui lòng tải lại trang (Ctrl+F5) và thử lại.');
+                console.error(err);
+            });
         }
 
         function deleteRole(id) {
             if (confirm('Bạn có chắc chắn muốn xóa nhóm quyền này?')) {
+                const formData = new FormData();
+                formData.append('id', id);
+                
                 fetch('@Url.Action("DeleteRole", "Settings", new { area = "Admin" })', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'id=' + id
+                    credentials: 'same-origin',
+                    body: formData
                 })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) location.reload();
-                    else alert('Lỗi: ' + data.message);
+                .then(async r => {
+                    if (!r.ok) {
+                        const text = await r.text();
+                        console.error("Server Error:", text);
+                        throw new Error("HTTP " + r.status);
+                    }
+                    return r.json();
+                })
+                .then(res => {
+                    if (res.success) location.reload();
+                    else alert('Lỗi: ' + res.message);
+                })
+                .catch(err => {
+                    alert('Lỗi mạng hoặc lỗi Server. Vui lòng tải lại trang (Ctrl+F5) và thử lại.');
+                    console.error(err);
                 });
             }
         }

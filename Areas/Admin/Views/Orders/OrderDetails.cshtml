@@ -178,6 +178,7 @@
 </div>
 
 @section Scripts {
+    @Html.AntiForgeryToken()
     <script>
         function updateStatus(id, status) {
             fetch('@Url.Action("UpdateOrderStatus", "Orders", new { area = "Admin" })', {
@@ -196,7 +197,7 @@
             })
             .catch(err => {
                 console.error(err);
-                location.reload();
+                alert('Có lỗi khi lưu trạng thái. Vui lòng thử lại!');
             });
         }
 
@@ -217,7 +218,7 @@
             })
             .catch(err => {
                 console.error(err);
-                location.reload();
+                alert('Có lỗi khi lưu trạng thái thanh toán. Vui lòng thử lại!');
             });
         }
     </script>

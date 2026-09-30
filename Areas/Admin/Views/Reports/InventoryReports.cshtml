@@ -5,9 +5,14 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h3 mb-0">@ViewBag.Title</h1>
-    <button class="btn btn-admin">
-        <i class="fas fa-box"></i> Nhập Kho
-    </button>
+    <div>
+        <button class="btn btn-outline-admin me-2" onclick="exportTableToExcel('Bao_Cao_Ton_Kho.xlsx')">
+            <i class="fas fa-file-excel"></i> Xuất Báo Cáo
+        </button>
+        <button class="btn btn-admin" onclick="openAddStockModal()">
+            <i class="fas fa-box"></i> Nhập Kho
+        </button>
+    </div>
 </div>
 
 <div class="admin-card">
@@ -63,6 +68,93 @@
         </table>
     </div>
 </div>
+
+<!-- Add Stock Modal -->
+<div class="modal fade" id="addStockModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content admin-form">
+            <div class="modal-header">
+                <h5 class="modal-title">Nhập Kho (Bổ sung Tồn Kho)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addStockForm">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label class="form-label">Chọn Sản Phẩm / Mã SKU</label>
+                        <select class="form-select" id="stockVariantId" required>
+                            <option value="">-- Chọn Sản Phẩm --</option>
+                            @if (Model != null) {
+                                foreach(var item in Model) {
+                                    <option value="@item.VariantId">@item.SKU - @(item.Product != null ? item.Product.ProductName : "") (@(item.Size != null ? item.Size.SizeValue : "") - @(item.Material != null ? item.Material.MaterialName : ""))</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Số lượng nhập thêm</label>
+                        <input type="number" class="form-control" id="stockQuantity" min="1" value="1" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-admin" onclick="submitAddStock()">Nhập Kho</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const stockModal = new bootstrap.Modal(document.getElementById('addStockModal'));
+
+        function openAddStockModal() {
+            document.getElementById('addStockForm').reset();
+            stockModal.show();
+        }
+
+        function submitAddStock() {
+            const form = document.getElementById('addStockForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const variantId = document.getElementById('stockVariantId').value;
+            const quantity = document.getElementById('stockQuantity').value;
+
+            const formData = new FormData();
+            formData.append('variantId', variantId);
+            formData.append('quantity', quantity);
+
+            fetch('@Url.Action("AddStock", "Reports", new { area = "Admin" })', {
+                method: 'POST',
+                credentials: 'same-origin',
+                body: formData
+            })
+            .then(async r => {
+                if (!r.ok) {
+                    const text = await r.text();
+                    console.error("Server Error:", text);
+                    throw new Error("HTTP " + r.status);
+                }
+                return r.json();
+            })
+            .then(res => {
+                if (res.success) {
+                    location.reload();
+                } else {
+                    alert('Lỗi: ' + res.message);
+                }
+            })
+            .catch(err => {
+                alert('Lỗi mạng hoặc lỗi Server. Vui lòng tải lại trang (Ctrl+F5) và thử lại.');
+                console.error(err);
+            });
+        }
+    </script>
+}
 
 
 

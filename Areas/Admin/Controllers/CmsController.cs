@@ -1,11 +1,10 @@
-using System.Web.Mvc;
+using Ganss.Xss;
 using PandoraWeb.Filters;
 using PandoraWeb.Models;
 using PandoraWeb.Models.Data;
-using System.Linq;
-using System.Data.Entity;
 using System;
-using Ganss.Xss;
+using System.Linq;
+using System.Web.Mvc;
 
 namespace PandoraWeb.Areas.Admin.Controllers
 {
@@ -23,7 +22,7 @@ namespace PandoraWeb.Areas.Admin.Controllers
             var pages = db.Pages.OrderByDescending(p => p.CreatedAt).ToList();
             return View(pages);
         }
-        
+
         [AdminAuthorize(Permission = "manage_cms")]
         public ActionResult Blog()
         {
@@ -108,7 +107,7 @@ namespace PandoraWeb.Areas.Admin.Controllers
             }
             return Json(new { success = false, message = "Không tìm thấy bài viết." });
         }
-        
+
         [AdminAuthorize(Permission = "manage_cms")]
         public ActionResult FAQ()
         {

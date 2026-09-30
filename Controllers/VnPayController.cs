@@ -1,9 +1,7 @@
 using PandoraWeb.Helpers;
-using PandoraWeb.Models;
 using PandoraWeb.Models.Data;
 using System;
 using System.Configuration;
-using System.Linq;
 using System.Web.Mvc;
 
 namespace PandoraWeb.Controllers

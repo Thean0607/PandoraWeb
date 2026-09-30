@@ -1,4 +1,4 @@
-﻿@model PandoraWeb.Models.Product
+@model PandoraWeb.Models.Product
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = Model != null ? Model.ProductName : "Chi Tiết Sản Phẩm";
@@ -204,6 +204,9 @@
                     </div>
                     <div class="col-md-6">
                         <h5 class="fw-bold mb-3">Các Đánh Giá Khác</h5>
+                        @{
+                            var currentCustomerId = Session["CustomerId"] != null ? (int)Session["CustomerId"] : 0;
+                        }
                         @if (reviews != null && reviews.Any())
                         {
                             <div class="list-group list-group-flush" style="max-height: 400px; overflow-y: auto;">
@@ -212,7 +215,13 @@
                                     <div class="list-group-item px-0 py-3">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
                                             <strong class="text-dark">@(r.Customer != null ? r.Customer.FullName : "Khách hàng")</strong>
-                                            <span class="text-muted fs-7">@r.ReviewDate.ToString("dd/MM/yyyy")</span>
+                                            <div>
+                                                @if (r.CustomerId == currentCustomerId)
+                                                {
+                                                    <button type="button" class="btn btn-sm btn-link text-decoration-none text-primary py-0 px-1 me-2" onclick="openEditReviewModal(@r.ReviewId, @r.Rating, '@HttpUtility.JavaScriptStringEncode(r.Comment)')">Sửa</button>
+                                                }
+                                                <span class="text-muted fs-7">@r.ReviewDate.ToString("dd/MM/yyyy")</span>
+                                            </div>
                                         </div>
                                         <div class="text-warning mb-2 fs-7">
                                             @for (int i = 0; i < r.Rating; i++)
@@ -239,6 +248,38 @@
         </div>
     </div>
 </section>
+
+<!-- Edit Review Modal -->
+<div class="modal fade" id="editReviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Sửa Đánh Giá</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-3">
+                <form id="editReviewForm">
+                    <input type="hidden" id="editReviewId" value="" />
+                    <div class="mb-3 text-center">
+                        <div class="edit-rating-stars fs-3 text-warning" style="cursor: pointer;">
+                            <i class="far fa-star" data-rating="1"></i>
+                            <i class="far fa-star" data-rating="2"></i>
+                            <i class="far fa-star" data-rating="3"></i>
+                            <i class="far fa-star" data-rating="4"></i>
+                            <i class="far fa-star" data-rating="5"></i>
+                        </div>
+                        <input type="hidden" id="editReviewRating" value="0" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="editReviewComment" class="form-label">Bình luận của bạn:</label>
+                        <textarea class="form-control" id="editReviewComment" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-dark w-100">Lưu Thay Đổi</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Image Lightbox Modal -->
 <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
@@ -282,7 +323,7 @@
                     let bodyData = `productId=${pid}&quantity=${quantity}`;
                     if (variantId) bodyData += `&variantId=${variantId}`;
 
-                    fetch('@Url.Action("AddToCart", "Cart")', {
+                    fetch('@Url.Action("BuyNow", "Cart")', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
@@ -292,7 +333,7 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            window.location.href = '@Url.Action("Index", "Checkout")';
+                            window.location.href = '@Url.Action("Index", "Checkout")' + '?isBuyNow=true';
                         } else {
                             alert(data.message || 'Có lỗi xảy ra');
                         }
@@ -357,6 +398,83 @@
                     .catch(error => {
                         console.error('Error:', error);
                     });
+                });
+            }
+
+            // Edit Review Modal Logic
+            const editReviewModal = new bootstrap.Modal(document.getElementById('editReviewModal'));
+            const editStarIcons = document.querySelectorAll('.edit-rating-stars i');
+            const editRatingInput = document.getElementById('editReviewRating');
+
+            window.openEditReviewModal = function (reviewId, rating, comment) {
+                document.getElementById('editReviewId').value = reviewId;
+                document.getElementById('editReviewComment').value = comment;
+                editRatingInput.value = rating;
+
+                editStarIcons.forEach(s => {
+                    if (parseInt(s.getAttribute('data-rating')) <= parseInt(rating)) {
+                        s.classList.remove('far');
+                        s.classList.add('fas');
+                    } else {
+                        s.classList.remove('fas');
+                        s.classList.add('far');
+                    }
+                });
+
+                editReviewModal.show();
+            };
+
+            if (editStarIcons.length > 0) {
+                editStarIcons.forEach(star => {
+                    star.addEventListener('click', function () {
+                        const rating = this.getAttribute('data-rating');
+                        editRatingInput.value = rating;
+                        editStarIcons.forEach(s => {
+                            if (parseInt(s.getAttribute('data-rating')) <= parseInt(rating)) {
+                                s.classList.remove('far');
+                                s.classList.add('fas');
+                            } else {
+                                s.classList.remove('fas');
+                                s.classList.add('far');
+                            }
+                        });
+                    });
+                });
+            }
+
+            const editReviewForm = document.getElementById('editReviewForm');
+            if (editReviewForm) {
+                editReviewForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const reviewId = document.getElementById('editReviewId').value;
+                    const rating = document.getElementById('editReviewRating').value;
+                    const comment = document.getElementById('editReviewComment').value;
+
+                    if (rating == 0) {
+                        alert('Vui lòng chọn số sao đánh giá!');
+                        return;
+                    }
+
+                    fetch('@Url.Action("EditReview", "Product")', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `reviewId=${reviewId}&rating=${rating}&comment=${encodeURIComponent(comment)}`
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert(data.message);
+                                window.location.reload();
+                            } else {
+                                alert(data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Đã xảy ra lỗi, vui lòng thử lại.');
+                        });
                 });
             }
         });

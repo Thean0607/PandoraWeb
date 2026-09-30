@@ -1,10 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Mvc;
-using System.Data.Entity;
 using PandoraWeb.Models;
 using PandoraWeb.Models.Data;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Web.Mvc;
 
 namespace PandoraWeb.Controllers
 {
@@ -16,9 +15,9 @@ namespace PandoraWeb.Controllers
         {
             ViewBag.ActiveMenu = "Wishlist";
             ViewBag.Title = "Danh Sách Yêu Thích";
-            
+
             List<int> wishlistIds = new List<int>();
-            
+
             if (Session["CustomerId"] != null)
             {
                 int customerId = (int)Session["CustomerId"];
@@ -30,12 +29,12 @@ namespace PandoraWeb.Controllers
             }
 
             List<Product> products = new List<Product>();
-            
+
             if (wishlistIds.Any())
             {
                 products = db.Products.Include(p => p.Category).Where(p => wishlistIds.Contains(p.ProductId)).ToList();
             }
-            
+
             return View(products);
         }
 

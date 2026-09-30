@@ -1,6 +1,6 @@
+using PandoraWeb.Models.Data;
 using System;
 using System.Linq;
-using PandoraWeb.Models.Data;
 
 namespace PandoraWeb.Helpers
 {
@@ -20,6 +20,7 @@ namespace PandoraWeb.Helpers
                     p.BasePrice = p.OldPrice.Value;
                     p.OldPrice = null;
                 }
+                p.FlashSaleStartDate = null;
                 p.FlashSaleEndDate = null;
                 changed = true;
             }

@@ -1,11 +1,10 @@
-using System;
-using System.Linq;
-using System.Web.Mvc;
 using PandoraWeb.Models;
 using PandoraWeb.Models.Data;
 using PandoraWeb.ViewModels;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using System.Linq;
+using System.Web.Mvc;
 
 namespace PandoraWeb.Controllers
 {
@@ -38,7 +37,7 @@ namespace PandoraWeb.Controllers
                 Session["Role"] = emp.Role.RoleName;
                 Session["Permissions"] = emp.Role.Permissions;
                 PandoraWeb.Helpers.LogHelper.LogActivity("Employee", emp.EmployeeId, "LOGIN_SUCCESS", "Nhân viên đăng nhập thành công");
-                return RedirectToAction("Index", "Admin", new { area = "Admin" });
+                return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
             }
 
             // Kiểm tra trong bảng Customers (Khách hàng)
@@ -52,11 +51,11 @@ namespace PandoraWeb.Controllers
                 {
                     Session["AvatarUrl"] = PandoraWeb.Helpers.ImageHelper.GetImageUrl(cus.AvatarUrl, "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop");
                 }
-                
+
                 SyncDbCartToSession(cus.CustomerId);
                 SyncWishlist(cus.CustomerId);
                 PandoraWeb.Helpers.LogHelper.LogActivity("Customer", cus.CustomerId, "LOGIN_SUCCESS", "Khách hàng đăng nhập thành công");
-                
+
                 return RedirectToAction("Index", "Home");
             }
 
@@ -233,7 +232,7 @@ namespace PandoraWeb.Controllers
             // Check if email or phone already exists
             var existingEmailCustomer = db.Customers.FirstOrDefault(c => c.Email == email);
             var existingEmailEmployee = db.Employees.FirstOrDefault(e => e.Email == email);
-            
+
             if (existingEmailCustomer != null || existingEmailEmployee != null)
             {
                 ViewBag.Error = "Email này đã được sử dụng. Vui lòng chọn email khác.";
@@ -268,7 +267,7 @@ namespace PandoraWeb.Controllers
             Session["CustomerId"] = customer.CustomerId;
             Session["FullName"] = customer.FullName;
             Session["Role"] = "Customer";
-            
+
             SyncDbCartToSession(customer.CustomerId);
             SyncWishlist(customer.CustomerId);
 
@@ -584,20 +583,20 @@ namespace PandoraWeb.Controllers
         public ActionResult Address()
         {
             if (Session["CustomerId"] == null) return RedirectToAction("Login");
-            
+
             ViewBag.ActiveMenu = "Address";
             ViewBag.Title = "Địa Chỉ Giao Hàng";
-            
+
             int customerId = (int)Session["CustomerId"];
             var addresses = db.Addresses.Where(a => a.CustomerId == customerId).ToList();
-            
+
             var customer = db.Customers.Find(customerId);
             ViewBag.Customer = customer;
             if (customer != null && !string.IsNullOrEmpty(customer.AvatarUrl))
             {
                 Session["AvatarUrl"] = PandoraWeb.Helpers.ImageHelper.GetImageUrl(customer.AvatarUrl, "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop");
             }
-            
+
             return View(addresses);
         }
 
@@ -661,7 +660,7 @@ namespace PandoraWeb.Controllers
                         });
                     }
                 }
-            }   
+            }
             Session["Cart"] = sessionCart;
 
             // Đồng thời lưu ngược những thứ có sẵn trong session (trước khi login) vào DB

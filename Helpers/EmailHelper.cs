@@ -1,3 +1,4 @@
+using PandoraWeb.Models;
 using System;
 using System.Configuration;
 using System.IO;
@@ -6,7 +7,6 @@ using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
-using PandoraWeb.Models;
 
 namespace PandoraWeb.Helpers
 {
@@ -101,7 +101,7 @@ namespace PandoraWeb.Helpers
             var sb = new StringBuilder();
             sb.Append("<!DOCTYPE html><html><head><meta charset='utf-8'></head><body style='font-family: Arial, sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px;'>");
             sb.Append("<div style='max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 30px; border-radius: 8px; border: 1px solid #eeeeee;'>");
-            
+
             // Header
             sb.Append("<div style='text-align: center; border-bottom: 2px solid #d4af37; padding-bottom: 15px; margin-bottom: 20px;'>");
             sb.Append("<h1 style='color: #000; font-family: Georgia, serif; margin: 0; letter-spacing: 2px;'>PANDORA</h1>");

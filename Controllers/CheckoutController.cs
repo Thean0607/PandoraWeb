@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Mvc;
-using System.Data.Entity;
 using PandoraWeb.Models;
 using PandoraWeb.Models.Data;
 using PandoraWeb.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Web.Mvc;
 
 namespace PandoraWeb.Controllers
 {
@@ -22,7 +22,7 @@ namespace PandoraWeb.Controllers
                 db.Carts.Add(dbCart);
                 db.SaveChanges();
             }
-            
+
             var oldItems = db.CartItems.Where(i => i.CartId == dbCart.CartId).ToList();
             db.CartItems.RemoveRange(oldItems);
             db.SaveChanges();
@@ -42,15 +42,17 @@ namespace PandoraWeb.Controllers
             }
         }
 
-        public ActionResult Index()
+        public ActionResult Index(bool isBuyNow = false)
         {
             ViewBag.ActiveMenu = "Checkout";
             ViewBag.Title = "Thanh Toán";
-            var cart = Session["Cart"] as List<CartItemVM>;
+            var cart = (isBuyNow ? Session["BuyNowCart"] : Session["Cart"]) as List<CartItemVM>;
             if (cart == null || !cart.Any())
             {
                 return RedirectToAction("Index", "Cart");
             }
+
+            ViewBag.IsBuyNow = isBuyNow;
 
             foreach (var item in cart)
             {
@@ -88,9 +90,9 @@ namespace PandoraWeb.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Index(string fullName, string phone, string email, string address, string notes, string paymentMethod, string city = null, string district = null, string ward = null, string street = null)
+        public ActionResult Index(string fullName, string phone, string email, string address, string notes, string paymentMethod, string city = null, string district = null, string ward = null, string street = null, bool isBuyNow = false)
         {
-            var cart = Session["Cart"] as List<CartItemVM>;
+            var cart = (isBuyNow ? Session["BuyNowCart"] : Session["Cart"]) as List<CartItemVM>;
             if (cart == null || !cart.Any())
             {
                 TempData["ErrorMessage"] = "Giỏ hàng của bạn đang trống.";
@@ -159,18 +161,51 @@ namespace PandoraWeb.Controllers
                 if (string.IsNullOrWhiteSpace(ward)) finalWard = parts[parts.Length - 3].Trim();
             }
 
-            var newAddress = new Address
+            string checkName = fullName.Trim().ToLower();
+            string checkPhone = phone.Trim();
+            string checkStreet = fullAddress.ToLower();
+            string checkWard = finalWard.ToLower();
+            string checkDistrict = finalDistrict.ToLower();
+            string checkCity = finalCity.ToLower();
+
+            var targetAddress = db.Addresses.FirstOrDefault(a =>
+                a.CustomerId == customer.CustomerId &&
+                a.ReceiverName.ToLower() == checkName &&
+                a.PhoneNumber == checkPhone &&
+                a.StreetAddress.ToLower() == checkStreet &&
+                a.Ward.ToLower() == checkWard &&
+                a.District.ToLower() == checkDistrict &&
+                a.City.ToLower() == checkCity);
+
+            if (targetAddress == null)
             {
-                CustomerId = customer.CustomerId,
-                ReceiverName = fullName.Trim(),
-                PhoneNumber = phone.Trim(),
-                StreetAddress = fullAddress,
-                City = finalCity,
-                District = finalDistrict,
-                Ward = finalWard,
-                IsDefault = true
-            };
-            db.Addresses.Add(newAddress);
+                // Unset existing defaults
+                var existingDefaults = db.Addresses.Where(a => a.CustomerId == customer.CustomerId && a.IsDefault).ToList();
+                foreach (var d in existingDefaults) { d.IsDefault = false; }
+
+                targetAddress = new Address
+                {
+                    CustomerId = customer.CustomerId,
+                    ReceiverName = fullName.Trim(),
+                    PhoneNumber = phone.Trim(),
+                    StreetAddress = fullAddress,
+                    City = finalCity,
+                    District = finalDistrict,
+                    Ward = finalWard,
+                    IsDefault = true
+                };
+                db.Addresses.Add(targetAddress);
+            }
+            else
+            {
+                // If exists but not default, make it default
+                if (!targetAddress.IsDefault)
+                {
+                    var existingDefaults = db.Addresses.Where(a => a.CustomerId == customer.CustomerId && a.IsDefault).ToList();
+                    foreach (var d in existingDefaults) { d.IsDefault = false; }
+                    targetAddress.IsDefault = true;
+                }
+            }
             db.SaveChanges();
 
             using (var transaction = db.Database.BeginTransaction())
@@ -194,7 +229,7 @@ namespace PandoraWeb.Controllers
                             TempData["ErrorMessage"] = $"Sản phẩm '{item.ProductName}' không đủ số lượng trong kho (chỉ còn {variantInDb?.Stock ?? 0} sản phẩm). Vui lòng cập nhật giỏ hàng.";
                             return RedirectToAction("Index", "Cart");
                         }
-                        
+
                         var prod = db.Products.Find(item.ProductId);
                         if (prod != null)
                         {
@@ -231,7 +266,7 @@ namespace PandoraWeb.Controllers
                     var order = new Order
                     {
                         CustomerId = customer.CustomerId,
-                        ShippingAddressId = newAddress.AddressId,
+                        ShippingAddressId = targetAddress.AddressId,
                         TotalAmount = cart.Sum(c => c.Total) - discountAmt,
                         ShippingFee = 0m,
                         DiscountAmount = discountAmt,
@@ -273,19 +308,23 @@ namespace PandoraWeb.Controllers
                     db.SaveChanges();
 
                     transaction.Commit();
-                    
+
                     PandoraWeb.Helpers.LogHelper.LogActivity("Customer", customer.CustomerId, "CREATE_ORDER", $"Khách hàng đặt thành công đơn hàng {order.OrderId}");
 
-                    // 4. Auto login guest session so user can view order history immediately
-                    Session["CustomerId"] = customer.CustomerId;
-                    Session["FullName"] = customer.FullName;
-                    Session["CustomerEmail"] = customer.Email;
-                    Session["Role"] = "Customer";
+                    // Do NOT auto-login if they are a guest (PasswordHash == "guest")
+                    // Only keep existing session if they were already logged in.
 
                     // Clear Session Cart, Coupon & DB Cart
-                    Session["Cart"] = null;
+                    if (isBuyNow)
+                    {
+                        Session["BuyNowCart"] = null;
+                    }
+                    else
+                    {
+                        Session["Cart"] = null;
+                        SaveCartToDb(customer.CustomerId, new List<CartItemVM>());
+                    }
                     Session["Coupon"] = null;
-                    SaveCartToDb(customer.CustomerId, new List<CartItemVM>());
 
                     // Send order confirmation email asynchronously to the email address specified at checkout
                     string recipientEmail = !string.IsNullOrWhiteSpace(email) ? email.Trim() : customer?.Email;

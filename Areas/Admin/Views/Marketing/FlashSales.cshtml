@@ -26,6 +26,7 @@
                 <th>Giá Cũ</th>
                 <th>Giá Flash Sale</th>
                 <th>Giảm (%)</th>
+                <th>Thời Gian Bắt Đầu</th>
                 <th>Thời Gian Kết Thúc</th>
                 <th>Tình Trạng</th>
             </tr>
@@ -55,10 +56,15 @@
                         <td class="text-danger fw-bold">@item.BasePrice.ToString("N0") ₫</td>
                         <td class="text-danger fw-bold fs-5">-@percent%</td>
                         <td>
+                            @(item.FlashSaleStartDate.HasValue ? item.FlashSaleStartDate.Value.ToString("dd/MM/yyyy HH:mm") : "Bây giờ")
+                        </td>
+                        <td>
                             @(item.FlashSaleEndDate.HasValue ? item.FlashSaleEndDate.Value.ToString("dd/MM/yyyy HH:mm") : "Vô hạn")
                         </td>
                         <td>
-                            @if(!item.FlashSaleEndDate.HasValue || item.FlashSaleEndDate.Value >= DateTime.Now) {
+                            @if(item.FlashSaleStartDate.HasValue && item.FlashSaleStartDate.Value > DateTime.Now) {
+                                <span class="badge bg-warning text-dark">Sắp diễn ra</span>
+                            } else if(!item.FlashSaleEndDate.HasValue || item.FlashSaleEndDate.Value >= DateTime.Now) {
                                 <span class="badge bg-danger pulse-animation">Đang diễn ra</span>
                             } else {
                                 <span class="badge bg-secondary">Đã kết thúc</span>
@@ -69,7 +75,7 @@
             }
             else
             {
-                <tr><td colspan="6" class="text-center py-4 text-muted">Không có sản phẩm Flash Sale nào đang chạy.</td></tr>
+                <tr><td colspan="7" class="text-center py-4 text-muted">Không có sản phẩm Flash Sale nào đang chạy.</td></tr>
             }
         </tbody>
     </table>

@@ -1,9 +1,9 @@
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using System;
 using System.Configuration;
 using System.IO;
 using System.Web;
-using CloudinaryDotNet;
-using CloudinaryDotNet.Actions;
 
 namespace PandoraWeb.Helpers
 {

@@ -1,4 +1,4 @@
-﻿@model PandoraWeb.Models.Order
+@model PandoraWeb.Models.Order
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Tra Cứu Đơn Hàng - Pandora";
@@ -143,9 +143,44 @@
                             </tfoot>
                         </table>
                     </div>
+                        @if (Model.OrderStatus == "Pending" || Model.OrderStatus == "Processing")
+                        {
+                            <div class="mt-4 pt-3 border-top">
+                                <button class="btn btn-outline-danger w-100 py-2" onclick="cancelOrder(@Model.OrderId, '@searchKeyVal')">
+                                    <i class="fas fa-times-circle me-1"></i> Hủy Đơn Hàng Này
+                                </button>
+                                <small class="d-block text-center text-muted mt-2 fs-8">Chỉ có thể hủy khi đơn hàng chưa được xử lý giao.</small>
+                            </div>
+                        }
                 </div>
             }
         </div>
     </div>
 </div>
 
+@section Scripts {
+    <script>
+        function cancelOrder(id, authKey) {
+            if(confirm('Bạn có chắc chắn muốn hủy đơn hàng này không? Quá trình này không thể hoàn tác.')) {
+                fetch('@Url.Action("CancelOrder", "Order")', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ id: id, authKey: authKey })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success) {
+                        alert(data.message || 'Đã hủy đơn hàng thành công!');
+                        location.reload();
+                    } else {
+                        alert(data.message || 'Có lỗi xảy ra khi hủy đơn!');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Lỗi kết nối máy chủ!');
+                });
+            }
+        }
+    </script>
+}

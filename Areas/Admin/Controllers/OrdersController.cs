@@ -1,11 +1,10 @@
-using System.Web.Mvc;
-using PandoraWeb.Filters;
-using PandoraWeb.Models;
-using PandoraWeb.Models.Data;
-using System.Linq;
-using System.Data.Entity;
-using System;
 using PagedList;
+using PandoraWeb.Filters;
+using PandoraWeb.Models.Data;
+using System;
+using System.Data.Entity;
+using System.Linq;
+using System.Web.Mvc;
 
 namespace PandoraWeb.Areas.Admin.Controllers
 {
@@ -52,16 +51,19 @@ namespace PandoraWeb.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult UpdateOrderStatus(int id, string status)
         {
-            try {
+            try
+            {
                 var order = db.Orders.Find(id);
-                if (order != null) {
+                if (order != null)
+                {
                     order.OrderStatus = status;
                     db.SaveChanges();
                     PandoraWeb.Helpers.LogHelper.LogActivity("Employee", Session["EmployeeId"] as int?, "UPDATE_ORDER_STATUS", $"Cập nhật trạng thái đơn hàng {id} thành {status}");
                     return Json(new { success = true });
                 }
                 return Json(new { success = false, message = "Không tìm thấy đơn hàng" });
-            } catch(Exception e) { return Json(new { success = false, message = e.Message }); }
+            }
+            catch (Exception e) { return Json(new { success = false, message = e.Message }); }
         }
 
         [HttpPost]
@@ -69,16 +71,19 @@ namespace PandoraWeb.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult UpdatePaymentStatus(int id, string status)
         {
-            try {
+            try
+            {
                 var order = db.Orders.Find(id);
-                if (order != null) {
+                if (order != null)
+                {
                     order.PaymentStatus = status;
                     db.SaveChanges();
                     PandoraWeb.Helpers.LogHelper.LogActivity("Employee", Session["EmployeeId"] as int?, "UPDATE_PAYMENT_STATUS", $"Cập nhật trạng thái thanh toán đơn hàng {id} thành {status}");
                     return Json(new { success = true });
                 }
                 return Json(new { success = false, message = "Không tìm thấy đơn hàng" });
-            } catch(Exception e) { return Json(new { success = false, message = e.Message }); }
+            }
+            catch (Exception e) { return Json(new { success = false, message = e.Message }); }
         }
 
         [AdminAuthorize(Permission = "manage_order")]

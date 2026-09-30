@@ -142,13 +142,26 @@
 
             const id = document.getElementById('employeeId').value;
             const formData = new FormData(form);
-            if(id) formData.append('id', id);
+            const params = new URLSearchParams();
+            for (const pair of formData.entries()) {
+                params.append(pair[0], pair[1]);
+            }
+            if(id) params.append('id', id);
 
             fetch('@Url.Action("SaveEmployee", "Settings", new { area = "Admin" })', {
                 method: 'POST',
-                body: formData
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params
             })
-            .then(r => r.json())
+            .then(async r => {
+                if (!r.ok) {
+                    const text = await r.text();
+                    console.error("Server Error:", text);
+                    throw new Error("Lỗi máy chủ hoặc hết phiên đăng nhập.");
+                }
+                return r.json();
+            })
             .then(data => {
                 if (data.success) {
                     location.reload();
@@ -156,21 +169,27 @@
                     alert('Lỗi: ' + data.message);
                 }
             })
-            .catch(err => alert('Lỗi mạng: ' + err));
+            .catch(err => alert('Lỗi: ' + err.message));
         }
 
         function deleteEmployee(id) {
             if (confirm('Bạn có chắc chắn muốn xóa nhân viên này?')) {
+                const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
                 fetch('@Url.Action("DeleteEmployee", "Settings", new { area = "Admin" })', {
                     method: 'POST',
+                    credentials: 'same-origin',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'id=' + id
+                    body: new URLSearchParams({ id: id, __RequestVerificationToken: token })
                 })
-                .then(r => r.json())
+                .then(async r => {
+                    if (!r.ok) throw new Error("Lỗi máy chủ.");
+                    return r.json();
+                })
                 .then(data => {
                     if (data.success) location.reload();
                     else alert('Lỗi: ' + data.message);
-                });
+                })
+                .catch(err => alert('Lỗi: ' + err.message));
             }
         }
     </script>

@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
@@ -23,6 +20,7 @@ namespace PandoraWeb
                 using (var db = new PandoraWeb.Models.Data.PandoraDbContext())
                 {
                     db.Database.ExecuteSqlCommand("IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Customers]') AND name = 'AvatarUrl') ALTER TABLE [dbo].[Customers] ADD [AvatarUrl] NVARCHAR(500) NULL;");
+                    db.Database.ExecuteSqlCommand("IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Products]') AND name = 'FlashSaleStartDate') ALTER TABLE [dbo].[Products] ADD [FlashSaleStartDate] DATETIME NULL;");
                 }
             }
             catch

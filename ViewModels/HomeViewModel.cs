@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using PandoraWeb.Models;
+using System.Collections.Generic;
 
 namespace PandoraWeb.ViewModels
 {

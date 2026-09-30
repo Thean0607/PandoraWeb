@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Mvc;
-using System.Data.Entity;
 using PandoraWeb.Models;
 using PandoraWeb.Models.Data;
 using PandoraWeb.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Web.Mvc;
 
 namespace PandoraWeb.Controllers
 {
@@ -17,7 +17,7 @@ namespace PandoraWeb.Controllers
         {
             ViewBag.ActiveMenu = "Cart";
             ViewBag.Title = "Giỏ Hàng";
-            
+
             var cart = Session["Cart"] as List<CartItemVM>;
             if (cart == null)
             {
@@ -42,7 +42,7 @@ namespace PandoraWeb.Controllers
                 if (prod != null)
                 {
                     item.IsFlashSale = prod.OldPrice.HasValue && prod.BasePrice < prod.OldPrice.Value && (!prod.FlashSaleEndDate.HasValue || prod.FlashSaleEndDate.Value >= DateTime.Now);
-                    item.Price = prod.BasePrice + (variant?.PriceAdjustment ?? 0m); // Update price dynamically
+                    item.Price = prod.BasePrice + (variant?.PriceAdjustment ?? 0m);
                 }
             }
 
@@ -58,7 +58,7 @@ namespace PandoraWeb.Controllers
                 db.Carts.Add(dbCart);
                 db.SaveChanges();
             }
-            
+
             var oldItems = db.CartItems.Where(i => i.CartId == dbCart.CartId).ToList();
             db.CartItems.RemoveRange(oldItems);
             db.SaveChanges();
@@ -86,17 +86,18 @@ namespace PandoraWeb.Controllers
             var product = db.Products.Find(productId);
             if (product == null) return Json(new { success = false, message = "Sản phẩm không tồn tại" });
 
-            var variant = variantId.HasValue 
+            var variant = variantId.HasValue
                 ? db.ProductVariants.Find(variantId.Value)
                 : db.ProductVariants.FirstOrDefault(v => v.ProductId == productId);
 
             int finalVariantId = variant?.VariantId ?? 0;
             decimal price = product.BasePrice + (variant?.PriceAdjustment ?? 0m);
             bool isFlashSale = product.OldPrice.HasValue && product.BasePrice < product.OldPrice.Value && (!product.FlashSaleEndDate.HasValue || product.FlashSaleEndDate.Value >= DateTime.Now);
-            
+
             // Lấy thêm thông tin size/material
             string sizeStr = "", materialStr = "";
-            if (variant != null) {
+            if (variant != null)
+            {
                 if (variant.SizeId.HasValue) sizeStr = db.Sizes.Find(variant.SizeId)?.SizeValue;
                 if (variant.MaterialId.HasValue) materialStr = db.Materials.Find(variant.MaterialId)?.MaterialName;
             }
@@ -134,7 +135,7 @@ namespace PandoraWeb.Controllers
 
             int totalItems = cart.Sum(x => x.Quantity);
             decimal subTotal = cart.Sum(x => x.Total);
-            
+
             decimal discountAmt = 0m;
             var promo = Session["Coupon"] as PandoraWeb.Models.Promotion;
             if (promo != null)
@@ -152,9 +153,10 @@ namespace PandoraWeb.Controllers
             }
             decimal finalTotal = subTotal - discountAmt;
 
-            return Json(new { 
-                success = true, 
-                totalItems = totalItems, 
+            return Json(new
+            {
+                success = true,
+                totalItems = totalItems,
                 subTotal = subTotal.ToString("N0") + " ₫",
                 discountAmt = discountAmt.ToString("N0") + " ₫",
                 finalTotal = finalTotal.ToString("N0") + " ₫",
@@ -162,6 +164,46 @@ namespace PandoraWeb.Controllers
             });
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult BuyNow(int productId, int quantity = 1, int? variantId = null)
+        {
+            if (quantity <= 0) quantity = 1;
+            var product = db.Products.Find(productId);
+            if (product == null) return Json(new { success = false, message = "Sản phẩm không tồn tại" });
+
+            var variant = variantId.HasValue
+                ? db.ProductVariants.Find(variantId.Value)
+                : db.ProductVariants.FirstOrDefault(v => v.ProductId == productId);
+
+            int finalVariantId = variant?.VariantId ?? 0;
+            decimal price = product.BasePrice + (variant?.PriceAdjustment ?? 0m);
+            bool isFlashSale = product.OldPrice.HasValue && product.BasePrice < product.OldPrice.Value && (!product.FlashSaleEndDate.HasValue || product.FlashSaleEndDate.Value >= DateTime.Now);
+
+            string sizeStr = "", materialStr = "";
+            if (variant != null)
+            {
+                if (variant.SizeId.HasValue) sizeStr = db.Sizes.Find(variant.SizeId)?.SizeValue;
+                if (variant.MaterialId.HasValue) materialStr = db.Materials.Find(variant.MaterialId)?.MaterialName;
+            }
+
+            var item = new CartItemVM
+            {
+                ProductId = productId,
+                VariantId = finalVariantId,
+                ProductName = product.ProductName,
+                ImageUrl = product.ImageUrl,
+                Price = price,
+                Quantity = quantity,
+                Size = sizeStr,
+                Material = materialStr,
+                IsFlashSale = isFlashSale
+            };
+
+            Session["BuyNowCart"] = new List<CartItemVM> { item };
+
+            return Json(new { success = true, message = "Đang chuyển đến trang thanh toán..." });
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult RemoveFromCart(int productId, int variantId)
@@ -199,9 +241,10 @@ namespace PandoraWeb.Controllers
             }
             decimal finalTotal = subTotal - discountAmt;
 
-            return Json(new { 
-                success = true, 
-                totalItems = totalItems, 
+            return Json(new
+            {
+                success = true,
+                totalItems = totalItems,
                 subTotal = subTotal.ToString("N0") + " ₫",
                 discountAmt = discountAmt.ToString("N0") + " ₫",
                 finalTotal = finalTotal.ToString("N0") + " ₫",
@@ -258,9 +301,10 @@ namespace PandoraWeb.Controllers
             }
             decimal finalTotal = subTotal - discountAmt;
 
-            return Json(new { 
-                success = true, 
-                totalItems = totalItems, 
+            return Json(new
+            {
+                success = true,
+                totalItems = totalItems,
                 itemTotal = itemTotal.ToString("N0") + " ₫",
                 subTotal = subTotal.ToString("N0") + " ₫",
                 discountAmt = discountAmt.ToString("N0") + " ₫",
@@ -275,11 +319,11 @@ namespace PandoraWeb.Controllers
         {
             if (string.IsNullOrEmpty(code))
                 return Json(new { success = false, message = "Vui lòng nhập mã." });
-            
+
             var promo = db.Promotions.FirstOrDefault(p => p.Code == code && p.IsActive);
             if (promo == null)
                 return Json(new { success = false, message = "Mã giảm giá không hợp lệ hoặc đã hết hạn." });
-                
+
             if (promo.StartDate > DateTime.Now || promo.EndDate < DateTime.Now)
                 return Json(new { success = false, message = "Mã giảm giá không trong thời gian sử dụng." });
 
